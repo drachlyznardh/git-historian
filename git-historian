@@ -13,10 +13,10 @@ class Node:
 		self.printed = 0
 
 	def to_string(self):
-		str = "  Hash {%s}\n" % self.hash
+		str = "  Hash {%s}" % self.hash
 		for i in self.parent: str += "\nParent {%s}" % i
-		for i in self.child: str += "\n Child {%s}" % i
-		for i in self.ref: str += "\n    Ref {%s}" % i
+		for i in self.child:  str += "\n Child {%s}" % i
+		for i in self.ref:    str += "\n   Ref {%s}" % i
 		return str
 
 print "Hello!"
@@ -26,24 +26,21 @@ graph_list = []
 
 for line in git_history_dump.split('\n'):
 	if len(line) == 0: continue
-	print
-	print "["+ line +"]"
+
 	hashes_n_refs = re.compile(r'''"(.*) \((.*)\)"''').match(line)
 	if hashes_n_refs:
 		hashes = hashes_n_refs.group(1).split()
-		refs = hashes_n_refs.group(2)
+		refs = hashes_n_refs.group(2).split(',')
 	else:
 		hashes = line[1:-1].split()
 		refs = ""
-
-	for ref in refs.split(','): print(" Ref : %s" % ref.strip())
-	#for hash in hashes.split(): print("Hash : %s" % hash.strip())
 
 	node = Node()
 	if hashes:
 		node.hash = hashes[0]
 		for i in hashes[1:]: node.parent.append(i)
+	for i in refs: node.ref.append(i.strip())
 
-	print(node.to_string())
+	print("%s\n" % node.to_string())
 
 print "Goodbye!"
