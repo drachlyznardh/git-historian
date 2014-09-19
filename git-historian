@@ -3,6 +3,15 @@
 from subprocess import check_output
 import re
 
+class Node:
+	def __init__ (self):
+		self.hash = ""
+		self.parent = []
+		self.child = []
+		self.ref = []
+		self.column = -1
+		self.printed = false
+
 print "Hello!"
 
 git_history_dump = check_output(["git", "log", '--pretty="%H %P%d"'])
@@ -18,9 +27,6 @@ for line in git_history_dump.split('\n'):
 	else:
 		hashes = line[1:-1]
 		refs = ""
-
-	#print("Refs {%s}" % refs)
-	#print("HASH {%s}" % hashes)
 
 	for ref in refs.split(','): print(" Ref : %s" % ref.strip())
 	for hash in hashes.split(): print("Hash : %s" % hash.strip())
