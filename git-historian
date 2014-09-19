@@ -21,7 +21,7 @@ class Node:
 
 def get_history():
 	git_history_dump = check_output(["git", "log", '--pretty="%H %P%d"'])
-	graph_list = []
+	history = []
 
 	for line in git_history_dump.split('\n'):
 		if len(line) == 0: continue
@@ -40,8 +40,8 @@ def get_history():
 			for i in hashes[1:]: node.parent.append(i)
 		for i in refs: node.ref.append(i.strip())
 
-		graph_list.append(node)
-	return graph_list
+		history.append(node)
+	return history
 
 print "Hello!"
 
