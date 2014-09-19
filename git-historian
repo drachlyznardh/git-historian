@@ -19,7 +19,10 @@ for line in git_history_dump.split('\n'):
 		hashes = line[1:-1]
 		refs = ""
 
-	print("Refs {%s}" % refs)
-	print("HASH {%s}" % hashes)
+	#print("Refs {%s}" % refs)
+	#print("HASH {%s}" % hashes)
+
+	for ref in refs.split(','): print(" Ref : %s" % ref.strip())
+	for hash in hashes.split(): print("Hash : %s" % hash.strip())
 
 print "Goodbye!"
