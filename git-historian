@@ -3,6 +3,10 @@
 from subprocess import check_output
 
 print "Hello!"
-git_history_dump = check_output(["git", "log"])
-print "["+git_history_dump+"]"
+
+git_history_dump = check_output(["git", "log", '--pretty="%H %P%d"'])
+
+for i in git_history_dump.split('\n'):
+	print "["+i+"]"
+
 print "Goodbye!"
