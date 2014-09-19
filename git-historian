@@ -1,6 +1,7 @@
 #!/usr/bin/python
 
 from subprocess import check_output
+import re
 
 print "Hello!"
 
@@ -8,6 +9,17 @@ git_history_dump = check_output(["git", "log", '--pretty="%H %P%d"'])
 
 for line in git_history_dump.split('\n'):
 	if len(line) == 0: continue
+	print
 	print "["+ line +"]"
+	hashes_n_refs = re.compile(r'''"(.*) \((.*)\)"''').match(line)
+	if hashes_n_refs:
+		hashes = hashes_n_refs.group(1)
+		refs = hashes_n_refs.group(2)
+	else:
+		hashes = line[1:-1]
+		refs = ""
+
+	print("Refs {%s}" % refs)
+	print("HASH {%s}" % hashes)
 
 print "Goodbye!"
