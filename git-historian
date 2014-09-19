@@ -1,3 +1,8 @@
 #!/usr/bin/python
 
+from subprocess import check_output
+
 print "Hello!"
+git_history_dump = check_output(["git", "log"])
+print "["+git_history_dump+"]"
+print "Goodbye!"
