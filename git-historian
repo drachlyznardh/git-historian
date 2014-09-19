@@ -13,10 +13,10 @@ class Node:
 		self.printed = 0
 
 	def to_string(self):
-		str = "  Hash {%s}" % self.hash
-		for i in self.parent: str += "Parent {%s}" % i
-		for i in self.child: str += " Child {%s}" % i
-		for i in self.ref: str += "    Ref {%s}" % i
+		str = "  Hash {%s}\n" % self.hash
+		for i in self.parent: str += "\nParent {%s}" % i
+		for i in self.child: str += "\n Child {%s}" % i
+		for i in self.ref: str += "\n    Ref {%s}" % i
 		return str
 
 print "Hello!"
@@ -30,16 +30,20 @@ for line in git_history_dump.split('\n'):
 	print "["+ line +"]"
 	hashes_n_refs = re.compile(r'''"(.*) \((.*)\)"''').match(line)
 	if hashes_n_refs:
-		hashes = hashes_n_refs.group(1)
+		hashes = hashes_n_refs.group(1).split()
 		refs = hashes_n_refs.group(2)
 	else:
-		hashes = line[1:-1]
+		hashes = line[1:-1].split()
 		refs = ""
 
 	for ref in refs.split(','): print(" Ref : %s" % ref.strip())
-	for hash in hashes.split(): print("Hash : %s" % hash.strip())
+	#for hash in hashes.split(): print("Hash : %s" % hash.strip())
 
 	node = Node()
+	if hashes:
+		node.hash = hashes[0]
+		for i in hashes[1:]: node.parent.append(i)
+
 	print(node.to_string())
 
 print "Goodbye!"
