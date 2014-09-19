@@ -1,8 +1,53 @@
 #!/usr/bin/python
 
 from subprocess import check_output
+import re
+
+class Node:
+	def __init__ (self):
+		self.hash = ""
+		self.parent = []
+		self.child = []
+		self.ref = []
+		self.column = -1
+		self.printed = 0
+
+	def to_string(self):
+		str = "  Hash {%s}" % self.hash
+		for i in self.parent: str += "\nParent {%s}" % i
+		for i in self.child:  str += "\n Child {%s}" % i
+		for i in self.ref:    str += "\n   Ref {%s}" % i
+		return str
+
+def get_history():
+	git_history_dump = check_output(["git", "log", '--pretty="%H %P%d"'])
+	graph_list = []
+
+	for line in git_history_dump.split('\n'):
+		if len(line) == 0: continue
+
+		hashes_n_refs = re.compile(r'''"(.*) \((.*)\)"''').match(line)
+		if hashes_n_refs:
+			hashes = hashes_n_refs.group(1).split()
+			refs = hashes_n_refs.group(2).split(',')
+		else:
+			hashes = line[1:-1].split()
+			refs = ""
+
+		node = Node()
+		if hashes:
+			node.hash = hashes[0]
+			for i in hashes[1:]: node.parent.append(i)
+		for i in refs: node.ref.append(i.strip())
+
+		graph_list.append(node)
+	return graph_list
 
 print "Hello!"
-git_history_dump = check_output(["git", "log"])
-print "["+git_history_dump+"]"
+
+history = get_history()
+
+for i in history:
+	print("%s\n" % i.to_string())
+
 print "Goodbye!"
