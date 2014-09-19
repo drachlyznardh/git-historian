@@ -10,11 +10,19 @@ class Node:
 		self.child = []
 		self.ref = []
 		self.column = -1
-		self.printed = false
+		self.printed = 0
+
+	def to_string(self):
+		str = "  Hash {%s}" % self.hash
+		for i in self.parent: str += "Parent {%s}" % i
+		for i in self.child: str += " Child {%s}" % i
+		for i in self.ref: str += "    Ref {%s}" % i
+		return str
 
 print "Hello!"
 
 git_history_dump = check_output(["git", "log", '--pretty="%H %P%d"'])
+graph_list = []
 
 for line in git_history_dump.split('\n'):
 	if len(line) == 0: continue
@@ -30,5 +38,8 @@ for line in git_history_dump.split('\n'):
 
 	for ref in refs.split(','): print(" Ref : %s" % ref.strip())
 	for hash in hashes.split(): print("Hash : %s" % hash.strip())
+
+	node = Node()
+	print(node.to_string())
 
 print "Goodbye!"
