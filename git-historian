@@ -43,11 +43,7 @@ def get_history():
 		history.append(node)
 	return history
 
-print "Hello!"
-
 history = get_history()
 
 for i in history:
 	print("%s\n" % i.to_string())
-
-print "Goodbye!"
