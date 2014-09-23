@@ -14,8 +14,8 @@ class Node:
 		self.printed = 0
 
 	def to_string(self):
-		if self.column > -1:
-			indent = ('%%%ds' % 2 * self.column) % ' '
+		if self.column > 0:
+			indent = ('%%%ds' % (3 * self.column)) % (' ')
 		else: indent = ''
 		str = "%s  Hash {%s}" % (indent, self.hash)
 		for i in self.parent: str += "\n%sParent {%s}" % (indent, i)
@@ -23,7 +23,7 @@ class Node:
 		for i in self.ref:    str += "\n%s   Ref {%s}" % (indent, i)
 		return str
 	
-	def inherit_column (self, base):
+	def inherit_column (self, commit_map, base):
 		if len(self.ref):
 			for i in self.ref:
 				if re.match(r'''^tag: r[0-9]+''', i):
@@ -39,7 +39,7 @@ class Node:
 		if not self.static: self.column = base
 		if len(self.parent):
 			for i in self.parent:
-				print i
+				commit_map[i].inherit_column(commit_map, base + 1)
 
 def get_history():
 	git_history_dump = check_output(["git", "log", '--pretty="%H %P%d"'])
@@ -71,11 +71,8 @@ commit_map = {}
 for i in history:
 	commit_map[i.hash] = i
 
-for i in commit_map:
-	print("%s:\n%s" % (i, commit_map[i].to_string()))
-
 if len(history):
-	history[0].inherit_column(4)
+	history[0].inherit_column(commit_map, 4)
 
 for i in history:
 	print("%s\n" % i.to_string())
