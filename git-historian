@@ -22,7 +22,17 @@ class Node:
 		for i in self.child:  str += "\n%s Child {%s}" % (indent, i)
 		for i in self.ref:    str += "\n%s   Ref {%s}" % (indent, i)
 		return str
-	
+
+	def know_your_children(self, child):
+		if child not in self.child:
+			self.child.append(child)
+
+	def know_your_parents(self, commit_map):
+		for i in self.parent:
+			parent = commit_map[i]
+			if parent:
+				parent.know_your_children(self.hash)
+
 	def inherit_column (self, commit_map, base):
 		if self.column != -1: return
 		if len(self.ref):
@@ -47,7 +57,7 @@ class Node:
 				counter += 1
 
 def get_history():
-	git_history_dump = check_output(["git", "log", '--pretty="%H %P%d"'])
+	git_history_dump = check_output(["git", "log", '--pretty="%H %P%d"', "--all"])
 	history = []
 
 	for line in git_history_dump.split('\n'):
@@ -76,8 +86,13 @@ commit_map = {}
 for i in history:
 	commit_map[i.hash] = i
 
+for i in history:
+	commit_map[i.hash].know_your_parents(commit_map)
+
 if len(history):
 	history[0].inherit_column(commit_map, 2)
+	#history[0].inherit_row(commit_map, 0)
+	#history[0].graph_step(
 
 for i in history:
 	print("%s\n" % i.to_string())
