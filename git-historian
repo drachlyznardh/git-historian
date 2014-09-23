@@ -73,31 +73,35 @@ class Node:
 			commit_map[i].inherit_column(commit_map, counter)
 			counter += 1
 
-def get_history():
-	git_history_dump = check_output(["git", "log", '--pretty="%H %P%d"', "--all"])
-	history = []
+class Historian:
+	
+	
+	def get_history(self):
+		git_history_dump = check_output(["git", "log", '--pretty="%H %P%d"', "--all"])
+		history = []
 
-	for line in git_history_dump.split('\n'):
-		if len(line) == 0: continue
+		for line in git_history_dump.split('\n'):
+			if len(line) == 0: continue
 
-		hashes_n_refs = re.compile(r'''"(.*) \((.*)\)"''').match(line)
-		if hashes_n_refs:
-			hashes = hashes_n_refs.group(1).split()
-			refs = hashes_n_refs.group(2).split(',')
-		else:
-			hashes = line[1:-1].split()
-			refs = ""
+			hashes_n_refs = re.compile(r'''"(.*) \((.*)\)"''').match(line)
+			if hashes_n_refs:
+				hashes = hashes_n_refs.group(1).split()
+				refs = hashes_n_refs.group(2).split(',')
+			else:
+				hashes = line[1:-1].split()
+				refs = ""
 
-		node = Node()
-		if hashes:
-			node.hash = hashes[0]
-			for i in hashes[1:]: node.parent.append(i)
-		for i in refs: node.ref.append(i.strip())
+			node = Node()
+			if hashes:
+				node.hash = hashes[0]
+				for i in hashes[1:]: node.parent.append(i)
+			for i in refs: node.ref.append(i.strip())
 
-		history.append(node)
-	return history
+			history.append(node)
+		return history
 
-history = get_history()
+historian = Historian()
+history = historian.get_history()
 commit_map = {}
 
 for i in history:
