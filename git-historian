@@ -64,6 +64,11 @@ class Node:
 		if not self.static: self.column = base
 
 		counter = self.column
+		for i in self.child:
+			commit_map[i].inherit_column(commit_map, counter)
+			counter += 1
+
+		counter = self.column
 		for i in self.parent:
 			commit_map[i].inherit_column(commit_map, counter)
 			counter += 1
