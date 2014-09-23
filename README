@@ -8,3 +8,6 @@ with two criteria:
 
  - no child gets printed after its parent; each node invokes its children before
    printing itself;
+
+It's working, but being recursive is bad. Long histories trigger the maximum
+recursion block. I'm thinking of a list of nodes to visit, in sequence.
