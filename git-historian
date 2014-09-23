@@ -19,9 +19,13 @@ class Node:
 
 		for i in self.child:
 			commit_map[i].print_graph(commit_map)
-		print("%s" % self.to_string())
+		#print("%s" % self.to_string())
+		print("%s" % self.to_oneline())
 		for i in self.parent:
 			commit_map[i].print_graph(commit_map)
+
+	def to_oneline(self):
+		return "%s* %s" % (('%%%ds' % (2 * self.column) % ''), self.hash)
 
 	def to_string(self):
 		if self.column > 0:
