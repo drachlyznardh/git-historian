@@ -10,18 +10,72 @@ class Node:
 		self.child = []
 		self.ref = []
 		self.column = -1
+		self.static = 0
 		self.printed = 0
 
+	def print_graph(self, commit_map):
+		if self.printed: return
+		self.printed = 1
+
+		for i in self.child:
+			commit_map[i].print_graph(commit_map)
+		print("%s" % self.to_oneline())
+		for i in reversed(self.parent):
+			commit_map[i].print_graph(commit_map)
+
+	def to_oneline(self):
+		if self.column > 0:
+			offset = ('%%%ds' % (2 * self.column) % '')
+		else: offset = ''
+		return "%s* %s" % (offset, self.hash)
+
 	def to_string(self):
-		str = "  Hash {%s}" % self.hash
-		for i in self.parent: str += "\nParent {%s}" % i
-		for i in self.child:  str += "\n Child {%s}" % i
-		for i in self.ref:    str += "\n   Ref {%s}" % i
+		if self.column > 0:
+			indent = ('%%%ds' % (2 * self.column)) % (' ')
+		else: indent = ''
+		str = "%s  Hash {%s}" % (indent, self.hash)
+		for i in self.parent: str += "\n%sParent {%s}" % (indent, i)
+		for i in self.child:  str += "\n%s Child {%s}" % (indent, i)
+		for i in self.ref:    str += "\n%s   Ref {%s}" % (indent, i)
 		return str
 
+	def know_your_children(self, child):
+		if child not in self.child:
+			self.child.append(child)
+
+	def know_your_parents(self, commit_map):
+		for i in self.parent:
+			parent = commit_map[i]
+			if parent:
+				parent.know_your_children(self.hash)
+
+	def inherit_column (self, commit_map, base):
+		if self.column != -1: return
+		if len(self.ref):
+			for i in self.ref:
+				if re.match(r'''^tag: r[0-9]+''', i):
+					self.static = 1
+					self.column = 1
+					break
+				if re.match(r'''^tag: h[0-9]+''', i):
+					self.static = 1
+					self.column = 0
+					break
+		if not self.static: self.column = base
+
+		counter = self.column
+		for i in self.child:
+			commit_map[i].inherit_column(commit_map, counter)
+			counter += 1
+
+		counter = self.column
+		for i in self.parent:
+			commit_map[i].inherit_column(commit_map, counter)
+			counter += 1
+
 def get_history():
-	git_history_dump = check_output(["git", "log", '--pretty="%H %P%d"'])
-	graph_list = []
+	git_history_dump = check_output(["git", "log", '--pretty="%H %P%d"', "--all"])
+	history = []
 
 	for line in git_history_dump.split('\n'):
 		if len(line) == 0: continue
@@ -40,14 +94,19 @@ def get_history():
 			for i in hashes[1:]: node.parent.append(i)
 		for i in refs: node.ref.append(i.strip())
 
-		graph_list.append(node)
-	return graph_list
-
-print "Hello!"
+		history.append(node)
+	return history
 
 history = get_history()
+commit_map = {}
 
 for i in history:
-	print("%s\n" % i.to_string())
+	commit_map[i.hash] = i
 
-print "Goodbye!"
+for i in history:
+	commit_map[i.hash].know_your_parents(commit_map)
+
+if len(history):
+	history[0].inherit_column(commit_map, 2)
+
+history[0].print_graph(commit_map)
