@@ -15,7 +15,7 @@ class Node:
 
 	def to_string(self):
 		if self.column > 0:
-			indent = ('%%%ds' % (3 * self.column)) % (' ')
+			indent = ('%%%ds' % (2 * self.column)) % (' ')
 		else: indent = ''
 		str = "%s  Hash {%s}" % (indent, self.hash)
 		for i in self.parent: str += "\n%sParent {%s}" % (indent, i)
@@ -77,7 +77,7 @@ for i in history:
 	commit_map[i.hash] = i
 
 if len(history):
-	history[0].inherit_column(commit_map, 4)
+	history[0].inherit_column(commit_map, 2)
 
 for i in history:
 	print("%s\n" % i.to_string())
