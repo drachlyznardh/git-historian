@@ -74,7 +74,9 @@ class Node:
 			counter += 1
 
 class Historian:
-	
+	def __init__ (self):
+		self.head = ""
+		self.commit = {}
 	
 	def get_history(self):
 		git_history_dump = check_output(["git", "log", '--pretty="%H %P%d"', "--all"])
