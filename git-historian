@@ -100,13 +100,19 @@ class Historian:
 
 			if not self.head: self.head = node.hash
 			self.commit[node.hash] = node
+	
+	def tell_the_story(self):
+
+		if not self.commit:
+			self.get_history()
+
+		for i in self.commit:
+			self.commit[i].know_your_parents(self.commit)
+	
+		if self.head:
+			self.commit[self.head].inherit_column(self.commit, 2)
+			self.commit[self.head].print_graph(self.commit)
 
 historian = Historian()
-historian.get_history()
+historian.tell_the_story()
 
-for i in historian.commit:
-	historian.commit[i].know_your_parents(historian.commit)
-
-if historian.head:
-	historian.commit[historian.head].inherit_column(historian.commit, 2)
-	historian.commit[historian.head].print_graph(historian.commit)
