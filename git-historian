@@ -39,10 +39,12 @@ class Node:
 					break
 		if not self.static: self.column = base
 		if len(self.parent) == 1:
-			commit_map[self.parent[0]].inherit_column(commit_map, base)
+			commit_map[self.parent[0]].inherit_column(commit_map, self.column)
 		else:
+			counter = self.column
 			for i in self.parent:
-				commit_map[i].inherit_column(commit_map, base + 1)
+				commit_map[i].inherit_column(commit_map, counter)
+				counter += 1
 
 def get_history():
 	git_history_dump = check_output(["git", "log", '--pretty="%H %P%d"'])
