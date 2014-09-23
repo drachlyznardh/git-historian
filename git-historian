@@ -18,12 +18,9 @@ class Node:
 		self.printed = 1
 
 		for i in self.child:
-			#print "Calling child %s" % i
 			commit_map[i].print_graph(commit_map)
-		#print("%s\n" % self.to_string())
 		print("%s" % self.to_oneline())
 		for i in reversed(self.parent):
-			#print "Calling parent %s" % i
 			commit_map[i].print_graph(commit_map)
 
 	def to_oneline(self):
@@ -54,12 +51,10 @@ class Node:
 		if len(self.ref):
 			for i in self.ref:
 				if re.match(r'''^tag: r[0-9]+''', i):
-					#print "%s matches release!" % i
 					self.static = 1
 					self.column = 1
 					break
 				if re.match(r'''^tag: h[0-9]+''', i):
-					#print "%s matches hotfix!" % i
 					self.static = 1
 					self.column = 0
 					break
@@ -107,10 +102,5 @@ for i in history:
 
 if len(history):
 	history[0].inherit_column(commit_map, 2)
-	#history[0].inherit_row(commit_map, 0)
-	#history[0].graph_step(
-
-#for i in history:
-#	print("%s\n" % i.to_string())
 
 history[0].print_graph(commit_map)
