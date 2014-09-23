@@ -18,12 +18,12 @@ class Node:
 		self.printed = 1
 
 		for i in self.child[1:]:
-			print "Calling child %s" % i
+			#print "Calling child %s" % i
 			commit_map[i].print_graph(commit_map)
-		print("%s\n" % self.to_string())
-		#print("%s" % self.to_oneline())
-		for i in self.parent:
-			print "Calling parent %s" % i
+		#print("%s\n" % self.to_string())
+		print("%s" % self.to_oneline())
+		for i in reversed(self.parent):
+			#print "Calling parent %s" % i
 			commit_map[i].print_graph(commit_map)
 
 	def to_oneline(self):
