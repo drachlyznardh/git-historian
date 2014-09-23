@@ -24,6 +24,7 @@ class Node:
 		return str
 	
 	def inherit_column (self, commit_map, base):
+		if self.column != -1: return
 		if len(self.ref):
 			for i in self.ref:
 				if re.match(r'''^tag: r[0-9]+''', i):
@@ -37,7 +38,9 @@ class Node:
 					self.column = 0
 					break
 		if not self.static: self.column = base
-		if len(self.parent):
+		if len(self.parent) == 1:
+			commit_map[self.parent[0]].inherit_column(commit_map, base)
+		else:
 			for i in self.parent:
 				commit_map[i].inherit_column(commit_map, base + 1)
 
