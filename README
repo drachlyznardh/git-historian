@@ -1,0 +1,10 @@
+
+Here's an idea: printing can be performed by walking the graph. Now that each
+node knows its direct family, I can shield the execution of the print method
+with two criteria:
+
+ - no father gets printed before its child; each node prints itself before
+   invoking its parents;
+
+ - no child gets printed after its parent; each node invokes its children before
+   printing itself;
