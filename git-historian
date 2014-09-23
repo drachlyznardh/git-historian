@@ -13,6 +13,9 @@ class Node:
 		self.static = 0
 		self.printed = 0
 
+	def print_graph(self, commit_map):
+		print("%s" % self.to_string())
+
 	def to_string(self):
 		if self.column > 0:
 			indent = ('%%%ds' % (2 * self.column)) % (' ')
@@ -94,5 +97,7 @@ if len(history):
 	#history[0].inherit_row(commit_map, 0)
 	#history[0].graph_step(
 
-for i in history:
-	print("%s\n" % i.to_string())
+#for i in history:
+#	print("%s\n" % i.to_string())
+
+history[0].print_graph(commit_map)
