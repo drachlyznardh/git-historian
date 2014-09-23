@@ -37,6 +37,9 @@ class Node:
 					self.column = 0
 					break
 		if not self.static: self.column = base
+		if len(self.parent):
+			for i in self.parent:
+				print i
 
 def get_history():
 	git_history_dump = check_output(["git", "log", '--pretty="%H %P%d"'])
@@ -63,6 +66,13 @@ def get_history():
 	return history
 
 history = get_history()
+commit_map = {}
+
+for i in history:
+	commit_map[i.hash] = i
+
+for i in commit_map:
+	print("%s:\n%s" % (i, commit_map[i].to_string()))
 
 if len(history):
 	history[0].inherit_column(4)
