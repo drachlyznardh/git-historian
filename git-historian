@@ -75,12 +75,12 @@ class Node:
 
 class Historian:
 	def __init__ (self):
-		self.head = ""
+		self.head = 0
 		self.commit = {}
 	
 	def get_history(self):
 		git_history_dump = check_output(["git", "log", '--pretty="%H %P%d"', "--all"])
-		history = []
+		#history = []
 
 		for line in git_history_dump.split('\n'):
 			if len(line) == 0: continue
@@ -99,20 +99,24 @@ class Historian:
 				for i in hashes[1:]: node.parent.append(i)
 			for i in refs: node.ref.append(i.strip())
 
-			history.append(node)
-		return history
+			#history.append(node)
+			if not self.head: self.head = node.hash
+			self.commit[node.hash] = node
+		#return history
 
 historian = Historian()
-history = historian.get_history()
-commit_map = {}
+#history = 
+historian.get_history()
+#commit_map = {}
 
-for i in history:
-	commit_map[i.hash] = i
+#for i in history:
+#	commit_map[i.hash] = i
 
-for i in history:
-	commit_map[i.hash].know_your_parents(commit_map)
+#for i in history:
+for i in historian.commit:
+	historian.commit[i].know_your_parents(historian.commit)
 
-if len(history):
-	history[0].inherit_column(commit_map, 2)
-
-history[0].print_graph(commit_map)
+#if len(history):
+if historian.head:
+	historian.commit[historian.head].inherit_column(historian.commit, 2)
+	historian.commit[historian.head].print_graph(historian.commit)
