@@ -14,6 +14,9 @@ class Node:
 		self.printed = 0
 
 	def print_graph(self, commit_map):
+		if self.printed: return
+		self.printed = 1
+
 		print("%s" % self.to_string())
 
 	def to_string(self):
