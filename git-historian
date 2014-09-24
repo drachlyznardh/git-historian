@@ -236,7 +236,7 @@ class Historian:
 					continue
 
 			columns.assign(self.commit, commit)
-			print "%20s %s %d" % (columns.show(commit.hash), commit.hash[0:7], len(commit.parent))
+			print "%s %s %d" % (columns.show(commit.hash), commit.hash[0:7], len(commit.parent))
 
 			if len(commit.parent) > 1:
 				for i in commit.parent:
@@ -261,7 +261,7 @@ class Historian:
 			self.commit[i].know_your_column()
 	
 		if self.head:
-			self.all_in_one_call(1)
+			self.all_in_one_call(0)
 			#self.commit[self.head].inherit_column(self.commit, 2)
 			#self.commit[self.head].print_graph(self.commit)
 
