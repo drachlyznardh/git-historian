@@ -144,7 +144,7 @@ class Historian:
 	def all_in_one_call(self):
 		
 		visit = Order(self.head)
-		visit.show()
+		#visit.show()
 
 		while 1:
 			target = visit.pop()
@@ -163,14 +163,18 @@ class Historian:
 
 			print "%s %d" % (commit.hash[0:7], len(commit.parent))
 			if len(commit.parent) > 1:
-				print "Adding all parents"
+				#print "Adding all parents"
 				for i in reversed(commit.parent):
-					print "Adding parent %s" % i
-					visit.ppush(i)
-				visit.show()
+					#print "Adding parent %s" % i
+						parent = self.commit[i]
+						if parent and not parent.done:
+							visit.ppush(i)
+				#visit.show()
 			elif len(commit.parent) > 0:
-				print "Adding lone parent"
-				visit.push(commit.parent[0])
+				#print "Adding lone parent"
+					parent = self.commit[commit.parent[0]]
+					if parent and not parent.done:
+						visit.push(commit.parent[0])
 			commit.done = 1
 
 			#visit.pop()
