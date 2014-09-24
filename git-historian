@@ -128,10 +128,28 @@ class Order:
 class Columns:
 	def __init__ (self):
 		self.stack = []
+		self.nextstack = []
+
+	def assign (self, commit):
+		if commit.column == -1:
+			actual = len(self.stack) + 2
+		else:
+			actual = commit.column * 2
+
+		while len(self.stack) <= actual:
+			self.stack.append('_')
+
+		if actual:
+			self.stack[actual - 1] = '+'
+		self.stack[actual] = commit
 
 	def show (self):
+		message = ''
 		for i in self.stack:
-			print "  "
+			if isinstance(i, basestring):
+				message += i
+			else: message += '|'
+		return message
 
 class Historian:
 	def __init__ (self):
@@ -181,8 +199,8 @@ class Historian:
 				#print "%s is done, skipping" % commit.hash[:7]
 				continue
 
-			columns.show()
-			print "%s %d" % (commit.hash[0:7], len(commit.parent))
+			columns.assign(commit)
+			print "%s %s %d" % (columns.show(), commit.hash[0:7], len(commit.parent))
 			if len(commit.parent) > 1:
 				for i in commit.parent:
 					parent = self.commit[i]
