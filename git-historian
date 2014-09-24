@@ -91,7 +91,8 @@ class Order:
 	def pop(self):
 		self.trim()
 		if len(self.stack) > 0 and len(self.stack[0]) > 0:
-			self.stack[0].pop(0)
+			return self.stack[0].pop(0)
+		return None
 
 	def push(self, value):
 		if len(self.stack) > 0:
