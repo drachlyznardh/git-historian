@@ -147,7 +147,7 @@ class Historian:
 		visit.show()
 
 		while 1:
-			target = visit.get()
+			target = visit.pop()
 
 			if not target:
 				print "No Target"
@@ -168,8 +168,7 @@ class Historian:
 				print "Adding lone parent"
 				visit.push(commit.parent[0])
 
-			visit.show()
-			visit.pop()
+			#visit.pop()
 			visit.show()
 
 	def tell_the_story(self):
