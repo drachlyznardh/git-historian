@@ -12,6 +12,7 @@ class Node:
 		self.column = -1
 		self.static = 0
 		self.printed = 0
+		self.done = 0
 
 	def print_graph(self, commit_map):
 		if self.printed: return
@@ -73,6 +74,45 @@ class Node:
 			commit_map[i].inherit_column(commit_map, counter)
 			counter += 1
 
+class Order:
+	def __init__ (self, first):
+		self.stack = [[first]]
+
+	def trim(self):
+		while len(self.stack) > 0 and len(self.stack[0]) == 0:
+			self.stack.pop(0)
+
+	def get(self):
+		self.trim()
+		if len(self.stack) > 0 and len(self.stack[0]) > 0:
+			return self.stack[0][0]
+		return None
+
+	def pop(self):
+		self.trim()
+		if len(self.stack) > 0 and len(self.stack[0]) > 0:
+			return self.stack[0].pop(0)
+		return None
+
+	def push(self, value):
+		if len(self.stack) > 0:
+			self.stack[0].append(value)
+		else:
+			self.stack.append([value])
+	
+	def ppush(self, value):
+		self.stack.insert(1, [value])
+
+	def show(self):
+		self.trim()
+		message = ''
+		for i in self.stack:
+			message += '\t[' + i[0][:7]
+			for ii in i[1:]:
+				message += ", " + ii[:7]
+			message += ']\n'
+		print "{\n%s}" % message
+
 class Historian:
 	def __init__ (self):
 		self.head = 0
@@ -103,40 +143,34 @@ class Historian:
 	
 	def all_in_one_call(self):
 		
-		visit = [[self.head]]
+		visit = Order(self.head)
 
 		while 1:
-			if len(visit) == 0: break
-			
-			tlist = visit[0]
-			while len(visit) and len(visit[0]) == 0:
-				visit.pop(0)
-			
-			if len(visit) == 0: break
-			
-			tlist = visit[0]
-			#print "\t%d" % len(visit)
-			#for i in visit:
-			#	print "\t%s" % self.commit[i].to_oneline()
-			target = self.commit[tlist[0]]
 
-			if not target: break
-			if target.printed: visit.pop(0); continue
-				
-			#if target.child:
-			#	for i in target.child:
-			#		if not self.commit[i].printed:
-			#			visit.insert(0, i)
-			#	continue
+			target = visit.pop()
+			if not target:
+				#print "No Target"
+				break
 
-			print "%s" % target.to_oneline()
-			target.printed = 1
-			visit.pop(0)
+			commit = self.commit[target]
+			if not commit:
+				#print "No Commit"
+				break
+			if commit.done:
+				#print "%s is done, skipping" % commit.hash[:7]
+				continue
 
-			if target.parent:
-				for i in reversed(target.parent):
-					if not self.commit[i].printed:
-						visit.append([i])
+			print "%s %d" % (commit.hash[0:7], len(commit.parent))
+			if len(commit.parent) > 1:
+				for i in commit.parent:
+					parent = self.commit[i]
+					if parent and not parent.done:
+						visit.ppush(i)
+			elif len(commit.parent) > 0:
+				parent = self.commit[commit.parent[0]]
+				if parent and not parent.done:
+					visit.push(commit.parent[0])
+			commit.done = 1
 
 	def tell_the_story(self):
 
