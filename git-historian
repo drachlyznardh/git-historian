@@ -107,9 +107,9 @@ class Order:
 		self.trim()
 		message = ''
 		for i in self.stack:
-			message += '\t[' + i[0]
+			message += '\t[' + i[0][:7]
 			for ii in i[1:]:
-				message += ", " + ii
+				message += ", " + ii[:7]
 			message += ']\n'
 		print "{\n%s}" % message
 
@@ -158,7 +158,7 @@ class Historian:
 				break
 			if commit.done:
 				#visit.pop()
-				print "%s is done, skipping" % commit.hash
+				print "%s is done, skipping" % commit.hash[:7]
 				continue
 
 			print "%s %d" % (commit.hash[0:7], len(commit.parent))
