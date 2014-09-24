@@ -73,6 +73,10 @@ class Node:
 			commit_map[i].inherit_column(commit_map, counter)
 			counter += 1
 
+class Order:
+	def __init__ (self, first):
+		self.stack = [[first]]
+
 class Historian:
 	def __init__ (self):
 		self.head = 0
