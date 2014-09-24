@@ -115,14 +115,18 @@ class Order:
 	def ppush(self, value):
 		self.stack.insert(1, [value])
 
+	def cpush(self, value):
+		self.stack.insert(0, [value])
+
 	def show(self):
 		self.trim()
 		message = ''
 		for i in self.stack:
-			message += '\t[' + i[0][:7]
-			for ii in i[1:]:
-				message += ", " + ii[:7]
-			message += ']\n'
+			if len(i):
+				message += '\t[' + i[0][:7]
+				for ii in i[1:]:
+					message += ", " + ii[:7]
+				message += ']\n'
 		print "{\n%s}" % message
 
 class Columns:
@@ -217,8 +221,23 @@ class Historian:
 				if debug: print "%s is done, skipping" % commit.hash[:7]
 				continue
 
+			if len(commit.child) > 1:
+				skip = 0
+				for i in reversed(commit.child):
+					child = self.commit[i]
+					if child and not child.done:
+						visit.cpush(i)
+						skip = 1
+				if skip: continue
+			elif len(commit.child) > 0:
+				child = self.commit[commit.child[0]]
+				if child and not child.done:
+					visit.cpush(commit.child[0])
+					continue
+
 			columns.assign(self.commit, commit)
 			print "%20s %s %d" % (columns.show(commit.hash), commit.hash[0:7], len(commit.parent))
+
 			if len(commit.parent) > 1:
 				for i in commit.parent:
 					parent = self.commit[i]
