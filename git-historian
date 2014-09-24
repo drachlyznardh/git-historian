@@ -73,40 +73,46 @@ class Node:
 			commit_map[i].inherit_column(commit_map, counter)
 			counter += 1
 
-def get_history():
-	git_history_dump = check_output(["git", "log", '--pretty="%H %P%d"', "--all"])
-	history = []
+class Historian:
+	def __init__ (self):
+		self.head = 0
+		self.commit = {}
+	
+	def get_history(self):
+		git_history_dump = check_output(["git", "log", '--pretty="%H %P%d"', "--all"])
 
-	for line in git_history_dump.split('\n'):
-		if len(line) == 0: continue
+		for line in git_history_dump.split('\n'):
+			if len(line) == 0: continue
 
-		hashes_n_refs = re.compile(r'''"(.*) \((.*)\)"''').match(line)
-		if hashes_n_refs:
-			hashes = hashes_n_refs.group(1).split()
-			refs = hashes_n_refs.group(2).split(',')
-		else:
-			hashes = line[1:-1].split()
-			refs = ""
+			hashes_n_refs = re.compile(r'''"(.*) \((.*)\)"''').match(line)
+			if hashes_n_refs:
+				hashes = hashes_n_refs.group(1).split()
+				refs = hashes_n_refs.group(2).split(',')
+			else:
+				hashes = line[1:-1].split()
+				refs = ""
 
-		node = Node()
-		if hashes:
-			node.hash = hashes[0]
-			for i in hashes[1:]: node.parent.append(i)
-		for i in refs: node.ref.append(i.strip())
+			node = Node()
+			if hashes:
+				node.hash = hashes[0]
+				for i in hashes[1:]: node.parent.append(i)
+			for i in refs: node.ref.append(i.strip())
 
-		history.append(node)
-	return history
+			if not self.head: self.head = node.hash
+			self.commit[node.hash] = node
+	
+	def tell_the_story(self):
 
-history = get_history()
-commit_map = {}
+		if not self.commit:
+			self.get_history()
 
-for i in history:
-	commit_map[i.hash] = i
+		for i in self.commit:
+			self.commit[i].know_your_parents(self.commit)
+	
+		if self.head:
+			self.commit[self.head].inherit_column(self.commit, 2)
+			self.commit[self.head].print_graph(self.commit)
 
-for i in history:
-	commit_map[i.hash].know_your_parents(commit_map)
+historian = Historian()
+historian.tell_the_story()
 
-if len(history):
-	history[0].inherit_column(commit_map, 2)
-
-history[0].print_graph(commit_map)
