@@ -84,7 +84,7 @@ class Order:
 	def get(self):
 		self.trim()
 		if len(self.stack) > 0 and len(self.stack[0]) > 0:
-			return self.stack[0].pop(0)
+			return self.stack[0][0]
 		return None
 
 	def pop(self):
@@ -102,13 +102,14 @@ class Order:
 		self.stack.append([value])
 
 	def show(self):
+		self.trim()
 		message = ''
 		for i in self.stack:
-			message += '['
-			for ii in i:
+			message += '\t[' + i[0]
+			for ii in i[1:]:
 				message += ", " + ii
 			message += ']\n'
-		print "{%s}" % message
+		print "{\n%s}" % message
 
 class Historian:
 	def __init__ (self):
@@ -146,10 +147,28 @@ class Historian:
 		while 1:
 			target = visit.get()
 
-			if not target: break
+			if not target:
+				print "No Target"
+				break
+			commit = self.commit[target]
+			if not commit:
+				print "No Commit"
+				break
+
+			print "%s %d" % (commit.hash[0:7], len(commit.parent))
+			if len(commit.parent) > 1:
+				print "Adding all parents"
+				for i in reversed(commit.parent):
+					print "Adding parent %s" % i
+					visit.ppush(i)
+				visit.show()
+			elif len(commit.parent) > 0:
+				print "Adding lone parent"
+				visit.push(commit.parent[0])
 
 			visit.show()
 			visit.pop()
+			visit.show()
 
 	def tell_the_story(self):
 
