@@ -50,6 +50,18 @@ class Node:
 			if parent:
 				parent.know_your_children(self.hash)
 
+	def know_your_column (self):
+		if len(self.ref):
+			for i in self.ref:
+				if re.match(r'''^tag: r[0-9]+''', i):
+					self.static = 1
+					self.column = 1
+					break
+				if re.match(r'''^tag: h[0-9]+''', i):
+					self.static = 1
+					self.column = 0
+					break
+
 	def inherit_column (self, commit_map, base):
 		if self.column != -1: return
 		if len(self.ref):
@@ -113,6 +125,14 @@ class Order:
 			message += ']\n'
 		print "{\n%s}" % message
 
+class Columns:
+	def __init__ (self):
+		self.stack = []
+
+	def show (self):
+		for i in self.stack:
+			print "  "
+
 class Historian:
 	def __init__ (self):
 		self.head = 0
@@ -144,6 +164,7 @@ class Historian:
 	def all_in_one_call(self):
 		
 		visit = Order(self.head)
+		columns = Columns()
 
 		while 1:
 
@@ -160,6 +181,7 @@ class Historian:
 				#print "%s is done, skipping" % commit.hash[:7]
 				continue
 
+			columns.show()
 			print "%s %d" % (commit.hash[0:7], len(commit.parent))
 			if len(commit.parent) > 1:
 				for i in commit.parent:
@@ -179,6 +201,7 @@ class Historian:
 
 		for i in self.commit:
 			self.commit[i].know_your_parents(self.commit)
+			self.commit[i].know_your_column()
 	
 		if self.head:
 			self.all_in_one_call()
