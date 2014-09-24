@@ -156,6 +156,10 @@ class Historian:
 			if not commit:
 				print "No Commit"
 				break
+			if commit.done:
+				#visit.pop()
+				print "%s is done, skipping" % commit.hash
+				continue
 
 			print "%s %d" % (commit.hash[0:7], len(commit.parent))
 			if len(commit.parent) > 1:
@@ -167,6 +171,7 @@ class Historian:
 			elif len(commit.parent) > 0:
 				print "Adding lone parent"
 				visit.push(commit.parent[0])
+			commit.done = 1
 
 			#visit.pop()
 			visit.show()
