@@ -12,6 +12,7 @@ class Node:
 		self.column = -1
 		self.static = 0
 		self.printed = 0
+		self.done = 0
 
 	def print_graph(self, commit_map):
 		if self.printed: return
