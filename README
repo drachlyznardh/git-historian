@@ -11,3 +11,6 @@ with two criteria:
 
 It's working, but being recursive is bad. Long histories trigger the maximum
 recursion block. I'm thinking of a list of nodes to visit, in sequence.
+
+Half of the recursion unrolling is done. Before I re-add children, I shall make
+this graph readable again, by adding just-in-time indentation.
