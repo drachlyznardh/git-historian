@@ -101,7 +101,8 @@ class Order:
 			self.stack.append([value])
 	
 	def ppush(self, value):
-		self.stack.append([value])
+		#self.stack.append([value])
+		self.stack.insert(1, [value])
 
 	def show(self):
 		self.trim()
@@ -164,7 +165,8 @@ class Historian:
 			print "%s %d" % (commit.hash[0:7], len(commit.parent))
 			if len(commit.parent) > 1:
 				#print "Adding all parents"
-				for i in reversed(commit.parent):
+				#for i in reversed(commit.parent):
+				for i in commit.parent:
 					#print "Adding parent %s" % i
 						parent = self.commit[i]
 						if parent and not parent.done:
@@ -178,7 +180,7 @@ class Historian:
 			commit.done = 1
 
 			#visit.pop()
-			visit.show()
+			#visit.show()
 
 	def tell_the_story(self):
 
