@@ -50,6 +50,18 @@ class Node:
 			if parent:
 				parent.know_your_children(self.hash)
 
+	def know_your_column (self):
+		if len(self.ref):
+			for i in self.ref:
+				if re.match(r'''^tag: r[0-9]+''', i):
+					self.static = 1
+					self.column = 1
+					break
+				if re.match(r'''^tag: h[0-9]+''', i):
+					self.static = 1
+					self.column = 0
+					break
+
 	def inherit_column (self, commit_map, base):
 		if self.column != -1: return
 		if len(self.ref):
@@ -103,15 +115,63 @@ class Order:
 	def ppush(self, value):
 		self.stack.insert(1, [value])
 
+	def cpush(self, value):
+		self.stack.insert(0, [value])
+
 	def show(self):
 		self.trim()
 		message = ''
 		for i in self.stack:
-			message += '\t[' + i[0][:7]
-			for ii in i[1:]:
-				message += ", " + ii[:7]
-			message += ']\n'
+			if len(i):
+				message += '\t[' + i[0][:7]
+				for ii in i[1:]:
+					message += ", " + ii[:7]
+				message += ']\n'
 		print "{\n%s}" % message
+
+class Columns:
+	def __init__ (self, size):
+		self.stack = []
+		while len(self.stack) < size:
+			self.stack.append(' ')
+		self.nextstack = self.stack
+
+	def assign (self, allcommit, commit):
+		if commit.column == -1:
+			if len(commit.child):
+				child = allcommit[commit.child[0]]
+				if child:
+					if len(child.parent) == 1:
+						commit.column = child.column
+					elif child.parent[0] == commit.hash:
+						commit.column = child.column
+					else:
+						commit.column = child.column + 1
+				#commit.column = allcommit[commit.child[-0]].column
+			elif len(commit.parent):
+				commit.column = allcommit[commit.parent[-0]].column
+
+		if commit.column == -1:
+			commit.column = len(self.stack)
+
+		actual = commit.column * 2
+
+		while len(self.stack) <= actual:
+			self.stack.append(' ')
+
+		if actual:
+			self.stack[actual - 1] = ' '
+		self.stack[actual] = commit
+
+	def show (self, target):
+		message = ''
+		for i in self.stack:
+			if isinstance(i, basestring):
+				message += i
+			elif i.hash == target:
+				message += '*'
+			else: message += ' '
+		return message
 
 class Historian:
 	def __init__ (self):
@@ -141,26 +201,43 @@ class Historian:
 			if not self.head: self.head = node.hash
 			self.commit[node.hash] = node
 	
-	def all_in_one_call(self):
+	def all_in_one_call(self, debug):
 		
 		visit = Order(self.head)
+		columns = Columns(2)
 
 		while 1:
 
 			target = visit.pop()
 			if not target:
-				#print "No Target"
+				if debug: print "No Target"
 				break
 
 			commit = self.commit[target]
 			if not commit:
-				#print "No Commit"
+				if debug: print "No Commit"
 				break
 			if commit.done:
-				#print "%s is done, skipping" % commit.hash[:7]
+				if debug: print "%s is done, skipping" % commit.hash[:7]
 				continue
 
-			print "%s %d" % (commit.hash[0:7], len(commit.parent))
+			if len(commit.child) > 1:
+				skip = 0
+				for i in reversed(commit.child):
+					child = self.commit[i]
+					if child and not child.done:
+						visit.cpush(i)
+						skip = 1
+				if skip: continue
+			elif len(commit.child) > 0:
+				child = self.commit[commit.child[0]]
+				if child and not child.done:
+					visit.cpush(commit.child[0])
+					continue
+
+			columns.assign(self.commit, commit)
+			print "%s %s %d" % (columns.show(commit.hash), commit.hash[0:7], len(commit.parent))
+
 			if len(commit.parent) > 1:
 				for i in commit.parent:
 					parent = self.commit[i]
@@ -170,6 +247,8 @@ class Historian:
 				parent = self.commit[commit.parent[0]]
 				if parent and not parent.done:
 					visit.push(commit.parent[0])
+			
+			if debug: visit.show()
 			commit.done = 1
 
 	def tell_the_story(self):
@@ -179,9 +258,10 @@ class Historian:
 
 		for i in self.commit:
 			self.commit[i].know_your_parents(self.commit)
+			self.commit[i].know_your_column()
 	
 		if self.head:
-			self.all_in_one_call()
+			self.all_in_one_call(0)
 			#self.commit[self.head].inherit_column(self.commit, 2)
 			#self.commit[self.head].print_graph(self.commit)
 
