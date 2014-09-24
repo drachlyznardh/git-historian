@@ -197,7 +197,7 @@ class Historian:
 			if not self.head: self.head = node.hash
 			self.commit[node.hash] = node
 	
-	def all_in_one_call(self):
+	def all_in_one_call(self, debug):
 		
 		visit = Order(self.head)
 		columns = Columns(2)
@@ -206,15 +206,15 @@ class Historian:
 
 			target = visit.pop()
 			if not target:
-				#print "No Target"
+				if debug: print "No Target"
 				break
 
 			commit = self.commit[target]
 			if not commit:
-				#print "No Commit"
+				if debug: print "No Commit"
 				break
 			if commit.done:
-				#print "%s is done, skipping" % commit.hash[:7]
+				if debug: print "%s is done, skipping" % commit.hash[:7]
 				continue
 
 			columns.assign(self.commit, commit)
@@ -228,6 +228,8 @@ class Historian:
 				parent = self.commit[commit.parent[0]]
 				if parent and not parent.done:
 					visit.push(commit.parent[0])
+			
+			if debug: visit.show()
 			commit.done = 1
 
 	def tell_the_story(self):
@@ -240,7 +242,7 @@ class Historian:
 			self.commit[i].know_your_column()
 	
 		if self.head:
-			self.all_in_one_call()
+			self.all_in_one_call(1)
 			#self.commit[self.head].inherit_column(self.commit, 2)
 			#self.commit[self.head].print_graph(self.commit)
 
