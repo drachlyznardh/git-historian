@@ -209,6 +209,7 @@ class Historian:
 		visit = Order(self.head)
 		columns = Columns(2)
 		q = [] # list of all commits which are waiting for their column
+		active = 2 # default column is the first with no fixed priority
 
 		while 1:
 
