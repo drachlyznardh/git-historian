@@ -225,7 +225,7 @@ class Historian:
 		for i in self.vertical:
 			self.commit[i].know_your_parents(self.commit)
 
-		self.unroll_horizontally(debug)
+		self.unroll_horizontally_top(1)#debug)
 
 		for i in self.vertical:
 			print "%s" % self.commit[i].to_oneline()
@@ -278,6 +278,46 @@ class Historian:
 			if debug: visit.show()
 			commit.done = 1
 
+	def unroll_horizontally_top(self, debug):
+
+		for i in self.commit:
+			self.commit[i].done = 0
+
+		visit = Order(self.head)
+		limit = 0
+
+		while 1:
+			
+			visit.show()
+			target = visit.pop()
+			if not target:
+				if debug: print "No Target"
+				break
+
+			commit = self.commit[target]
+			if not commit:
+				if debug: print "No Commit for target %s" % target[:7]
+				break
+
+			if commit.done:
+				if debug: print "%s is Done, skipping" % target[:7]
+				continue
+
+			children = len(commit.child)
+			if children == 0:
+				commit.column = limit
+
+			parents = len(commit.parent)
+			if parents > 0:
+				name = commit.parent[0]
+				parent = self.commit[name]
+				if parent: parent.column = commit.column
+				visit.ppush(name)
+
+			print " -- "
+			for i in self.vertical:
+				print "%s" % self.commit[i].to_oneline()
+
 	def unroll_horizontally(self, debug):
 		
 		base = self.commit[self.head]
@@ -288,10 +328,10 @@ class Historian:
 		print "%s is the left-most base" % base.hash
 
 		visit = Order(base.hash)
-		counter = 1
+		counter = -1
 		for i in self.commit:
 			self.commit[i].done = 0
-			self.commit[i].know_your_column()
+			#self.commit[i].know_your_column()
 
 		while 1:
 
@@ -326,24 +366,28 @@ class Historian:
 						
 			if missing_parents: continue
 			
-			commit.know_your_column()
+			#commit.know_your_column()
 			commit.done = 1
+
+			counter += len(commit.child)
 
 			if not commit.static:
 				parents = len(commit.parent)
 				if parents == 0:
-					counter += 1
+					#counter += 1
 					commit.column = counter
 				else:
 					name = commit.parent[0]
 					parent = self.commit[name]
 					if parent: commit.column = parent.column
 					else: commit.column = 1
+					commit.column = counter
 
 			for name in reversed(commit.child):
 				child = self.commit[name]
 				if child and not child.done:
 					print "v H calling child %s" % child.hash[:7]
+					counter -= 1
 					visit.ppush(name)
 
 	def tell_the_story(self):
