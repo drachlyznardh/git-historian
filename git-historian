@@ -251,9 +251,9 @@ class Historian:
 				elif children == 1:
 					child = self.commit[commit.child[0]]
 					if child:
-						#commit.column = child.column
+						commit.column = child.column
 						#commit.column = len(child.parent)
-						commit.column = 2
+						#commit.column = 2
 						for i in child.parent:
 							if commit.hash == i: break
 							commit.column += 1
