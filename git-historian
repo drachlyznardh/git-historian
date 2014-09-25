@@ -285,6 +285,7 @@ class Historian:
 
 		visit = Order(self.head)
 		limit = 1
+		direction = 1 # DOWN
 
 		while 1:
 			
@@ -303,29 +304,24 @@ class Historian:
 				if debug: print "%s is Done, skipping" % target[:7]
 				continue
 
-			if commit.column == -1:
-				children = len(commit.child)
-				if children == 0:
-					commit.column = limit
+			if direction: # GOING DOWN, APPLYING
 
-			commit.done = 1
+				if commit.column == -1:
+					children = len(commit.child)
+					if children == 0:
+						commit.column = limit
 
-			parents = len(commit.parent)
-			if parents > 0:
-				name = commit.parent[0]
-				parent = self.commit[name]
-				if parent and not parent.done:
-					if parent.column == -1:
-						parent.column = commit.column
-					visit.ppush(name)
-				for name in commit.parent[1:]:
+				parents = len(commit.parent)
+				if parents == 1:
+					name = commit.parent[0]
 					parent = self.commit[name]
-					if parent and not parent.done:
-						visit.ppush(name)
+					if parent:
+						if parent.column == -1:
+							parent.column = commit.column
+						visit.push(name)
 
-			print " -- "
-			for i in self.vertical:
-				print "%s" % self.commit[i].to_oneline()
+			else: # GOING UP, TRAVERSING
+				break
 
 	def unroll_horizontally(self, debug):
 		
