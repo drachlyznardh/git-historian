@@ -340,10 +340,7 @@ class Historian:
 						if not parent.done:
 							commit = parent
 							break
-
-					visit.cpush(commit.hash)
 					direction = 0
-				#print "%s is a base" % commit.hash
 
 			print "^ H processing %s" % commit.hash[:7]
 
