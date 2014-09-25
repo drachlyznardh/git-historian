@@ -339,7 +339,11 @@ class Historian:
 					if parent: commit.column = parent.column
 					else: commit.column = 1
 				else:
-					'culo'
+					available = []
+					for name in commit.parent:
+						parent = self.commit[name]
+						if parent: available.append(parent.column)
+					commit.column = min(available)
 
 			children = len(commit.child)
 			if children == 1:
