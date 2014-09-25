@@ -240,15 +240,17 @@ class Historian:
 					visit.cpush(commit.child[0])
 					continue
 
+			active -= len(commit.child)
+			active += len(commit.parent)
+
 			if not commit.know_your_column():
-				default_column = 2
 				children = len(commit.child)
 				if children == 0:
-					commit.column = default_column
+					commit.column = active
 				elif children == 1:
 					child = self.commit[commit.child[0]]
 					if child: commit.column = child.column
-					else: commit.column = default_column
+					else: commit.column = active
 				else:
 					column = []
 					for i in commit.child:
@@ -256,7 +258,6 @@ class Historian:
 						if child: column.append(child.column)
 					commit.column = min(column)
 					print "%s %d" % (column, commit.column)
-
 
 			print "%s" % commit.to_oneline()
 
