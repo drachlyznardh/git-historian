@@ -300,15 +300,15 @@ class Historian:
 
 	def unroll_horizontally(self, debug):
 		
-		#base = self.commit[self.head]
+		base = self.commit[self.head]
 
-		#while len(base.parent):
-		#base = self.commit[base.parent[0]]
+		while len(base.parent):
+			base = self.commit[base.parent[0]]
 
-		#print "%s is the left-most base" % base.hash
+		print "%s is the left-most base" % base.hash
 
-		visit = Order(self.head)
-		direction = 1 # DOWN
+		visit = Order(base.hash)#self.head)
+		#direction = 1 # DOWN
 		counter = 2
 		for i in self.commit:
 			self.commit[i].done = 0
@@ -330,6 +330,7 @@ class Historian:
 				if debug: print "H %s is done, skipping" % commit.hash[:7]
 				continue
 
+			'''
 			if direction: # GOING DOWN TO FIND BASE
 
 				print "V H processing %s" % commit.hash[:7]
@@ -342,23 +343,24 @@ class Historian:
 							break
 					direction = 0
 					counter += 1
+			'''
 
 			print "* H processing %s" % commit.hash[:7]
 
-			missing_children = len(commit.child)
-			for name in commit.child:
-				child = self.commit[name]
-				if child:
-					if child.done:
-						missing_children -= 1
+			missing_parents = len(commit.parent)
+			for name in commit.parent:
+				parent = self.commit[name]
+				if parent:
+					if parent.done:
+						missing_parents -= 1
 					else:
-						print "^ H calling child %s" % child.hash[:7]
+						print "^ H calling parent %s" % parent.hash[:7]
 						visit.cpush(name)
 						break
 				else:
-					missing_children -= 1
+					missing_parents -= 1
 						
-			if missing_children: continue
+			if missing_parents: continue
 			
 			commit.know_your_column()
 			commit.done = 1
@@ -399,10 +401,10 @@ class Historian:
 				if skip: continue
 			'''
 
-			for name in commit.parent:
-				parent = self.commit[name]
-				if parent and not parent.done:
-					print "v H calling parent %s" % parent.hash[:7]
+			for name in reversed(commit.child):
+				child = self.commit[name]
+				if child and not child.done:
+					print "v H calling child %s" % child.hash[:7]
 					visit.ppush(name)
 
 	def tell_the_story(self):
