@@ -309,7 +309,7 @@ class Historian:
 
 		visit = Order(base.hash)#self.head)
 		#direction = 1 # DOWN
-		counter = 2
+		counter = 1
 		for i in self.commit:
 			self.commit[i].done = 0
 			self.commit[i].know_your_column()
@@ -368,20 +368,13 @@ class Historian:
 			if not commit.static:
 				parents = len(commit.parent)
 				if parents == 0:
+					counter += 1
 					commit.column = counter
-				elif parents == 1:
+				else:
 					name = commit.parent[0]
 					parent = self.commit[name]
 					if parent: commit.column = parent.column
 					else: commit.column = 1
-				else:
-					#counter += 1
-					commit.column += counter
-					#available = []
-					#for name in commit.parent:
-					#	parent = self.commit[name]
-					#	if parent: available.append(parent.column)
-					#commit.column = min(available)
 
 			'''
 			children = len(commit.child)
