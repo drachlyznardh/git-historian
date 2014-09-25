@@ -13,6 +13,7 @@ class Node:
 		self.static = 0
 		self.printed = 0
 		self.done = 0
+		self.nth_child = 0
 
 	def print_graph(self, commit_map):
 		if self.printed: return
@@ -42,15 +43,21 @@ class Node:
 		for i in self.ref:    str += "\n%s   Ref {%s}" % (indent, i)
 		return str
 
-	def know_your_children(self, child):
+	def know_your_children(self, child, i):
 		if child not in self.child:
 			self.child.append(child)
+			self.nth_child += i
 
 	def know_your_parents(self, commit_map):
-		for i in self.parent:
-			parent = commit_map[i]
+		for i in range(len(self.parent)):
+			name = self.parent[i]
+			parent = commit_map[name]
 			if parent:
-				parent.know_your_children(self.hash)
+				parent.know_your_children(self.hash, i)
+		#for i in self.parent:
+		#	parent = commit_map[i]
+		#	if parent:
+		#		parent.know_your_children(self.hash)
 
 	def know_your_column (self):
 		if len(self.ref):
