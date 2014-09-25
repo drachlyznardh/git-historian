@@ -14,3 +14,9 @@ recursion block. I'm thinking of a list of nodes to visit, in sequence.
 
 Half of the recursion unrolling is done. Before I re-add children, I shall make
 this graph readable again, by adding just-in-time indentation.
+
+Here's an idea: keep track of all (already printed?) commits with multiple
+parents, which are waiting for one or more of them. Will this allow me to wait
+until I have the max width of a branch?
+
+Up to this point, I cannot deal with multiple bases…
