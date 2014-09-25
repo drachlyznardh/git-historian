@@ -208,6 +208,7 @@ class Historian:
 		
 		visit = Order(self.head)
 		columns = Columns(2)
+		q = [] # list of all commits which are waiting for their column
 
 		while 1:
 
@@ -238,8 +239,28 @@ class Historian:
 					visit.cpush(commit.child[0])
 					continue
 
-			columns.assign(self.commit, commit)
-			print "%s %s %d" % (columns.show(commit.hash), commit.hash[0:7], len(commit.parent))
+			if not commit.know_your_column():
+				default_column = 2
+				children = len(commit.child)
+				if children == 0:
+					commit.column = default_column
+				elif children == 1:
+					child = self.commit[commit.child[0]]
+					if child: commit.column = child.column
+					else: commit.column = default_column
+				else:
+					column = []
+					for i in commit.child:
+						child = self.commit[i]
+						if child: column.append(child.column)
+					commit.column = min(column)
+					print "%s %d" % (column, commit.column)
+
+
+			print "%s" % commit.to_oneline()
+
+			#columns.assign(self.commit, commit)
+			#print "%s %s %d" % (columns.show(commit.hash), commit.hash[0:7], len(commit.parent))
 
 			if len(commit.parent) > 1:
 				for i in commit.parent:
@@ -261,7 +282,7 @@ class Historian:
 
 		for i in self.commit:
 			self.commit[i].know_your_parents(self.commit)
-			self.commit[i].know_your_column()
+			#self.commit[i].know_your_column()
 	
 		if self.head:
 			self.all_in_one_call(0)
