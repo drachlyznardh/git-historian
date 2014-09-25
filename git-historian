@@ -342,7 +342,7 @@ class Historian:
 							break
 					direction = 0
 
-			print "^ H processing %s" % commit.hash[:7]
+			print "* H processing %s" % commit.hash[:7]
 
 			missing_children = len(commit.child)
 			for name in commit.child:
