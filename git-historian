@@ -216,9 +216,6 @@ class Historian:
 	def unroll_vertically(self, debug):
 		
 		visit = Order(self.head)
-		columns = Columns(2)
-		q = [] # list of all commits which are waiting for their column
-		active = 2 # default column is the first with no fixed priority
 
 		while 1:
 
@@ -248,52 +245,18 @@ class Historian:
 				if child and not child.done:
 					visit.cpush(commit.child[0])
 					continue
-			'''
-			active -= len(commit.child)
-			active += len(commit.parent)
-
-			if not commit.know_your_column():
-				children = len(commit.child)
-				if children == 0:
-					commit.column = 2#active
-					#print "No child"
-				elif children == 1:
-					child = self.commit[commit.child[0]]
-					if child:
-						commit.column = child.column
-						#commit.column = len(child.parent)
-						#commit.column = 2
-						for i in child.parent:
-							if commit.hash == i: break
-							commit.column += 1
-					else: commit.column = active
-					#print "One child"
-				else:
-					column = []
-					for i in commit.child:
-						child = self.commit[i]
-						if child.parent[0] == commit.hash:
-							column.append(child.column)
-					commit.column = min(column)
-					#print "Many children %s %d" % (column, commit.column)
-			'''
-			#print "%s" % commit.to_oneline()
+			
 			self.vertical.append(commit.hash)
-
-			#columns.assign(self.commit, commit)
-			#print "%s %s %d" % (columns.show(commit.hash), commit.hash[0:7], len(commit.parent))
 
 			if len(commit.parent) > 1:
 				for i in commit.parent:
 					parent = self.commit[i]
 					if parent and not parent.done:
 						visit.ppush(i)
-						#active += 1
 			elif len(commit.parent) > 0:
 				parent = self.commit[commit.parent[0]]
 				if parent and not parent.done:
 					visit.push(commit.parent[0])
-					#active += 1
 			
 			if debug: visit.show()
 			commit.done = 1
@@ -307,8 +270,7 @@ class Historian:
 
 		print "%s is the left-most base" % base.hash
 
-		visit = Order(base.hash)#self.head)
-		#direction = 1 # DOWN
+		visit = Order(base.hash)
 		counter = 1
 		for i in self.commit:
 			self.commit[i].done = 0
