@@ -207,6 +207,10 @@ class Historian:
 	
 	def all_in_one_call(self, debug):
 
+		for i in self.commit:
+			self.commit[i].know_your_parents(self.commit)
+			#self.commit[i].know_your_column()
+	
 		self.unroll_vertically(debug)
 		self.unroll_horizontally(debug)
 
@@ -334,10 +338,6 @@ class Historian:
 		if not self.commit:
 			self.get_history()
 
-		for i in self.commit:
-			self.commit[i].know_your_parents(self.commit)
-			#self.commit[i].know_your_column()
-	
 		if self.head:
 			self.all_in_one_call(0)
 			#self.commit[self.head].inherit_column(self.commit, 2)
