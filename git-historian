@@ -341,6 +341,7 @@ class Historian:
 							commit = parent
 							break
 					direction = 0
+					counter += 1
 
 			print "* H processing %s" % commit.hash[:7]
 
@@ -362,23 +363,25 @@ class Historian:
 			commit.know_your_column()
 			commit.done = 1
 
-			'''
 			if not commit.static:
 				parents = len(commit.parent)
 				if parents == 0:
-					commit.column = 1
+					commit.column = counter
 				elif parents == 1:
 					name = commit.parent[0]
 					parent = self.commit[name]
 					if parent: commit.column = parent.column
 					else: commit.column = 1
 				else:
-					available = []
-					for name in commit.parent:
-						parent = self.commit[name]
-						if parent: available.append(parent.column)
-					commit.column = min(available)
+					#counter += 1
+					commit.column += counter
+					#available = []
+					#for name in commit.parent:
+					#	parent = self.commit[name]
+					#	if parent: available.append(parent.column)
+					#commit.column = min(available)
 
+			'''
 			children = len(commit.child)
 			if children == 1:
 				name = commit.child[0]
