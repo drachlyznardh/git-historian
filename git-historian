@@ -209,9 +209,15 @@ class Historian:
 
 		for i in self.commit:
 			self.commit[i].know_your_parents(self.commit)
-			#self.commit[i].know_your_column()
 	
 		self.unroll_vertically(debug)
+
+		for i in self.commit:
+			self.commit[i].child = []
+
+		for i in self.vertical:
+			self.commit[i].know_your_parents(self.commit)
+
 		self.unroll_horizontally(debug)
 
 		for i in self.vertical:
