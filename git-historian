@@ -300,22 +300,22 @@ class Historian:
 
 	def unroll_horizontally(self, debug):
 		
-		base = self.commit[self.head]
+		#base = self.commit[self.head]
 
-		while len(base.parent):
-			base = self.commit[base.parent[0]]
+		#while len(base.parent):
+		#base = self.commit[base.parent[0]]
 
-		print "%s is the left-most base" % base.hash
+		#print "%s is the left-most base" % base.hash
 
-		visit = Order(base.hash)
-		direction = 1 # UP
+		visit = Order(self.head)
+		direction = 1 # DOWN
 		counter = 0
 		for i in self.commit:
 			self.commit[i].done = 0
 			self.commit[i].know_your_column()
 
 		while 1:
-			
+
 			target = visit.pop()
 			if not target:
 				if debug: print "H No Target"
@@ -328,6 +328,22 @@ class Historian:
 			if commit.done:
 				if debug: print "H %s is done, skipping" % commit.hash[:7]
 				continue
+
+			if direction: # GOING DOWN TO FIND BASE
+
+				while len(commit.parent):
+					for name in commit.parent:
+						parent = self.commit[name]
+						if not parent.done:
+							commit = parent
+							break
+
+				#if len(commit.parent) == 0: # FOUND A BASE
+				#if not commit.done
+					visit.cpush(commit.hash)
+					direction = 0
+				print "%s is a base" % commit.hash
+				#continue
 
 			if not commit.static:
 				parents = len(commit.parent)
