@@ -30,7 +30,7 @@ class Node:
 		else: offset = ''
 		if self.static: t = 'St'
 		else: t = 'Dy'
-		return "%s %s* %s" % (t, offset, self.hash)
+		return "%s(%02d) %s* %s" % (t, self.column, offset, self.hash)
 
 	def to_string(self):
 		if self.column > 0:
@@ -308,6 +308,7 @@ class Historian:
 		print "%s is the left-most base" % base.hash
 
 		visit = Order(base.hash)
+		direction = 1 # UP
 		counter = 0
 		for i in self.commit:
 			self.commit[i].done = 0
@@ -330,15 +331,15 @@ class Historian:
 
 			if not commit.static:
 				parents = len(commit.parent)
-				if parents == 1:
+				if parents == 0:
+					commit.column = 1
+				elif parents == 1:
 					name = commit.parent[0]
 					parent = self.commit[name]
 					if parent: commit.column = parent.column
 					else: commit.column = 1
-				elif parents > 1:
-					'culo'
 				else:
-					commit.column = 1
+					'culo'
 
 			children = len(commit.child)
 			if children == 1:
