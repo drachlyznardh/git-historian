@@ -180,6 +180,7 @@ class Historian:
 	def __init__ (self):
 		self.head = 0
 		self.commit = {}
+		self.vertical = []
 	
 	def get_history(self):
 		git_history_dump = check_output(["git", "log", '--pretty="%H %P%d"', "--all"])
