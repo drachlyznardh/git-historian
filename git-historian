@@ -303,16 +303,20 @@ class Historian:
 				if debug: print "%s is Done, skipping" % target[:7]
 				continue
 
-			children = len(commit.child)
-			if children == 0:
-				commit.column = limit
+			if commit.column == -1:
+				children = len(commit.child)
+				if children == 0:
+					commit.column = limit
+
+			commit.done = 1
 
 			parents = len(commit.parent)
 			if parents > 0:
 				name = commit.parent[0]
 				parent = self.commit[name]
 				if parent and not parent.done:
-					parent.column = commit.column
+					if parent.column == -1:
+						parent.column = commit.column
 					visit.ppush(name)
 				for name in commit.parent[1:]:
 					parent = self.commit[name]
