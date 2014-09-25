@@ -309,14 +309,14 @@ class Historian:
 
 		visit = Order(self.head)
 		direction = 1 # DOWN
-		counter = 0
+		counter = 2
 		for i in self.commit:
 			self.commit[i].done = 0
 			self.commit[i].know_your_column()
 
 		while 1:
 
-			visit.show()
+			#visit.show()
 			target = visit.pop()
 			if not target:
 				if debug: print "H No Target"
@@ -362,12 +362,6 @@ class Historian:
 			commit.know_your_column()
 			commit.done = 1
 
-			for name in commit.parent:
-				parent = self.commit[name]
-				if parent and not parent.done:
-					print "v H calling parent %s" % parent.hash[:7]
-					visit.ppush(name)
-
 			'''
 			if not commit.static:
 				parents = len(commit.parent)
@@ -401,6 +395,12 @@ class Historian:
 						skip += 1
 				if skip: continue
 			'''
+
+			for name in commit.parent:
+				parent = self.commit[name]
+				if parent and not parent.done:
+					print "v H calling parent %s" % parent.hash[:7]
+					visit.ppush(name)
 
 	def tell_the_story(self):
 
