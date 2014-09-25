@@ -206,12 +206,13 @@ class Historian:
 			self.commit[node.hash] = node
 	
 	def all_in_one_call(self, debug):
-		self.unroll_vertical(debug)
+
+		self.unroll_vertically(debug)
 
 		for i in self.vertical:
 			print "%s" % self.commit[i].to_oneline()
 
-	def unroll_vertical(self, debug):
+	def unroll_vertically(self, debug):
 		
 		visit = Order(self.head)
 		columns = Columns(2)
