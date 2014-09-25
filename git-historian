@@ -263,7 +263,8 @@ class Historian:
 					column = []
 					for i in commit.child:
 						child = self.commit[i]
-						if child: column.append(child.column)
+						if child.parent[0] == commit.hash:
+							column.append(child.column)
 					commit.column = min(column)
 					#print "Many children %s %d" % (column, commit.column)
 
