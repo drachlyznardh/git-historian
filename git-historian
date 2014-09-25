@@ -28,7 +28,9 @@ class Node:
 		if self.column > 0:
 			offset = ('%%%ds' % (2 * self.column) % '')
 		else: offset = ''
-		return "%s* %s" % (offset, self.hash)
+		if self.static: t = 'St'
+		else: t = 'Dy'
+		return "%s %s* %s" % (t, offset, self.hash)
 
 	def to_string(self):
 		if self.column > 0:
@@ -61,6 +63,7 @@ class Node:
 					self.static = 1
 					self.column = 0
 					break
+		return self.static
 
 	def inherit_column (self, commit_map, base):
 		if self.column != -1: return
