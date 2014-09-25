@@ -330,21 +330,6 @@ class Historian:
 				if debug: print "H %s is done, skipping" % commit.hash[:7]
 				continue
 
-			'''
-			if direction: # GOING DOWN TO FIND BASE
-
-				print "V H processing %s" % commit.hash[:7]
-
-				while len(commit.parent):
-					for name in commit.parent:
-						parent = self.commit[name]
-						if not parent.done:
-							commit = parent
-							break
-					direction = 0
-					counter += 1
-			'''
-
 			print "* H processing %s" % commit.hash[:7]
 
 			missing_parents = len(commit.parent)
@@ -375,24 +360,6 @@ class Historian:
 					parent = self.commit[name]
 					if parent: commit.column = parent.column
 					else: commit.column = 1
-
-			'''
-			children = len(commit.child)
-			if children == 1:
-				name = commit.child[0]
-				child = self.commit[name]
-				if child and not child.done:
-					visit.cpush(name)
-					continue
-			elif children > 1:
-				skip = 0
-				for name in reversed(commit.child):
-					child = self.commit[name]
-					if child and not child.done:
-						visit.cpush(name)
-						skip += 1
-				if skip: continue
-			'''
 
 			for name in reversed(commit.child):
 				child = self.commit[name]
