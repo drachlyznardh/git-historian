@@ -19,4 +19,5 @@ Here's an idea: keep track of all (already printed?) commits with multiple
 parents, which are waiting for one or more of them. Will this allow me to wait
 until I have the max width of a branch?
 
-Up to this point, I cannot deal with multiple bases…
+Up to this point, I cannot deal with multiple bases… now I can. Now I need to
+order children consistently.
