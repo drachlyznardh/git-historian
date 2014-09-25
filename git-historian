@@ -316,6 +316,7 @@ class Historian:
 
 		while 1:
 
+			visit.show()
 			target = visit.pop()
 			if not target:
 				if debug: print "H No Target"
@@ -331,6 +332,8 @@ class Historian:
 
 			if direction: # GOING DOWN TO FIND BASE
 
+				print "V H processing %s" % commit.hash[:7]
+
 				while len(commit.parent):
 					for name in commit.parent:
 						parent = self.commit[name]
@@ -338,13 +341,37 @@ class Historian:
 							commit = parent
 							break
 
-				#if len(commit.parent) == 0: # FOUND A BASE
-				#if not commit.done
 					visit.cpush(commit.hash)
 					direction = 0
-				print "%s is a base" % commit.hash
-				#continue
+				#print "%s is a base" % commit.hash
 
+			print "^ H processing %s" % commit.hash[:7]
+
+			missing_children = len(commit.child)
+			for name in commit.child:
+				child = self.commit[name]
+				if child:
+					if child.done:
+						missing_children -= 1
+					else:
+						print "^ H calling child %s" % child.hash[:7]
+						visit.cpush(name)
+						break
+				else:
+					missing_children -= 1
+						
+			if missing_children: continue
+			
+			commit.know_your_column()
+			commit.done = 1
+
+			for name in commit.parent:
+				parent = self.commit[name]
+				if parent and not parent.done:
+					print "v H calling parent %s" % parent.hash[:7]
+					visit.ppush(name)
+
+			'''
 			if not commit.static:
 				parents = len(commit.parent)
 				if parents == 0:
@@ -376,6 +403,7 @@ class Historian:
 						visit.cpush(name)
 						skip += 1
 				if skip: continue
+			'''
 
 	def tell_the_story(self):
 
