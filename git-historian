@@ -206,6 +206,12 @@ class Historian:
 			self.commit[node.hash] = node
 	
 	def all_in_one_call(self, debug):
+		self.unroll_vertical(debug)
+
+		for i in self.vertical:
+			print "%s" % self.commit[i].to_oneline()
+
+	def unroll_vertical(self, debug):
 		
 		visit = Order(self.head)
 		columns = Columns(2)
@@ -269,7 +275,8 @@ class Historian:
 					commit.column = min(column)
 					#print "Many children %s %d" % (column, commit.column)
 
-			print "%s" % commit.to_oneline()
+			#print "%s" % commit.to_oneline()
+			self.vertical.append(commit.hash)
 
 			#columns.assign(self.commit, commit)
 			#print "%s %s %d" % (columns.show(commit.hash), commit.hash[0:7], len(commit.parent))
