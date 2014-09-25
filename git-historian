@@ -246,18 +246,26 @@ class Historian:
 			if not commit.know_your_column():
 				children = len(commit.child)
 				if children == 0:
-					commit.column = active
+					commit.column = 2#active
+					#print "No child"
 				elif children == 1:
 					child = self.commit[commit.child[0]]
-					if child: commit.column = child.column
+					if child:
+						#commit.column = child.column
+						#commit.column = len(child.parent)
+						commit.column = 2
+						for i in child.parent:
+							if commit.hash == i: break
+							commit.column += 1
 					else: commit.column = active
+					#print "One child"
 				else:
 					column = []
 					for i in commit.child:
 						child = self.commit[i]
 						if child: column.append(child.column)
 					commit.column = min(column)
-					print "%s %d" % (column, commit.column)
+					#print "Many children %s %d" % (column, commit.column)
 
 			print "%s" % commit.to_oneline()
 
@@ -269,10 +277,12 @@ class Historian:
 					parent = self.commit[i]
 					if parent and not parent.done:
 						visit.ppush(i)
+						#active += 1
 			elif len(commit.parent) > 0:
 				parent = self.commit[commit.parent[0]]
 				if parent and not parent.done:
 					visit.push(commit.parent[0])
+					#active += 1
 			
 			if debug: visit.show()
 			commit.done = 1
