@@ -208,6 +208,7 @@ class Historian:
 	def all_in_one_call(self, debug):
 
 		self.unroll_vertically(debug)
+		self.unroll_horizontally(debug)
 
 		for i in self.vertical:
 			print "%s" % self.commit[i].to_oneline()
@@ -296,6 +297,15 @@ class Historian:
 			
 			if debug: visit.show()
 			commit.done = 1
+
+	def unroll_horizontally(self, debug):
+		
+		base = self.commit[self.head]
+
+		while len(base.parent):
+			base = self.commit[base.parent[0]]
+
+		print "%s is the left-most base" % base.hash
 
 	def tell_the_story(self):
 
