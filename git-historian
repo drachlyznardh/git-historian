@@ -259,7 +259,16 @@ class Historian:
 
 		leftmost = 2
 		lines = Columns()
-		
+
+		# Children must appear in their vertical order
+		for name in self.vertical:
+			commit = self.commit[name]
+			if commit: commit.child = []
+
+		for name in self.vertical:
+			commit = self.commit[name]
+			if commit: commit.know_your_parents(self.commit)
+
 		for name in self.vertical:
 			
 			print ""
