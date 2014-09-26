@@ -154,8 +154,8 @@ class Columns:
 			i = self.l[index]
 			if i.bottom() == bottom and target in i.l:
 				#Archiving
-				to_archive = Column([])
-				for e in i.l[1:-1]: to_archive.l.append(e)
+				to_archive = Column(i.l[1:-1])
+				#for e in i.l[1:-1]: to_archive.l.append(e)
 
 				#index = self.l.index(i)
 				to_archive.index = index
