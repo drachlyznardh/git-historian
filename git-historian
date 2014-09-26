@@ -332,6 +332,7 @@ class Historian:
 
 	def print_graph (self):
 		
+		columns = [None] * self.max_column
 		for name in self.vertical:
 
 			commit = self.commit[name]
@@ -339,9 +340,12 @@ class Historian:
 				print "No Commit for name %s" % name[:7]
 
 			layout = ''
+			for i in xrange(self.max_column + 1):
+				if i == commit.column: layout += ' *'
+				else: layout += '  '
 
 			#print "%s" % commit.to_oneline(self.max_column)
-			print "%s %s" % (layout, name[:7])
+			print "%s %02d %s" % (layout, commit.column, name[:7])
 
 	def tell_the_story(self):
 
