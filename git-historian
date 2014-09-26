@@ -112,8 +112,9 @@ class Order:
 		print "{\n%s}" % message
 
 class Column:
-	def __init__ (self, top, bottom):
-		self.l = [top, bottom]
+	def __init__ (self, l):
+		self.l = l
+		self.index = -1
 	
 	def top (self):
 		return self.l[0]
@@ -134,13 +135,29 @@ class Column:
 class Columns:
 	def __init__ (self):
 		self.l = []
+		self.archived = []
 
 	def insert (self, top, bottom):
 		for i in self.l:
 			if i.bottom() == top:
 				i.append(bottom)
 				return
-		self.l.append(Column(top, bottom))
+		self.l.append(Column([top, bottom]))
+
+	def archive (self, bottom, target):
+		for i in self.l:
+			if i.bottom() == bottom and i.l[-2] == target:
+				#Archiving
+				next = Column([])
+				for e in i.l[1:-1]: next.l.append(e)
+
+				index = self.l.index(i)
+				next.index = index
+				self.archived.append(next)
+				self.l.pop(index)
+				
+				print "Archiving %s at index %d" % (target[:7], index)
+				break
 
 	def show (self):
 		print '{'
@@ -251,8 +268,9 @@ class Historian:
 				if debug: print "No Commit for name %s" % name[:7]
 				break
 
-			for child in commit.child:
+			for child in commit.child[1:]:
 				print "Should be archiving branch for %s" % child[:7]
+				lines.archive(name, child)
 
 			for parent in commit.parent:
 				print "  Inserting (%s, %s)" % (name[:7], parent[:7])
@@ -260,6 +278,15 @@ class Historian:
 
 		for index in range(len(lines.l)):
 			for name in lines.l[index].l:
+				print "Calling %s with %d" % (name[:7], index)
+				target = self.commit[name]
+				if target and target.column == -1:
+					target.column = index
+
+		for i in xrange(len(lines.archived)):
+			column = lines.archived[i]
+			index = column.index
+			for name in column.l:
 				print "Calling %s with %d" % (name[:7], index)
 				target = self.commit[name]
 				if target and target.column == -1:
