@@ -289,6 +289,8 @@ class Historian:
 
 		while 1:
 			
+			if direction: print "v"
+			else: print "^"
 			visit.show()
 			target = visit.pop()
 			if not target:
@@ -311,6 +313,20 @@ class Historian:
 					if children == 0:
 						commit.column = limit
 
+				children = len(commit.child)
+				if children:
+					missing = children
+					for name in commit.child:
+						child = self.commit[name]
+						if child:
+							if child.column != 1:
+								missing -= 1
+							else:
+								visit.cpush(name)
+								direction = 0
+								break
+					if missing: continue
+
 				parents = len(commit.parent)
 				if parents == 1:
 					name = commit.parent[0]
@@ -321,7 +337,15 @@ class Historian:
 						visit.push(name)
 
 			else: # GOING UP, TRAVERSING
-				break
+				while len(commit.child):
+					for name in commit.child:
+						child = self.commit[name]
+						if child and child.column == -1:
+							commit = child
+							break
+				visit.cpush(name)
+				direction = 1
+				continue
 
 	def unroll_horizontally(self, debug):
 		
