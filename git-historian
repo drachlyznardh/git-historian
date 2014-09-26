@@ -230,9 +230,7 @@ class Historian:
 	
 		self.unroll_vertically(debug)
 		self.unroll_horizontally(debug)
-
-		for i in self.vertical:
-			print "%s" % self.commit[i].to_oneline(self.max_column)
+		self.print_graph()
 
 	def unroll_vertically(self, debug):
 		
@@ -331,6 +329,19 @@ class Historian:
 					target.column = index
 		
 		self.max_column = len(lines.l) - 1
+
+	def print_graph (self):
+		
+		for name in self.vertical:
+
+			commit = self.commit[name]
+			if not commit:
+				print "No Commit for name %s" % name[:7]
+
+			layout = ''
+
+			#print "%s" % commit.to_oneline(self.max_column)
+			print "%s %s" % (layout, name[:7])
 
 	def tell_the_story(self):
 
