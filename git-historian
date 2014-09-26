@@ -251,6 +251,9 @@ class Historian:
 				if debug: print "No Commit for name %s" % name[:7]
 				break
 
+			for child in commit.child:
+				print "Should be archiving branch for %s" % child[:7]
+
 			for parent in commit.parent:
 				print "  Inserting (%s, %s)" % (name[:7], parent[:7])
 				lines.insert(name, parent)
