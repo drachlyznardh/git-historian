@@ -129,48 +129,12 @@ class Column:
 		print "%s" % line
 
 class Columns:
-	def __init__ (self, size):
-		self.stack = []
-		while len(self.stack) < size:
-			self.stack.append(' ')
-		self.nextstack = self.stack
+	def __init__ (self, first):
+		self.l = [Column(first)]
 
-	def assign (self, allcommit, commit):
-		if commit.column == -1:
-			if len(commit.child):
-				child = allcommit[commit.child[0]]
-				if child:
-					if len(child.parent) == 1:
-						commit.column = child.column
-					elif child.parent[0] == commit.hash:
-						commit.column = child.column
-					else:
-						commit.column = child.column + 1
-				#commit.column = allcommit[commit.child[-0]].column
-			elif len(commit.parent):
-				commit.column = allcommit[commit.parent[-0]].column
-
-		if commit.column == -1:
-			commit.column = len(self.stack)
-
-		actual = commit.column * 2
-
-		while len(self.stack) <= actual:
-			self.stack.append(' ')
-
-		if actual:
-			self.stack[actual - 1] = ' '
-		self.stack[actual] = commit
-
-	def show (self, target):
-		message = ''
-		for i in self.stack:
-			if isinstance(i, basestring):
-				message += i
-			elif i.hash == target:
-				message += '*'
-			else: message += ' '
-		return message
+	def show (self):
+		for i in self.l:
+			i.show()
 
 class Historian:
 	def __init__ (self):
@@ -263,10 +227,11 @@ class Historian:
 	def unroll_horizontally(self, debug):
 
 		leftmost = 2
-		lines = [[]]
+		lines = Columns(self.vertical[0])
 		
 		for name in self.vertical:
 			
+			lines.show()
 			commit = self.commit[name]
 			if not commit:
 				if debug: print "No Commit for name %s" % name[:7]
