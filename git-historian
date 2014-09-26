@@ -29,7 +29,9 @@ class Node:
 		if self.column > 0:
 			offset = ('%%%ds' % (2 * self.column) % '')
 		else: offset = ''
-		padding = ('%%%ds' % (2 * (max_column - self.column)) % '')
+		if max_column - self.column:
+			padding = ('%%%ds' % (2 * (max_column - self.column)) % '')
+		else: padding = ''
 		if self.static: t = 'St'
 		else: t = 'Dy'
 		return "%s(%02d) %s*%s %s" % (t, self.column, offset, padding, self.hash)
