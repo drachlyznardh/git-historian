@@ -13,6 +13,7 @@ class Node:
 		self.static = 0
 		self.printed = 0
 		self.done = 0
+		self.nth_child = 0
 
 	def print_graph(self, commit_map):
 		if self.printed: return
@@ -30,7 +31,7 @@ class Node:
 		else: offset = ''
 		if self.static: t = 'St'
 		else: t = 'Dy'
-		return "%s %s* %s" % (t, offset, self.hash)
+		return "%s(%02d) %s* %s" % (t, self.column, offset, self.hash)
 
 	def to_string(self):
 		if self.column > 0:
@@ -42,15 +43,21 @@ class Node:
 		for i in self.ref:    str += "\n%s   Ref {%s}" % (indent, i)
 		return str
 
-	def know_your_children(self, child):
+	def know_your_children(self, child, i):
 		if child not in self.child:
 			self.child.append(child)
+			self.nth_child += i
 
 	def know_your_parents(self, commit_map):
-		for i in self.parent:
-			parent = commit_map[i]
+		for i in range(len(self.parent)):
+			name = self.parent[i]
+			parent = commit_map[name]
 			if parent:
-				parent.know_your_children(self.hash)
+				parent.know_your_children(self.hash, i)
+		#for i in self.parent:
+		#	parent = commit_map[i]
+		#	if parent:
+		#		parent.know_your_children(self.hash)
 
 	def know_your_column (self):
 		if len(self.ref):
@@ -71,11 +78,11 @@ class Node:
 			for i in self.ref:
 				if re.match(r'''^tag: r[0-9]+''', i):
 					self.static = 1
-					self.column = 1
+					self.column = 3
 					break
 				if re.match(r'''^tag: h[0-9]+''', i):
 					self.static = 1
-					self.column = 0
+					self.column = 2
 					break
 		if not self.static: self.column = base
 
@@ -180,6 +187,7 @@ class Historian:
 	def __init__ (self):
 		self.head = 0
 		self.commit = {}
+		self.vertical = []
 	
 	def get_history(self):
 		git_history_dump = check_output(["git", "log", '--pretty="%H %P%d"', "--all"])
@@ -205,11 +213,26 @@ class Historian:
 			self.commit[node.hash] = node
 	
 	def all_in_one_call(self, debug):
+
+		for i in self.commit:
+			self.commit[i].know_your_parents(self.commit)
+	
+		self.unroll_vertically(debug)
+
+		for i in self.commit:
+			self.commit[i].child = []
+
+		for i in self.vertical:
+			self.commit[i].know_your_parents(self.commit)
+
+		self.unroll_horizontally_top(1)#debug)
+
+		for i in self.vertical:
+			print "%s" % self.commit[i].to_oneline()
+
+	def unroll_vertically(self, debug):
 		
 		visit = Order(self.head)
-		columns = Columns(2)
-		q = [] # list of all commits which are waiting for their column
-		active = 2 # default column is the first with no fixed priority
 
 		while 1:
 
@@ -239,64 +262,168 @@ class Historian:
 				if child and not child.done:
 					visit.cpush(commit.child[0])
 					continue
-
-			active -= len(commit.child)
-			active += len(commit.parent)
-
-			if not commit.know_your_column():
-				children = len(commit.child)
-				if children == 0:
-					commit.column = 2#active
-					#print "No child"
-				elif children == 1:
-					child = self.commit[commit.child[0]]
-					if child:
-						commit.column = child.column
-						#commit.column = len(child.parent)
-						#commit.column = 2
-						for i in child.parent:
-							if commit.hash == i: break
-							commit.column += 1
-					else: commit.column = active
-					#print "One child"
-				else:
-					column = []
-					for i in commit.child:
-						child = self.commit[i]
-						if child.parent[0] == commit.hash:
-							column.append(child.column)
-					commit.column = min(column)
-					#print "Many children %s %d" % (column, commit.column)
-
-			print "%s" % commit.to_oneline()
-
-			#columns.assign(self.commit, commit)
-			#print "%s %s %d" % (columns.show(commit.hash), commit.hash[0:7], len(commit.parent))
+			
+			self.vertical.append(commit.hash)
 
 			if len(commit.parent) > 1:
 				for i in commit.parent:
 					parent = self.commit[i]
 					if parent and not parent.done:
 						visit.ppush(i)
-						#active += 1
 			elif len(commit.parent) > 0:
 				parent = self.commit[commit.parent[0]]
 				if parent and not parent.done:
 					visit.push(commit.parent[0])
-					#active += 1
 			
 			if debug: visit.show()
 			commit.done = 1
+
+	def unroll_horizontally_top(self, debug):
+
+		for i in self.commit:
+			self.commit[i].done = 0
+
+		visit = Order(self.head)
+		limit = 1
+		direction = 1 # DOWN
+
+		while 1:
+			
+			if direction: print "v"
+			else: print "^"
+			visit.show()
+			target = visit.pop()
+			if not target:
+				if debug: print "No Target"
+				break
+
+			commit = self.commit[target]
+			if not commit:
+				if debug: print "No Commit for target %s" % target[:7]
+				break
+
+			if commit.done:
+				if debug: print "%s is Done, skipping" % target[:7]
+				continue
+
+			if direction: # GOING DOWN, APPLYING
+
+				if commit.column == -1:
+					children = len(commit.child)
+					if children == 0:
+						commit.column = limit
+
+				children = len(commit.child)
+				if children:
+					missing = children
+					for name in commit.child:
+						child = self.commit[name]
+						if child:
+							if child.column != 1:
+								missing -= 1
+							else:
+								visit.cpush(name)
+								direction = 0
+								break
+					if missing: continue
+
+				parents = len(commit.parent)
+				if parents == 1:
+					name = commit.parent[0]
+					parent = self.commit[name]
+					if parent:
+						if parent.column == -1:
+							parent.column = commit.column
+						visit.push(name)
+
+			else: # GOING UP, TRAVERSING
+				while len(commit.child):
+					for name in commit.child:
+						child = self.commit[name]
+						if child and child.column == -1:
+							commit = child
+							break
+				visit.cpush(name)
+				direction = 1
+				continue
+
+	def unroll_horizontally(self, debug):
+		
+		base = self.commit[self.head]
+
+		while len(base.parent):
+			base = self.commit[base.parent[0]]
+
+		print "%s is the left-most base" % base.hash
+
+		visit = Order(base.hash)
+		counter = -1
+		for i in self.commit:
+			self.commit[i].done = 0
+			#self.commit[i].know_your_column()
+
+		while 1:
+
+			#visit.show()
+			target = visit.pop()
+			if not target:
+				if debug: print "H No Target"
+				break
+
+			commit = self.commit[target]
+			if not commit:
+				if debug: print "H No Commit"
+				break
+			if commit.done:
+				if debug: print "H %s is done, skipping" % commit.hash[:7]
+				continue
+
+			print "* H processing %s" % commit.hash[:7]
+
+			missing_parents = len(commit.parent)
+			for name in commit.parent:
+				parent = self.commit[name]
+				if parent:
+					if parent.done:
+						missing_parents -= 1
+					else:
+						print "^ H calling parent %s" % parent.hash[:7]
+						visit.cpush(name)
+						break
+				else:
+					missing_parents -= 1
+						
+			if missing_parents: continue
+			
+			#commit.know_your_column()
+			commit.done = 1
+
+			counter += len(commit.child)
+
+			if not commit.static:
+				parents = len(commit.parent)
+				if parents == 0:
+					#counter += 1
+					commit.column = counter
+				else:
+					name = commit.parent[0]
+					parent = self.commit[name]
+					if parent: commit.column = parent.column
+					else: commit.column = 1
+					commit.column = counter
+
+			for name in reversed(commit.child):
+				child = self.commit[name]
+				if child and not child.done:
+					print "v H calling child %s" % child.hash[:7]
+					counter -= 1
+					visit.ppush(name)
 
 	def tell_the_story(self):
 
 		if not self.commit:
 			self.get_history()
 
-		for i in self.commit:
-			self.commit[i].know_your_parents(self.commit)
-			#self.commit[i].know_your_column()
-	
 		if self.head:
 			self.all_in_one_call(0)
 			#self.commit[self.head].inherit_column(self.commit, 2)
