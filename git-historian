@@ -116,6 +116,10 @@ class Column:
 		self.l = l
 		self.index = -1
 	
+	def make_available (self):
+		self.l = []
+		self.index = -1
+
 	def top (self):
 		return self.l[0]
 	
