@@ -174,7 +174,7 @@ class Columns:
 		print "C.Archive (%s, %s)" % (bottom[:7], target[:7])
 		for index in reversed(xrange(len(self.l))):
 			i = self.l[index]
-			if i.bottom() == bottom and target in i.l:
+			if not i.available and i.bottom() == bottom and target in i.l:
 				#Archiving
 				to_archive = Column(i.l[1:-1])
 				#for e in i.l[1:-1]: to_archive.l.append(e)
