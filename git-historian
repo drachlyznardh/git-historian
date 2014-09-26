@@ -112,14 +112,17 @@ class Order:
 		print "{\n%s}" % message
 
 class Column:
-	def __init__ (self, top):
-		self.l = [top]
+	def __init__ (self, top, bottom):
+		self.l = [top, bottom]
 	
 	def top (self):
 		return self.l[0]
 	
 	def bottom (self):
 		return self.l[-1]
+
+	def append (self, bottom):
+		self.l.append(bottom)
 
 	def show (self):
 		line = '[' + self.l[0][:7]
@@ -131,6 +134,13 @@ class Column:
 class Columns:
 	def __init__ (self):
 		self.l = []
+
+	def insert (self, top, bottom):
+		for i in self.l:
+			if i.bottom() == top:
+				i.append(bottom)
+				return
+		self.l.append(Column(top, bottom))
 
 	def show (self):
 		print '{'
@@ -233,11 +243,24 @@ class Historian:
 		
 		for name in self.vertical:
 			
+			print ""
 			lines.show()
+			print "Processing %s" % name[:7]
 			commit = self.commit[name]
 			if not commit:
 				if debug: print "No Commit for name %s" % name[:7]
 				break
+
+			for parent in commit.parent:
+				print "  Inserting (%s, %s)" % (name[:7], parent[:7])
+				lines.insert(name, parent)
+
+		for index in range(len(lines.l)):
+			for name in lines.l[index].l:
+				print "Calling %s with %d" % (name[:7], index)
+				target = self.commit[name]
+				if target and target.column == -1:
+					target.column = index
 
 	def tell_the_story(self):
 
