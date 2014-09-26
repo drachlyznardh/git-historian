@@ -111,6 +111,23 @@ class Order:
 				message += ']\n'
 		print "{\n%s}" % message
 
+class Column:
+	def __init__ (self, top):
+		self.l = [top]
+	
+	def top (self):
+		return self.l[0]
+	
+	def bottom (self):
+		return self.l[-1]
+
+	def show (self):
+		line = '[' + self.l[0][:7]
+		for i in self.l[1:]:
+			line += ', ' + i[:7]
+		line += ']'
+		print "%s" % line
+
 class Columns:
 	def __init__ (self, size):
 		self.stack = []
@@ -245,6 +262,9 @@ class Historian:
 
 	def unroll_horizontally(self, debug):
 
+		leftmost = 2
+		lines = [[]]
+		
 		for name in self.vertical:
 			
 			commit = self.commit[name]
