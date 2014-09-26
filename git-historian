@@ -328,16 +328,27 @@ class Historian:
 				if target and target.column == -1:
 					target.column = index
 		
-		self.max_column = len(lines.l) - 1
+		self.max_column = len(lines.l)# - 1
 
 	def print_graph (self):
 		
-		columns = [None] * self.max_column
+		row_p = {}
+		row_c = {}
+
 		for name in self.vertical:
 
 			commit = self.commit[name]
 			if not commit:
 				print "No Commit for name %s" % name[:7]
+				break
+
+			row_p = row_c.copy() # Previous row in the old current
+			row_c[commit.column] = commit.hash
+
+			transition = ''
+			for i in range(self.max_column):
+				if i in row_p and row_p[i]: transition += ' |'
+			if transition: print "{%s}" % transition
 
 			layout = ''
 			for i in xrange(self.max_column + 1):
@@ -345,7 +356,12 @@ class Historian:
 				else: layout += '  '
 
 			#print "%s" % commit.to_oneline(self.max_column)
-			print "%s %02d %s" % (layout, commit.column, name[:7])
+			print "{%s}%02d %s" % (layout, commit.column, name[:7])
+
+			row_c[commit.column] = None
+			for name in commit.parent:
+				parent = self.commit[name]
+				if parent: row_c[parent.column] = name
 
 	def tell_the_story(self):
 
