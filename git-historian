@@ -129,12 +129,14 @@ class Column:
 		print "%s" % line
 
 class Columns:
-	def __init__ (self, first):
-		self.l = [Column(first)]
+	def __init__ (self):
+		self.l = []
 
 	def show (self):
+		print '{'
 		for i in self.l:
 			i.show()
+		print '}'
 
 class Historian:
 	def __init__ (self):
@@ -227,7 +229,7 @@ class Historian:
 	def unroll_horizontally(self, debug):
 
 		leftmost = 2
-		lines = Columns(self.vertical[0])
+		lines = Columns()
 		
 		for name in self.vertical:
 			
