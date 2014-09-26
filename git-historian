@@ -115,10 +115,12 @@ class Column:
 	def __init__ (self, l):
 		self.l = l
 		self.index = -1
+		self.available = 0
 	
 	def make_available (self):
 		self.l = []
 		self.index = -1
+		self.available = 1
 
 	def top (self):
 		return self.l[0]
@@ -130,6 +132,8 @@ class Column:
 		self.l.append(bottom)
 
 	def show (self):
+		if len(self.l) == 0: return
+
 		line = '[' + self.l[0][:7]
 		for i in self.l[1:]:
 			line += ', ' + i[:7]
@@ -143,9 +147,10 @@ class Columns:
 
 	def insert (self, top, bottom):
 		for i in self.l:
-			if i.bottom() == top:
+			if not i.available and i.bottom() == top:
 				i.append(bottom)
 				return
+		#print "C.Insert (not found) (%s, %s)" % (top[:7], bottom[:7])
 		self.l.append(Column([top, bottom]))
 
 	def archive (self, bottom, target):
@@ -160,7 +165,8 @@ class Columns:
 				#index = self.l.index(i)
 				to_archive.index = index
 				self.archived.append(to_archive)
-				self.l.pop(index)
+				#self.l.pop(index)
+				self.l[index].make_available()
 				
 				print "Archiving %s at index %d" % (target[:7], index)
 				break
