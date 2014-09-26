@@ -25,13 +25,14 @@ class Node:
 		for i in reversed(self.parent):
 			commit_map[i].print_graph(commit_map)
 
-	def to_oneline(self):
+	def to_oneline(self, max_column):
 		if self.column > 0:
 			offset = ('%%%ds' % (2 * self.column) % '')
 		else: offset = ''
+		padding = ('%%%ds' % (2 * (max_column - self.column)) % '')
 		if self.static: t = 'St'
 		else: t = 'Dy'
-		return "%s(%02d) %s* %s" % (t, self.column, offset, self.hash)
+		return "%s(%02d) %s*%s %s" % (t, self.column, offset, padding, self.hash)
 
 	def to_string(self):
 		if self.column > 0:
@@ -195,6 +196,7 @@ class Historian:
 		self.head = 0
 		self.commit = {}
 		self.vertical = []
+		self.max_column = -1
 	
 	def get_history(self):
 		git_history_dump = check_output(["git", "log", '--pretty="%H %P%d"', "--all"])
@@ -228,7 +230,7 @@ class Historian:
 		self.unroll_horizontally(debug)
 
 		for i in self.vertical:
-			print "%s" % self.commit[i].to_oneline()
+			print "%s" % self.commit[i].to_oneline(self.max_column)
 
 	def unroll_vertically(self, debug):
 		
@@ -325,6 +327,8 @@ class Historian:
 				target = self.commit[name]
 				if target and target.column == -1:
 					target.column = index
+		
+		self.max_column = len(lines.l) - 1
 
 	def tell_the_story(self):
 
