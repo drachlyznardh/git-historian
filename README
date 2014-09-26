@@ -11,15 +11,10 @@ Starting from the first head, the unrolling orders commits with two rule:
  - a commit appears only after all its children;
  - a commit appears strictly before any of its parents;
 
-It's working, but being recursive is bad. Long histories trigger the maximum
-recursion block. I'm thinking of a list of nodes to visit, in sequence.
+Horizontal unroll
+=================
 
-Half of the recursion unrolling is done. Before I re-add children, I shall make
-this graph readable again, by adding just-in-time indentation.
+Conjecture: in each line, only “open branches” take columns. If I keep a list of
+supposely straight vertical lines connecting a branch's head to its foot, I may
+be able to push whole columns around as needed.
 
-Here's an idea: keep track of all (already printed?) commits with multiple
-parents, which are waiting for one or more of them. Will this allow me to wait
-until I have the max width of a branch?
-
-Up to this point, I cannot deal with multiple bases… now I can. Now I need to
-order children consistently.
