@@ -245,28 +245,12 @@ class Historian:
 
 	def unroll_horizontally(self, debug):
 
-		for i in self.commit:
-			self.commit[i].done = 0
-
-		visit = Order(self.head)
-		limit = 1
-
-		while 1:
+		for name in self.vertical:
 			
-			#visit.show()
-			target = visit.pop()
-			if not target:
-				if debug: print "No Target"
-				break
-
-			commit = self.commit[target]
+			commit = self.commit[name]
 			if not commit:
-				if debug: print "No Commit for target %s" % target[:7]
+				if debug: print "No Commit for name %s" % name[:7]
 				break
-
-			if commit.done:
-				if debug: print "%s is Done, skipping" % target[:7]
-				continue
 
 	def tell_the_story(self):
 
