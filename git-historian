@@ -327,7 +327,7 @@ class Historian:
 	
 		self.unroll_vertically(debug)
 		self.unroll_horizontally(debug)
-		self.print_graph()
+		self.print_graph(1)
 
 	def unroll_vertically(self, debug):
 		
@@ -427,7 +427,7 @@ class Historian:
 		
 		self.max_column = len(lines.l)# + 1
 
-	def print_graph (self):
+	def print_graph (self, debug):
 		
 		head = self.commit[self.head]
 		if not head:
@@ -443,7 +443,7 @@ class Historian:
 				print "No Commit for name %s" % name[:7]
 				break
 
-			#print "\nP %s" % name[:7]
+			if debug: print "\nP %s" % name[:7]
 			
 			t.swap()
 
@@ -454,8 +454,8 @@ class Historian:
 					print "No parent with name %s" % name[:7]
 				t.bottom[parent.column] = commit.hash
 
-			#t.plot_top()
-			#t.plot_bottom()
+			if debug: t.plot_top()
+			if debug: t.plot_bottom()
 			print "%s %s" % (t.draw_layout(commit), commit.hash[:7])
 			
 			for name in commit.parent:
