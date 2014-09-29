@@ -429,22 +429,8 @@ class Historian:
 				if not parent:
 					print "No parent with name %s" % name[:7]
 				t.bottom[parent.column] = name
-			continue
-
-			layout = ''
-			for i in xrange(self.max_column):
-				if i == commit.column: layout += ' *'
-				else: layout += '  '
-
-			print "{%s}%02d %s" % (layout, commit.column, name[:7])
-
-			row_b[commit.column] = commit.hash
-			for name in commit.parent:
-				parent = self.commit[name]
-				if parent: row_b[parent.column] = name
 
 	def tell_the_story(self):
-
 
 		if not self.commit:
 			self.get_history()
