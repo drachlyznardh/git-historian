@@ -194,6 +194,15 @@ class Columns:
 			i.show()
 		print '}'
 
+class Transition:
+	def __init__ (self, size):
+		self.bottom = {}
+		for i in xrange(size):
+			self.bottom[i] = None
+
+	def swap (self):
+		self.top = self.bottom.copy()
+
 class Historian:
 	def __init__ (self):
 		self.head = 0
