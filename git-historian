@@ -219,6 +219,10 @@ class Transition:
 			else: transition += " %s" % "XXXXXXX"
 		print "B {%s}" % transition
 
+	def draw_layout (self, target):
+		layout = ''
+		return layout
+
 class Historian:
 	def __init__ (self):
 		self.head = 0
@@ -412,6 +416,7 @@ class Historian:
 					else:
 						layout += '  '
 			print "%s %s" % (layout, commit.hash[:7])
+			print "%s %s" % (t.draw_layout(commit), name[:7])
 
 			t.plot_bottom()
 			
