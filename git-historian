@@ -229,18 +229,20 @@ class Transition:
 		bottom_right = self.bottom.values()
 		bottom = None
 		bottom_left = []
+		#print "T-- (%s) '%s' (%s)" % (top_left, top, top_right)
+		#print "B-- (%s) '%s' (%s)" % (bottom_left, bottom, bottom_right)
 
 		for i in self.top:
 	
 			if top: top_left.append(top)
-			top = top_right.pop()
+			top = top_right.pop(0)
 			if bottom: bottom_left.append(bottom)
-			bottom = bottom_right.pop()
+			bottom = bottom_right.pop(0)
 			
 			#print "\tC[%d][%d] ^(%s) v(%s)" % (i, target.column, top, bottom)
 			#print "(%s) (%s)" % (hit_cols, missing_cols)
-			print "T%02d (%s) '%s' (%s)" % (i, top_left, top, top_right)
-			print "B%02d (%s) '%s' (%s)" % (i, bottom_left, bottom, bottom_right)
+			#print "T%02d (%s) '%s' (%s)" % (i, top_left, top, top_right)
+			#print "B%02d (%s) '%s' (%s)" % (i, bottom_left, bottom, bottom_right)
 
 			# Commit column, print the star
 			if i == target.column:
@@ -248,9 +250,9 @@ class Transition:
 				continue
 
 			# Every column before the commit has a preceeding whitespace
-			if i > target.column:
-				if target.hash in top_right: layout += '─' # \U2500
-				else: layout += ' '
+			#if i > target.column:
+			#	if target.hash in top_right: layout += '─' # \U2500
+			#	else: layout += ' '
 
 			if top != '':
 				
@@ -258,31 +260,31 @@ class Transition:
 
 					# Both top and bottom cells have values
 					if top == bottom:
-						layout += '│' # \U2502
-					elif target.hash in top_right:
-						layout += '├' # \U251C
+						layout += '│ ' # \U2502
+					elif bottom == target or target.hash in top_right:
+						layout += '├→' # \U251C \u2500
 					else:
 						layout += '?'
 
 				else:
 					if top == target.hash:
 						#or target.hash in top_right:
-						layout += '┘' # \U2518
+						layout += '→┘' # \u2500 \U2518
 					else: layout += '^'
 
 			elif bottom != '':
 				
 				if bottom == target.hash:
-					layout += '┐' # \U2510
+					layout += '←┐' # \u2500 \U2510
 				else: layout += 'v'
 
-			else: layout += '#'
+			else: layout += ' #'
 
 			# Every column after the commit has a following whitespace
-			if i < target.column:
-				if target.hash in top_right:
-					layout += '─' # \U2500
-				else: layout += ' '
+			#if i < target.column:
+			#	if target.hash in top_right:
+			#		layout += '─' # \U2500
+			#	else: layout += ' '
 
 		return layout
 
@@ -451,8 +453,8 @@ class Historian:
 				t.bottom[parent.column] = commit.hash
 
 			t.plot_top()
-			print "%s %s" % (t.draw_layout(commit), commit.hash[:7])
 			t.plot_bottom()
+			print "%s %s" % (t.draw_layout(commit), commit.hash[:7])
 			
 			for name in commit.parent:
 				parent = self.commit[name]
