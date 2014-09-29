@@ -198,7 +198,7 @@ class Transition:
 	def __init__ (self, size):
 		self.bottom = {}
 		for i in xrange(size):
-			self.bottom[i] = None
+			self.bottom[i] = ''
 
 	def swap (self):
 		self.top = self.bottom.copy()
@@ -239,8 +239,8 @@ class Transition:
 			
 			#print "\tC[%d][%d] ^(%s) v(%s)" % (i, target.column, top, bottom)
 			#print "(%s) (%s)" % (hit_cols, missing_cols)
-			print "T%02d (%s) %s (%s)" % (i, top_left, top, top_right)
-			print "B%02d (%s) %s (%s)" % (i, bottom_left, bottom, bottom_right)
+			print "T%02d (%s) '%s' (%s)" % (i, top_left, top, top_right)
+			print "B%02d (%s) '%s' (%s)" % (i, bottom_left, bottom, bottom_right)
 
 			# Commit column, print the star
 			if i == target.column:
@@ -252,9 +252,9 @@ class Transition:
 				if target.hash in top_right: layout += '─' # \U2500
 				else: layout += ' '
 
-			if top != None:
+			if top != '':
 				
-				if bottom != None:
+				if bottom != '':
 
 					# Both top and bottom cells have values
 					if top == bottom:
@@ -264,9 +264,13 @@ class Transition:
 					else:
 						layout += '?'
 
-				else: layout += '^'
+				else:
+					if top == target.hash:
+						#or target.hash in top_right:
+						layout += '┘' # \U2518
+					else: layout += '^'
 
-			elif bottom != None:
+			elif bottom != '':
 				
 				if bottom == target.hash:
 					layout += '┐' # \U2510
@@ -421,12 +425,6 @@ class Historian:
 
 	def print_graph (self):
 		
-		row_t = {}
-		row_b = {}
-		for i in xrange(self.max_column):
-			row_t[i] = None
-			row_b[i] = None
-
 		head = self.commit[self.head]
 		if not head:
 			print "Wut!"
@@ -445,9 +443,7 @@ class Historian:
 			
 			t.swap()
 
-			row_b[commit.column] = None
-			t.bottom[commit.column] = None
-
+			t.bottom[commit.column] = ''
 			for name in commit.parent:
 				parent = self.commit[name]
 				if not parent:
