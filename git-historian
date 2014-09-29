@@ -260,7 +260,7 @@ class Transition:
 
 					# Both top and bottom cells have values
 					if top == bottom:
-						layout += '|'
+						layout += '│' # \U2502
 					elif target.hash in missing_top:
 						layout += '├' # \U251C
 					else:
