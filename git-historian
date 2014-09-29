@@ -223,35 +223,33 @@ class Transition:
 		
 		layout = ''
 
-		missing_top = self.top.values()
-		hit_top = []
+		top_right = self.top.values()
+		top = None
+		top_left = []
+		bottom_right = self.bottom.values()
+		bottom = None
+		bottom_left = []
 
-		hit_cols = []
-		missing_cols = []
-
-		for i in self.bottom:
-			if self.bottom[i] == target.hash:
-				missing_cols.append(i)
-		
 		for i in self.top:
 	
-			top = self.top[i]
-			bottom = self.bottom[i]
+			if top: top_left.append(top)
+			top = top_right.pop()
+			if bottom: bottom_left.append(bottom)
+			bottom = bottom_right.pop()
+			
 			#print "\tC[%d][%d] ^(%s) v(%s)" % (i, target.column, top, bottom)
 			#print "(%s) (%s)" % (hit_cols, missing_cols)
+			print "T%02d (%s) %s (%s)" % (i, top_left, top, top_right)
+			print "B%02d (%s) %s (%s)" % (i, bottom_left, bottom, bottom_right)
 
 			# Commit column, print the star
 			if i == target.column:
 				layout += '⬤' # \U2B24
 				continue
 
-			if i in missing_cols:
-				missing_cols.pop()
-				hit_cols.append(i)
-
 			# Every column before the commit has a preceeding whitespace
 			if i > target.column:
-				if i in hit_cols: layout += '─' # \U2500
+				if target.hash in top_right: layout += '─' # \U2500
 				else: layout += ' '
 
 			if top != None:
@@ -261,7 +259,7 @@ class Transition:
 					# Both top and bottom cells have values
 					if top == bottom:
 						layout += '│' # \U2502
-					elif target.hash in missing_top:
+					elif target.hash in top_right:
 						layout += '├' # \U251C
 					else:
 						layout += '?'
@@ -278,12 +276,9 @@ class Transition:
 
 			# Every column after the commit has a following whitespace
 			if i < target.column:
-				#if i in missing_cols:
-				if target.hash in missing_top:
+				if target.hash in top_right:
 					layout += '─' # \U2500
 				else: layout += ' '
-
-			hit_top.append(missing_top.pop())
 
 		return layout
 
