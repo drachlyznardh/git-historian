@@ -258,6 +258,9 @@ class Transition:
 				
 				if bottom != '':
 
+					if i > target.column: # after the target commit
+						layout += ' '
+	
 					if top == bottom:
 						layout += '│'
 					elif bottom == target.hash:
@@ -265,16 +268,19 @@ class Transition:
 					else:
 						layout += '?'
 
-					# Both top and bottom cells have values
-					if (target.hash == bottom or target.hash in bottom_left) and (target.hash == top or target.hash in top_right):
-						layout += '→' # \U251C \u2500
-					elif top == bottom:
-						#if target.hash == top_right[0]:
-						#	layout += '│→' # \U2502
-						#else:
-						layout += ' ' # \U2502
-					else:
-						layout += '?'
+					if i < target.column: # before the target commit
+						# Both top and bottom cells have values
+						if (target.hash == bottom or target.hash in bottom_left) and (target.hash == top or target.hash in top_right):
+							layout += '→' # \U251C \u2500
+						elif top == bottom:
+							#if target.hash == top_right[0]:
+							#	layout += '│→' # \U2502
+							#else:
+							layout += ' ' # \U2502
+						elif target.hash == bottom and target.hash in bottom_right:
+							layout += '→'
+						else:
+							layout += '?'
 
 				else:
 					if top == target.hash:
@@ -335,7 +341,7 @@ class Historian:
 	
 		self.unroll_vertically(debug)
 		self.unroll_horizontally(debug)
-		self.print_graph(1)
+		self.print_graph(0)
 
 	def unroll_vertically(self, debug):
 		
