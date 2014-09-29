@@ -258,13 +258,21 @@ class Transition:
 				
 				if bottom != '':
 
-					# Both top and bottom cells have values
 					if top == bottom:
-						if target.hash in top_right:
-							layout += '│→' # \U2502
-						else: layout += '│ ' # \U2502
-					elif bottom == target or target.hash in top_right:
-						layout += '├→' # \U251C \u2500
+						layout += '│'
+					elif bottom == target.hash:
+						layout += '├'
+					else:
+						layout += '?'
+
+					# Both top and bottom cells have values
+					if (target.hash == bottom or target.hash in bottom_left) and (target.hash == top or target.hash in top_right):
+						layout += '→' # \U251C \u2500
+					elif top == bottom:
+						#if target.hash == top_right[0]:
+						#	layout += '│→' # \U2502
+						#else:
+						layout += ' ' # \U2502
 					else:
 						layout += '?'
 
