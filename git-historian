@@ -220,31 +220,60 @@ class Transition:
 		print "B {%s}" % transition
 
 	def draw_layout (self, target):
+		
 		layout = ''
+		hit_cols = []
+		missing_cols = []
+
+		for i in self.bottom:
+			if self.bottom[i] == target.hash:
+				missing_cols.append(i)
+		
 		for i in self.top:
-			
+	
+			top = self.top[i]
+			bottom = self.bottom[i]
+			#print "\tC[%d][%d] ^(%s) v(%s)" % (i, target.column, top, bottom)
+			#print "(%s) (%s)" % (hit_cols, missing_cols)
+
 			# Commit column, print the star
 			if i == target.column:
-				layout += '⬤'
+				layout += '⬤' # \U2B24
 				continue
 
+			if i in missing_cols:
+				missing_cols.pop()
+				hit_cols.append(i)
+
 			# Every column before the commit has a preceeding whitespace
-			if i > target.column: layout += ' '
+			if i > target.column:
+				if i in hit_cols: layout += '-'
+				else: layout += ' '
 
-			if self.top[i]:
-				layout += '^'
+			if top != None:
+				
+				if bottom != None:
 
-			else:
-				layout += 'v'
+					# Both top and bottom cells have values
+					if top == bottom:
+						layout += '|'
+					else:
+						layout += '?'
 
-			#if self.top[i] == self.bottom[i]:
-			#	if self.top[i]: layout += '|'
-			#	else: layout += '#'
-			#	
-			#else: layout += '?'
+				else: layout += '^'
+
+			elif bottom != None:
+				
+				if bottom == target.hash:
+					layout += '┐' # \U2510
+				else: layout += 'v'
+
+			else: layout += '#'
 
 			# Every column after the commit has a following whitespace
-			if i < target.column: layout += ' '
+			if i < target.column:
+				if i in missing_cols: layout += '-'
+				else: layout += ' '
 
 		return layout
 
