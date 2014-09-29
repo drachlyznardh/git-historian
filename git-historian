@@ -221,6 +221,31 @@ class Transition:
 
 	def draw_layout (self, target):
 		layout = ''
+		for i in self.top:
+			
+			# Commit column, print the star
+			if i == target.column:
+				layout += '⬤'
+				continue
+
+			# Every column before the commit has a preceeding whitespace
+			if i > target.column: layout += ' '
+
+			if self.top[i]:
+				layout += '^'
+
+			else:
+				layout += 'v'
+
+			#if self.top[i] == self.bottom[i]:
+			#	if self.top[i]: layout += '|'
+			#	else: layout += '#'
+			#	
+			#else: layout += '?'
+
+			# Every column after the commit has a following whitespace
+			if i < target.column: layout += ' '
+
 		return layout
 
 class Historian:
@@ -396,28 +421,7 @@ class Historian:
 				t.bottom[parent.column] = commit.hash
 
 			t.plot_top()
-
-			layout = ''
-			for i in row_t:
-				c = row_t[i]
-				if i < commit.column:
-					if c == commit.column:
-						layout += '└─'
-					elif c:
-						layout += '│ '
-					else:
-						layout += '  '
-				elif i == commit.column: layout += '⬤'#'•'#'⌖'
-				else:
-					if c == commit.column:
-						layout += '─┘'
-					elif c:
-						layout += ' │'
-					else:
-						layout += '  '
-			print "%s %s" % (layout, commit.hash[:7])
-			print "%s %s" % (t.draw_layout(commit), name[:7])
-
+			print "%s %s" % (t.draw_layout(commit), commit.hash[:7])
 			t.plot_bottom()
 			
 			for name in commit.parent:
