@@ -371,15 +371,6 @@ class Historian:
 
 		t = Transition(self.max_column)
 
-		'''
-		for name in head.parent:
-			parent = self.commit[name]
-			if not parent:
-				print "Wut! No parent for name %s" % name[:7]
-				return
-			row_b[parent.column] = name
-		'''
-
 		for name in self.vertical:
 
 			commit = self.commit[name]
@@ -389,27 +380,17 @@ class Historian:
 
 			print "\nP %s" % name[:7]
 			
-			row_t = row_b.copy() # Previous row in the old current
 			t.swap()
 
-			#row_b[commit.column] = commit.hash
 			row_b[commit.column] = None
 			t.bottom[commit.column] = None
+
 			for name in commit.parent:
 				parent = self.commit[name]
 				if not parent:
 					print "No parent with name %s" % name[:7]
-				row_b[parent.column] = commit.hash
 				t.bottom[parent.column] = commit.hash
 
-			transition = ''
-			for i in row_t:
-				c = row_t[i]
-				if c: transition += " %s" % c[:7]
-				else: transition += " %s" % "XXXXXXX"
-				#if i in row_t and row_t[i]: transition += ' ' + row_t[i][:7]
-			#if transition:
-			print "T {%s}" % transition
 			t.plot_top()
 
 			layout = ''
@@ -432,20 +413,12 @@ class Historian:
 						layout += '  '
 			print "%s %s" % (layout, commit.hash[:7])
 
-			transition = ''
-			for i in row_b:
-				c = row_b[i]
-				if c: transition += " %s" % c[:7]
-				else: transition += " %s" % "XXXXXXX"
-			#if transition:
-			print "B {%s}" % transition
 			t.plot_bottom()
 			
 			for name in commit.parent:
 				parent = self.commit[name]
 				if not parent:
 					print "No parent with name %s" % name[:7]
-				row_b[parent.column] = name#commit.hash
 				t.bottom[parent.column] = name
 			continue
 
@@ -454,7 +427,6 @@ class Historian:
 				if i == commit.column: layout += ' *'
 				else: layout += '  '
 
-			#print "%s" % commit.to_oneline(self.max_column)
 			print "{%s}%02d %s" % (layout, commit.column, name[:7])
 
 			row_b[commit.column] = commit.hash
