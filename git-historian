@@ -222,6 +222,10 @@ class Transition:
 	def draw_layout (self, target):
 		
 		layout = ''
+
+		missing_top = self.top.values()
+		hit_top = []
+
 		hit_cols = []
 		missing_cols = []
 
@@ -247,7 +251,7 @@ class Transition:
 
 			# Every column before the commit has a preceeding whitespace
 			if i > target.column:
-				if i in hit_cols: layout += '-'
+				if i in hit_cols: layout += '─' # \U2500
 				else: layout += ' '
 
 			if top != None:
@@ -257,6 +261,8 @@ class Transition:
 					# Both top and bottom cells have values
 					if top == bottom:
 						layout += '|'
+					elif target.hash in missing_top:
+						layout += '├' # \U251C
 					else:
 						layout += '?'
 
@@ -272,8 +278,12 @@ class Transition:
 
 			# Every column after the commit has a following whitespace
 			if i < target.column:
-				if i in missing_cols: layout += '-'
+				#if i in missing_cols:
+				if target.hash in missing_top:
+					layout += '─' # \U2500
 				else: layout += ' '
+
+			hit_top.append(missing_top.pop())
 
 		return layout
 
