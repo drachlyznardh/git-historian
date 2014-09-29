@@ -278,7 +278,7 @@ class Transition:
 					layout += '←┐' # \u2500 \U2510
 				else: layout += 'v'
 
-			else: layout += ' #'
+			else: layout += '  '
 
 			# Every column after the commit has a following whitespace
 			#if i < target.column:
@@ -441,7 +441,7 @@ class Historian:
 				print "No Commit for name %s" % name[:7]
 				break
 
-			print "\nP %s" % name[:7]
+			#print "\nP %s" % name[:7]
 			
 			t.swap()
 
@@ -452,8 +452,8 @@ class Historian:
 					print "No parent with name %s" % name[:7]
 				t.bottom[parent.column] = commit.hash
 
-			t.plot_top()
-			t.plot_bottom()
+			#t.plot_top()
+			#t.plot_bottom()
 			print "%s %s" % (t.draw_layout(commit), commit.hash[:7])
 			
 			for name in commit.parent:
