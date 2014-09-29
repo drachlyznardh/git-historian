@@ -389,7 +389,7 @@ class Historian:
 						layout += '│ '
 					else:
 						layout += '  '
-				elif i == commit.column: layout += '*'
+				elif i == commit.column: layout += '⬤'#'•'#'⌖'
 				else:
 					if c == commit.column:
 						layout += '─┘'
@@ -406,6 +406,12 @@ class Historian:
 				else: transition += " %s" % "XXXXXXX"
 			#if transition:
 			print "B {%s}" % transition
+			
+			for name in commit.parent:
+				parent = self.commit[name]
+				if not parent:
+					print "No parent with name %s" % name[:7]
+				row_b[parent.column] = name#commit.hash
 			continue
 
 			layout = ''
