@@ -70,7 +70,7 @@ class Layout:
 
 		else: self.layout += ' '
 
-	def draw_layout (self, target):
+	def draw_layout (self, target, padding = 0):
 		
 		self.layout = ''
 
@@ -78,6 +78,14 @@ class Layout:
 		self.nw = []
 		self.se = self.bottom.values()
 		self.sw = []
+
+		if padding:
+			if self.ne[0]: self.layout += '│' # \u2502
+			else: self.layout += ' '
+			for i in self.ne[1:]:
+				if i: self.layout += ' │'
+				else: self.layout += '  '
+			self.layout += '\n'
 
 		if self.size:
 			self.draw_even_column(0, target)
