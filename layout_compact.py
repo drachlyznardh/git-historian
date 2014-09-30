@@ -57,7 +57,11 @@ class Layout:
 
 
 	def draw_odd_column(self, index, target):
-		self.layout += ' '
+		
+		if index > target.column:
+			self.layout += '←'
+		else:
+			self.layout += '→'
 
 	def draw_layout (self, target):
 		
