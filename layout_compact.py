@@ -3,6 +3,7 @@
 
 class Layout:
 	def __init__ (self, size):
+		self.size = size
 		self.bottom = {}
 		for i in xrange(size):
 			self.bottom[i] = ''
@@ -26,88 +27,74 @@ class Layout:
 			else: transition += " %s" % "XXXXXXX"
 		print "B {%s}" % transition
 
-	def draw_layout (self, target):
+	def draw_even_column(self, index, target):
 		
-		layout = ''
+		if index == target.column:
+			self.layout += '⬤' # \u2b24
+			return
 
-		top_right = self.top.values()
-		top = None
-		top_left = []
-		bottom_right = self.bottom.values()
-		bottom = None
-		bottom_left = []
-		#print "T-- (%s) '%s' (%s)" % (top_left, top, top_right)
-		#print "B-- (%s) '%s' (%s)" % (bottom_left, bottom, bottom_right)
+		top = self.top[index]
+		bottom = self.bottom[index]
+		#print "#%02d ^(%s) v(%s)" % (index, top, bottom)
 
-		for i in self.top:
-	
-			if top: top_left.append(top)
-			top = top_right.pop(0)
-			if bottom: bottom_left.append(bottom)
-			bottom = bottom_right.pop(0)
+		if top and len(top):
+			'CULO'
+
+			if bottom and len(bottom):
+
+				if top == bottom:
+					self.layout += '│' # \u2502
+
+				elif bottom == target.hash:
+					self.layout += '├' # \u251c
+		elif bottom and len(bottom):
 			
-			#print "\tC[%d][%d] ^(%s) v(%s)" % (i, target.column, top, bottom)
-			#print "(%s) (%s)" % (hit_cols, missing_cols)
-			#print "T%02d (%s) '%s' (%s)" % (i, top_left, top, top_right)
-			#print "B%02d (%s) '%s' (%s)" % (i, bottom_left, bottom, bottom_right)
-
-			# Commit column, print the star
-			if i == target.column:
-				layout += '⬤' # \U2B24
-				continue
-
-			# Every column before the commit has a preceeding whitespace
-			#if i > target.column:
-			#	if target.hash in top_right: layout += '─' # \U2500
-			#	else: layout += ' '
-
-			if top != '':
+			if bottom == target.hash:
+				self.layout += '┐' # \u2510
 				
-				if bottom != '':
+		else:
+			self.layout += ' '
 
-					if i > target.column: # after the target commit
-						layout += ' '
-	
-					if top == bottom:
-						layout += '│'
-					elif bottom == target.hash:
-						layout += '├'
-					else:
-						layout += '?'
 
-					if i < target.column: # before the target commit
-						# Both top and bottom cells have values
-						if (target.hash == bottom or target.hash in bottom_left) and (target.hash == top or target.hash in top_right):
-							layout += '→' # \U251C \u2500
-						elif top == bottom:
-							#if target.hash == top_right[0]:
-							#	layout += '│→' # \U2502
-							#else:
-							layout += ' ' # \U2502
-						elif target.hash == bottom and target.hash in bottom_right:
-							layout += '→'
-						else:
-							layout += '?'
+	def draw_odd_column(self, index, target):
 
-				else:
-					if top == target.hash:
-						#or target.hash in top_right:
-						layout += '→┘' # \u2500 \U2518
-					else: layout += '^'
+		west = target.hash in self.nw or target.hash in self.sw
+		east = target.hash in self.ne or target.hash in self.se
 
-			elif bottom != '':
-				
-				if bottom == target.hash:
-					layout += '←┐' # \u2500 \U2510
-				else: layout += 'v'
+		if west and east:
 
-			else: layout += '  '
+			if index > target.column:
+				self.layout += '←'
+			else:
+				self.layout += '→'
 
-			# Every column after the commit has a following whitespace
-			#if i < target.column:
-			#	if target.hash in top_right:
-			#		layout += '─' # \U2500
-			#	else: layout += ' '
+		else: self.layout += ' '
 
-		return layout
+	def draw_layout (self, target, padding = 0):
+		
+		self.layout = ''
+
+		self.ne = self.top.values()
+		self.nw = []
+		self.se = self.bottom.values()
+		self.sw = []
+
+		if padding:
+			if self.ne[0]: self.layout += '│' # \u2502
+			else: self.layout += ' '
+			for i in self.ne[1:]:
+				if i: self.layout += ' │'
+				else: self.layout += '  '
+			self.layout += '\n'
+
+		if self.size:
+			self.draw_even_column(0, target)
+		for i in xrange(1, self.size):
+			self.nw.append(self.ne.pop(0))
+			self.sw.append(self.se.pop(0))
+			#print "N (%s) (%s)" % (self.nw, self.ne)
+			#print "S (%s) (%s)" % (self.sw, self.se)
+			self.draw_odd_column(i, target)
+			self.draw_even_column(i, target)
+		return self.layout
 
