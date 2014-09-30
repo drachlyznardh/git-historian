@@ -168,11 +168,13 @@ class Historian:
 			if debug: t.plot_bottom()
 			print "%s %s" % (t.draw_layout(commit), commit.hash[:7])
 			
+			'''
 			for name in commit.parent:
 				parent = self.commit[name]
 				if not parent:
 					print "No parent with name %s" % name[:7]
 				t.bottom[parent.column] = name
+			'''
 
 	def tell_the_story(self, debug=0):
 

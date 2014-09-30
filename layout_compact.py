@@ -65,17 +65,37 @@ class Layout:
 
 	def draw_odd_column(self, index, target):
 
-		west = target.hash in self.nw or target.hash in self.sw
-		east = target.hash in self.ne or target.hash in self.se
+		father = None
 
-		if west and east:
+		if index > target.column:
+			
+			for name in target.parent:
+				if name in self.se:
+					father = self.commit[name]
+					break
 
-			if index > target.column:
-				self.layout += '←'
-			else:
-				self.layout += '→'
+			if father == None:
+				self.layout += '\x1b[m '
+				return
 
-		else: self.layout += ' '
+			color = 1 + father.column % 7
+			self.layout += '\x1b[3%dm%s' % (color, '←')
+			return
+
+		else:
+
+			for name in reversed(target.parent):
+				if name in self.sw:
+					father = self.commit[name]
+					break
+
+			if father == None:
+				self.layout += '\x1b[m '
+				return
+
+			color = 1 + father.column % 7
+			self.layout += '\x1b[3%dm%s' % (color, '→')
+			return
 
 	def draw_layout (self, target, padding = 0):
 		
