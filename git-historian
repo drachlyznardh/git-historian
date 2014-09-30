@@ -5,128 +5,8 @@ from subprocess import check_output
 import re
 
 import commit
-
-class Order:
-	def __init__ (self, first):
-		self.stack = [[first]]
-
-	def trim(self):
-		while len(self.stack) > 0 and len(self.stack[0]) == 0:
-			self.stack.pop(0)
-
-	def get(self):
-		self.trim()
-		if len(self.stack) > 0 and len(self.stack[0]) > 0:
-			return self.stack[0][0]
-		return None
-
-	def pop(self):
-		self.trim()
-		if len(self.stack) > 0 and len(self.stack[0]) > 0:
-			return self.stack[0].pop(0)
-		return None
-
-	def push(self, value):
-		if len(self.stack) > 0:
-			self.stack[0].append(value)
-		else:
-			self.stack.append([value])
-	
-	def ppush(self, value):
-		self.stack.insert(1, [value])
-
-	def cpush(self, value):
-		self.stack.insert(0, [value])
-
-	def show(self):
-		self.trim()
-		message = ''
-		for i in self.stack:
-			if len(i):
-				message += '\t[' + i[0][:7]
-				for ii in i[1:]:
-					message += ", " + ii[:7]
-				message += ']\n'
-		print "{\n%s}" % message
-
-class Column:
-	def __init__ (self, l):
-		self.l = l
-		self.index = -1
-		self.available = 0
-	
-	def make_available (self):
-		self.l = []
-		self.index = -1
-		self.available = 1
-
-	def top (self):
-		return self.l[0]
-	
-	def bottom (self):
-		return self.l[-1]
-
-	def append (self, bottom):
-		self.l.append(bottom)
-
-	def show (self):
-		if len(self.l) == 0:
-			print '[Avail]'
-			return
-
-		line = '[' + self.l[0][:7]
-		for i in self.l[1:]:
-			line += ', ' + i[:7]
-		line += ']'
-		print "%s" % line
-
-class Columns:
-	def __init__ (self):
-		self.l = []
-		self.archived = []
-
-	def trim_one_available (self, target):
-		for i in xrange(target + 1, len(self.l)):
-			if self.l[i].available:
-				self.l.pop(i)
-				break
-
-	def insert (self, top, bottom):
-		for i in self.l:
-			if not i.available and i.bottom() == top:
-				i.append(bottom)
-				return
-		#print "C.Insert (not found) (%s, %s)" % (top[:7], bottom[:7])
-		for i in reversed(self.l):
-			if not i.available and i.l[-2] == top:
-				#self.show()
-				index = self.l.index(i) + 1
-				#print "C.Insert (father column index) (%d)" % index
-				self.l.insert(index, Column([top, bottom]))
-				self.trim_one_available(index)
-				#self.show()
-				return
-		self.l.append(Column([top, bottom]))
-
-	def archive (self, bottom, target):
-		#print "C.Archive (%s, %s)" % (bottom[:7], target[:7])
-		for index in reversed(xrange(len(self.l))):
-			i = self.l[index]
-			if not i.available and i.bottom() == bottom and target in i.l:
-				#Archiving
-				to_archive = Column(i.l[1:-1])
-				to_archive.index = index
-				self.archived.append(to_archive)
-				self.l[index].make_available()
-				
-				#print "Archiving %s at index %d" % (target[:7], index)
-				break
-
-	def show (self):
-		print '{'
-		for i in self.l:
-			i.show()
-		print '}'
+import vertical
+import horizontal
 
 class Transition:
 	def __init__ (self, size):
@@ -279,7 +159,7 @@ class Historian:
 
 	def unroll_vertically(self, debug):
 		
-		visit = Order(self.head)
+		visit = vertical.Order(self.head)
 
 		while 1:
 
@@ -328,7 +208,7 @@ class Historian:
 	def unroll_horizontally(self, debug):
 
 		leftmost = 2
-		lines = Columns()
+		order = horizontal.Order()
 
 		# Children must appear in their vertical order
 		for name in self.vertical:
@@ -342,7 +222,7 @@ class Historian:
 		for name in self.vertical:
 			
 			#print ""
-			#lines.show()
+			#order.show()
 			#print "Processing %s" % name[:7]
 			commit = self.commit[name]
 			if not commit:
@@ -351,21 +231,21 @@ class Historian:
 
 			for child in commit.child[1:]:
 				#print "Should be archiving branch for %s" % child[:7]
-				lines.archive(name, child)
+				order.archive(name, child)
 
 			for parent in commit.parent:
 				#print "  Inserting (%s, %s)" % (name[:7], parent[:7])
-				lines.insert(name, parent)
+				order.insert(name, parent)
 
-		for index in range(len(lines.l)):
-			for name in lines.l[index].l:
+		for index in range(len(order.l)):
+			for name in order.l[index].l:
 				#print "Calling %s with %d" % (name[:7], index)
 				target = self.commit[name]
 				if target and target.column == -1:
 					target.column = index
 
-		for i in xrange(len(lines.archived)):
-			column = lines.archived[i]
+		for i in xrange(len(order.archived)):
+			column = order.archived[i]
 			index = column.index
 			for name in column.l:
 				#print "Calling %s with %d" % (name[:7], index)
@@ -373,7 +253,7 @@ class Historian:
 				if target and target.column == -1:
 					target.column = index
 		
-		self.max_column = len(lines.l)# + 1
+		self.max_column = len(order.l)# + 1
 
 	def print_graph (self, debug):
 		
