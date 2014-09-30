@@ -3,6 +3,7 @@
 
 class Layout:
 	def __init__ (self, size):
+		self.size = size
 		self.bottom = {}
 		for i in xrange(size):
 			self.bottom[i] = ''
@@ -26,6 +27,12 @@ class Layout:
 			else: transition += " %s" % "XXXXXXX"
 		print "B {%s}" % transition
 
+	def draw_even_column(self, index, target):
+		return '│' # \u2502
+
+	def draw_odd_column(self, index, target):
+		return ' '
+
 	def draw_layout (self, target):
 		
 		layout = ''
@@ -38,6 +45,13 @@ class Layout:
 		bottom_left = []
 		#print "T-- (%s) '%s' (%s)" % (top_left, top, top_right)
 		#print "B-- (%s) '%s' (%s)" % (bottom_left, bottom, bottom_right)
+
+		if self.size:
+			layout += self.draw_even_column(0, target)
+		for i in xrange(1, self.size):
+			layout += self.draw_odd_column(i, target)
+			layout += self.draw_even_column(i, target)
+		layout += '\n'
 
 		for i in self.top:
 	
