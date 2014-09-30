@@ -58,6 +58,18 @@ class Layout:
 			
 			if bottom == target.hash:
 				self.layout += '┐' # \u2510
+				return
+
+			father = None
+
+			for name in target.parent:
+				if name in self.se:
+					father = self.commit[name]
+					color = 1 + father.column % 7
+					self.layout += '\x1b[3%dm%s' % (color, '┐') # \u2510
+					return
+
+			self.layout += '\x1b[m '
 				
 		else:
 			self.layout += ' '
@@ -106,8 +118,8 @@ class Layout:
 		self.se = self.bottom.values()
 		self.sw = []
 
-		print "North %s" % self.ne
-		print "South %s" % self.se
+		#print "North %s" % self.ne
+		#print "South %s" % self.se
 
 		if padding:
 			if self.ne[0]: self.layout += '│' # \u2502
