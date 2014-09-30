@@ -2,8 +2,10 @@
 # -*- encoding: utf-8 -*-
 
 class Layout:
-	def __init__ (self, size):
+	def __init__ (self, size, commit):
+		
 		self.size = size
+		self.commit = commit
 		self.bottom = {}
 		for i in xrange(size):
 			self.bottom[i] = ''
@@ -30,7 +32,7 @@ class Layout:
 	def draw_even_column(self, index, target):
 		
 		if index == target.column:
-			self.layout += '⬤' # \u2b24
+			self.layout += '\x1b[m%s' % '⬤' # \u2b24
 			return
 
 		top = self.top[index]
@@ -43,10 +45,15 @@ class Layout:
 			if bottom and len(bottom):
 
 				if top == bottom:
-					self.layout += '│' # \u2502
+					father = self.commit[top]
+					color = 1 + father.column % 7
+					self.layout += '\x1b[3%dm%s' % (color, '│') # \u2502
 
 				elif bottom == target.hash:
-					self.layout += '├' # \u251c
+					father = self.commit[self.top[0]]
+					color = 1 + father.column % 7
+					self.layout += '\x1b[3%dm%s' % (color, '├') # \u251c
+
 		elif bottom and len(bottom):
 			
 			if bottom == target.hash:
@@ -78,6 +85,9 @@ class Layout:
 		self.nw = []
 		self.se = self.bottom.values()
 		self.sw = []
+
+		print "North %s" % self.ne
+		print "South %s" % self.se
 
 		if padding:
 			if self.ne[0]: self.layout += '│' # \u2502

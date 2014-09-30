@@ -144,7 +144,7 @@ class Historian:
 			print "Wut!"
 			return
 
-		t = layout.Layout(self.max_column)
+		t = layout.Layout(self.max_column, self.commit)
 
 		for name in self.vertical:
 
@@ -162,7 +162,7 @@ class Historian:
 				parent = self.commit[name]
 				if not parent:
 					print "No parent with name %s" % name[:7]
-				t.bottom[parent.column] = commit.hash
+				t.bottom[parent.column] = name#commit.hash
 
 			if debug: t.plot_top()
 			if debug: t.plot_bottom()
