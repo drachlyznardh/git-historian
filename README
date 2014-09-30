@@ -1,13 +1,20 @@
 
-Here's an idea: printing can be performed by walking the graph. Now that each
-node knows its direct family, I can shield the execution of the print method
-with two criteria:
+Vertical unroll
+===============
 
- - no father gets printed before its child; each node prints itself before
-   invoking its parents;
+As it is loaded, the graph grows from top to bottom, from recent to past
+commits, as Git gives it; each commit knows its parent(s). With the first walk
+of the graph as it is, each commit gets to know its children.
 
- - no child gets printed after its parent; each node invokes its children before
-   printing itself;
+Starting from the first head, the unrolling orders commits with two rule:
 
-It's working, but being recursive is bad. Long histories trigger the maximum
-recursion block. I'm thinking of a list of nodes to visit, in sequence.
+ - a commit appears only after all its children;
+ - a commit appears strictly before any of its parents;
+
+Horizontal unroll
+=================
+
+Conjecture: in each line, only “open branches” take columns. If I keep a list of
+supposely straight vertical lines connecting a branch's head to its foot, I may
+be able to push whole columns around as needed.
+

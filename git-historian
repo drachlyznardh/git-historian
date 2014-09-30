@@ -1,4 +1,5 @@
 #!/usr/bin/python
+# -*- encoding: utf-8 -*-
 
 from subprocess import check_output
 import re
@@ -12,6 +13,8 @@ class Node:
 		self.column = -1
 		self.static = 0
 		self.printed = 0
+		self.done = 0
+		self.nth_child = 0
 
 	def print_graph(self, commit_map):
 		if self.printed: return
@@ -23,11 +26,16 @@ class Node:
 		for i in reversed(self.parent):
 			commit_map[i].print_graph(commit_map)
 
-	def to_oneline(self):
+	def to_oneline(self, max_column):
 		if self.column > 0:
 			offset = ('%%%ds' % (2 * self.column) % '')
 		else: offset = ''
-		return "%s* %s" % (offset, self.hash)
+		if max_column - self.column:
+			padding = ('%%%ds' % (2 * (max_column - self.column)) % '')
+		else: padding = ''
+		if self.static: t = 'St'
+		else: t = 'Dy'
+		return "%s(%02d) %s*%s %s" % (t, self.column, offset, padding, self.hash)
 
 	def to_string(self):
 		if self.column > 0:
@@ -39,18 +47,19 @@ class Node:
 		for i in self.ref:    str += "\n%s   Ref {%s}" % (indent, i)
 		return str
 
-	def know_your_children(self, child):
+	def know_your_children(self, child, i):
 		if child not in self.child:
 			self.child.append(child)
+			self.nth_child += i
 
 	def know_your_parents(self, commit_map):
-		for i in self.parent:
-			parent = commit_map[i]
+		for i in range(len(self.parent)):
+			name = self.parent[i]
+			parent = commit_map[name]
 			if parent:
-				parent.know_your_children(self.hash)
+				parent.know_your_children(self.hash, i)
 
-	def inherit_column (self, commit_map, base):
-		if self.column != -1: return
+	def know_your_column (self):
 		if len(self.ref):
 			for i in self.ref:
 				if re.match(r'''^tag: r[0-9]+''', i):
@@ -61,22 +70,246 @@ class Node:
 					self.static = 1
 					self.column = 0
 					break
-		if not self.static: self.column = base
+		return self.static
 
-		counter = self.column
-		for i in self.child:
-			commit_map[i].inherit_column(commit_map, counter)
-			counter += 1
+class Order:
+	def __init__ (self, first):
+		self.stack = [[first]]
 
-		counter = self.column
-		for i in self.parent:
-			commit_map[i].inherit_column(commit_map, counter)
-			counter += 1
+	def trim(self):
+		while len(self.stack) > 0 and len(self.stack[0]) == 0:
+			self.stack.pop(0)
+
+	def get(self):
+		self.trim()
+		if len(self.stack) > 0 and len(self.stack[0]) > 0:
+			return self.stack[0][0]
+		return None
+
+	def pop(self):
+		self.trim()
+		if len(self.stack) > 0 and len(self.stack[0]) > 0:
+			return self.stack[0].pop(0)
+		return None
+
+	def push(self, value):
+		if len(self.stack) > 0:
+			self.stack[0].append(value)
+		else:
+			self.stack.append([value])
+	
+	def ppush(self, value):
+		self.stack.insert(1, [value])
+
+	def cpush(self, value):
+		self.stack.insert(0, [value])
+
+	def show(self):
+		self.trim()
+		message = ''
+		for i in self.stack:
+			if len(i):
+				message += '\t[' + i[0][:7]
+				for ii in i[1:]:
+					message += ", " + ii[:7]
+				message += ']\n'
+		print "{\n%s}" % message
+
+class Column:
+	def __init__ (self, l):
+		self.l = l
+		self.index = -1
+		self.available = 0
+	
+	def make_available (self):
+		self.l = []
+		self.index = -1
+		self.available = 1
+
+	def top (self):
+		return self.l[0]
+	
+	def bottom (self):
+		return self.l[-1]
+
+	def append (self, bottom):
+		self.l.append(bottom)
+
+	def show (self):
+		if len(self.l) == 0:
+			print '[Avail]'
+			return
+
+		line = '[' + self.l[0][:7]
+		for i in self.l[1:]:
+			line += ', ' + i[:7]
+		line += ']'
+		print "%s" % line
+
+class Columns:
+	def __init__ (self):
+		self.l = []
+		self.archived = []
+
+	def trim_one_available (self, target):
+		for i in xrange(target + 1, len(self.l)):
+			if self.l[i].available:
+				self.l.pop(i)
+				break
+
+	def insert (self, top, bottom):
+		for i in self.l:
+			if not i.available and i.bottom() == top:
+				i.append(bottom)
+				return
+		#print "C.Insert (not found) (%s, %s)" % (top[:7], bottom[:7])
+		for i in reversed(self.l):
+			if not i.available and i.l[-2] == top:
+				#self.show()
+				index = self.l.index(i) + 1
+				#print "C.Insert (father column index) (%d)" % index
+				self.l.insert(index, Column([top, bottom]))
+				self.trim_one_available(index)
+				#self.show()
+				return
+		self.l.append(Column([top, bottom]))
+
+	def archive (self, bottom, target):
+		#print "C.Archive (%s, %s)" % (bottom[:7], target[:7])
+		for index in reversed(xrange(len(self.l))):
+			i = self.l[index]
+			if not i.available and i.bottom() == bottom and target in i.l:
+				#Archiving
+				to_archive = Column(i.l[1:-1])
+				to_archive.index = index
+				self.archived.append(to_archive)
+				self.l[index].make_available()
+				
+				#print "Archiving %s at index %d" % (target[:7], index)
+				break
+
+	def show (self):
+		print '{'
+		for i in self.l:
+			i.show()
+		print '}'
+
+class Transition:
+	def __init__ (self, size):
+		self.bottom = {}
+		for i in xrange(size):
+			self.bottom[i] = ''
+
+	def swap (self):
+		self.top = self.bottom.copy()
+
+	def plot_top (self):
+		transition = ''
+		for i in self.top:
+			c = self.top[i]
+			if c: transition += " %s" % c[:7]
+			else: transition += " %s" % "XXXXXXX"
+		print "T {%s}" % transition
+
+	def plot_bottom (self):
+		transition = ''
+		for i in self.bottom:
+			c = self.bottom[i]
+			if c: transition += " %s" % c[:7]
+			else: transition += " %s" % "XXXXXXX"
+		print "B {%s}" % transition
+
+	def draw_layout (self, target):
+		
+		layout = ''
+
+		top_right = self.top.values()
+		top = None
+		top_left = []
+		bottom_right = self.bottom.values()
+		bottom = None
+		bottom_left = []
+		#print "T-- (%s) '%s' (%s)" % (top_left, top, top_right)
+		#print "B-- (%s) '%s' (%s)" % (bottom_left, bottom, bottom_right)
+
+		for i in self.top:
+	
+			if top: top_left.append(top)
+			top = top_right.pop(0)
+			if bottom: bottom_left.append(bottom)
+			bottom = bottom_right.pop(0)
+			
+			#print "\tC[%d][%d] ^(%s) v(%s)" % (i, target.column, top, bottom)
+			#print "(%s) (%s)" % (hit_cols, missing_cols)
+			#print "T%02d (%s) '%s' (%s)" % (i, top_left, top, top_right)
+			#print "B%02d (%s) '%s' (%s)" % (i, bottom_left, bottom, bottom_right)
+
+			# Commit column, print the star
+			if i == target.column:
+				layout += '⬤' # \U2B24
+				continue
+
+			# Every column before the commit has a preceeding whitespace
+			#if i > target.column:
+			#	if target.hash in top_right: layout += '─' # \U2500
+			#	else: layout += ' '
+
+			if top != '':
+				
+				if bottom != '':
+
+					if i > target.column: # after the target commit
+						layout += ' '
+	
+					if top == bottom:
+						layout += '│'
+					elif bottom == target.hash:
+						layout += '├'
+					else:
+						layout += '?'
+
+					if i < target.column: # before the target commit
+						# Both top and bottom cells have values
+						if (target.hash == bottom or target.hash in bottom_left) and (target.hash == top or target.hash in top_right):
+							layout += '→' # \U251C \u2500
+						elif top == bottom:
+							#if target.hash == top_right[0]:
+							#	layout += '│→' # \U2502
+							#else:
+							layout += ' ' # \U2502
+						elif target.hash == bottom and target.hash in bottom_right:
+							layout += '→'
+						else:
+							layout += '?'
+
+				else:
+					if top == target.hash:
+						#or target.hash in top_right:
+						layout += '→┘' # \u2500 \U2518
+					else: layout += '^'
+
+			elif bottom != '':
+				
+				if bottom == target.hash:
+					layout += '←┐' # \u2500 \U2510
+				else: layout += 'v'
+
+			else: layout += '  '
+
+			# Every column after the commit has a following whitespace
+			#if i < target.column:
+			#	if target.hash in top_right:
+			#		layout += '─' # \U2500
+			#	else: layout += ' '
+
+		return layout
 
 class Historian:
 	def __init__ (self):
 		self.head = 0
 		self.commit = {}
+		self.vertical = []
+		self.max_column = -1
 	
 	def get_history(self):
 		git_history_dump = check_output(["git", "log", '--pretty="%H %P%d"', "--all"])
@@ -101,17 +334,157 @@ class Historian:
 			if not self.head: self.head = node.hash
 			self.commit[node.hash] = node
 	
+	def all_in_one_call(self, debug):
+
+		for i in self.commit:
+			self.commit[i].know_your_parents(self.commit)
+	
+		self.unroll_vertically(debug)
+		self.unroll_horizontally(debug)
+		self.print_graph(0)
+
+	def unroll_vertically(self, debug):
+		
+		visit = Order(self.head)
+
+		while 1:
+
+			target = visit.pop()
+			if not target:
+				if debug: print "No Target"
+				break
+
+			commit = self.commit[target]
+			if not commit:
+				if debug: print "No Commit"
+				break
+			if commit.done:
+				if debug: print "%s is done, skipping" % commit.hash[:7]
+				continue
+
+			if len(commit.child) > 1:
+				skip = 0
+				for i in reversed(commit.child):
+					child = self.commit[i]
+					if child and not child.done:
+						visit.cpush(i)
+						skip = 1
+				if skip: continue
+			elif len(commit.child) > 0:
+				child = self.commit[commit.child[0]]
+				if child and not child.done:
+					visit.cpush(commit.child[0])
+					continue
+			
+			self.vertical.append(commit.hash)
+
+			if len(commit.parent) > 1:
+				for i in commit.parent:
+					parent = self.commit[i]
+					if parent and not parent.done:
+						visit.ppush(i)
+			elif len(commit.parent) > 0:
+				parent = self.commit[commit.parent[0]]
+				if parent and not parent.done:
+					visit.push(commit.parent[0])
+			
+			if debug: visit.show()
+			commit.done = 1
+
+	def unroll_horizontally(self, debug):
+
+		leftmost = 2
+		lines = Columns()
+
+		# Children must appear in their vertical order
+		for name in self.vertical:
+			commit = self.commit[name]
+			if commit: commit.child = []
+
+		for name in self.vertical:
+			commit = self.commit[name]
+			if commit: commit.know_your_parents(self.commit)
+
+		for name in self.vertical:
+			
+			#print ""
+			#lines.show()
+			#print "Processing %s" % name[:7]
+			commit = self.commit[name]
+			if not commit:
+				if debug: print "No Commit for name %s" % name[:7]
+				break
+
+			for child in commit.child[1:]:
+				#print "Should be archiving branch for %s" % child[:7]
+				lines.archive(name, child)
+
+			for parent in commit.parent:
+				#print "  Inserting (%s, %s)" % (name[:7], parent[:7])
+				lines.insert(name, parent)
+
+		for index in range(len(lines.l)):
+			for name in lines.l[index].l:
+				#print "Calling %s with %d" % (name[:7], index)
+				target = self.commit[name]
+				if target and target.column == -1:
+					target.column = index
+
+		for i in xrange(len(lines.archived)):
+			column = lines.archived[i]
+			index = column.index
+			for name in column.l:
+				#print "Calling %s with %d" % (name[:7], index)
+				target = self.commit[name]
+				if target and target.column == -1:
+					target.column = index
+		
+		self.max_column = len(lines.l)# + 1
+
+	def print_graph (self, debug):
+		
+		head = self.commit[self.head]
+		if not head:
+			print "Wut!"
+			return
+
+		t = Transition(self.max_column)
+
+		for name in self.vertical:
+
+			commit = self.commit[name]
+			if not commit:
+				print "No Commit for name %s" % name[:7]
+				break
+
+			if debug: print "\nP %s" % name[:7]
+			
+			t.swap()
+
+			t.bottom[commit.column] = ''
+			for name in commit.parent:
+				parent = self.commit[name]
+				if not parent:
+					print "No parent with name %s" % name[:7]
+				t.bottom[parent.column] = commit.hash
+
+			if debug: t.plot_top()
+			if debug: t.plot_bottom()
+			print "%s %s" % (t.draw_layout(commit), commit.hash[:7])
+			
+			for name in commit.parent:
+				parent = self.commit[name]
+				if not parent:
+					print "No parent with name %s" % name[:7]
+				t.bottom[parent.column] = name
+
 	def tell_the_story(self):
 
 		if not self.commit:
 			self.get_history()
 
-		for i in self.commit:
-			self.commit[i].know_your_parents(self.commit)
-	
 		if self.head:
-			self.commit[self.head].inherit_column(self.commit, 2)
-			self.commit[self.head].print_graph(self.commit)
+			self.all_in_one_call(0)
 
 historian = Historian()
 historian.tell_the_story()
