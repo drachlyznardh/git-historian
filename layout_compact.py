@@ -35,7 +35,7 @@ class Layout:
 
 		top = self.top[index]
 		bottom = self.bottom[index]
-		print "#%02d ^(%s) v(%s)" % (index, top, bottom)
+		#print "#%02d ^(%s) v(%s)" % (index, top, bottom)
 
 		if top and len(top):
 			'CULO'
@@ -53,15 +53,22 @@ class Layout:
 				self.layout += '┐' # \u2510
 				
 		else:
-			'CULO'
+			self.layout += ' '
 
 
 	def draw_odd_column(self, index, target):
-		
-		if index > target.column:
-			self.layout += '←'
-		else:
-			self.layout += '→'
+
+		west = target.hash in self.nw or target.hash in self.sw
+		east = target.hash in self.ne or target.hash in self.se
+
+		if west and east:
+
+			if index > target.column:
+				self.layout += '←'
+			else:
+				self.layout += '→'
+
+		else: self.layout += ' '
 
 	def draw_layout (self, target):
 		
@@ -76,9 +83,18 @@ class Layout:
 		#print "T-- (%s) '%s' (%s)" % (top_left, top, top_right)
 		#print "B-- (%s) '%s' (%s)" % (bottom_left, bottom, bottom_right)
 
+		self.ne = self.top.values()
+		self.nw = []
+		self.se = self.bottom.values()
+		self.sw = []
+
 		if self.size:
 			self.draw_even_column(0, target)
 		for i in xrange(1, self.size):
+			self.nw.append(self.ne.pop(0))
+			self.sw.append(self.se.pop(0))
+			#print "N (%s) (%s)" % (self.nw, self.ne)
+			#print "S (%s) (%s)" % (self.sw, self.se)
 			self.draw_odd_column(i, target)
 			self.draw_even_column(i, target)
 		self.layout += '\n'
