@@ -28,7 +28,33 @@ class Layout:
 		print "B {%s}" % transition
 
 	def draw_even_column(self, index, target):
-		self.layout += '│' # \u2502
+		
+		if index == target.column:
+			self.layout += '⬤' # \u2b24
+			return
+
+		top = self.top[index]
+		bottom = self.bottom[index]
+		print "#%02d ^(%s) v(%s)" % (index, top, bottom)
+
+		if top and len(top):
+			'CULO'
+
+			if bottom and len(bottom):
+
+				if top == bottom:
+					self.layout += '│' # \u2502
+
+				elif bottom == target.hash:
+					self.layout += '├' # \u251c
+		elif bottom and len(bottom):
+			
+			if bottom == target.hash:
+				self.layout += '┐' # \u2510
+				
+		else:
+			'CULO'
+
 
 	def draw_odd_column(self, index, target):
 		self.layout += ' '
