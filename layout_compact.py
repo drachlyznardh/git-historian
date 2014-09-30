@@ -97,7 +97,8 @@ class Layout:
 			#print "S (%s) (%s)" % (self.sw, self.se)
 			self.draw_odd_column(i, target)
 			self.draw_even_column(i, target)
-		self.layout += '\n'
+		#self.layout += '\n'
+		return self.layout
 
 		for i in self.top:
 	
