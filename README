@@ -18,3 +18,9 @@ Conjecture: in each line, only “open branches” take columns. If I keep a lis
 supposely straight vertical lines connecting a branch's head to its foot, I may
 be able to push whole columns around as needed.
 
+Done.
+
+Layout
+======
+
+The first layout is working in many cases. It takes only one line per commit.
