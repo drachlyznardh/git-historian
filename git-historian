@@ -40,15 +40,6 @@ class Historian:
 			if not self.head: self.head = node.hash
 			self.commit[node.hash] = node
 	
-	def all_in_one_call(self, debug):
-
-		for i in self.commit:
-			self.commit[i].know_your_parents(self.commit)
-	
-		self.unroll_vertically(debug)
-		self.unroll_horizontally(debug)
-		self.print_graph(0)
-
 	def unroll_vertically(self, debug):
 		
 		visit = vertical.Order(self.head)
@@ -184,13 +175,18 @@ class Historian:
 					print "No parent with name %s" % name[:7]
 				t.bottom[parent.column] = name
 
-	def tell_the_story(self):
+	def tell_the_story(self, debug=0):
 
 		if not self.commit:
 			self.get_history()
 
-		if self.head:
-			self.all_in_one_call(0)
+		for i in self.commit:
+			self.commit[i].know_your_parents(self.commit)
+	
+		self.unroll_vertically(debug)
+		self.unroll_horizontally(debug)
+		self.print_graph(debug)
+
 
 historian = Historian()
 historian.tell_the_story()
