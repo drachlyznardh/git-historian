@@ -53,12 +53,15 @@ class Layout:
 
 				if bottom in target.parent:
 
-					if target.hash in self.ne or target.hash in self.commit[bottom].child:
-
+					if target.hash in self.ne:
+						
 						self.put_char(bottom, '├') # \u251c
 					elif target.hash in self.nw:
 						
-						self.puh_char(top, '┤') # \u2524
+						self.put_char(top, '┤') # \u2524
+					elif target.hash in self.commit[bottom].child:
+
+						self.put_char(bottom, '├') # \u251c
 					else: self.layout += '^'
 
 				else: 
