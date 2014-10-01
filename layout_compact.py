@@ -45,14 +45,27 @@ class Layout:
 			if bottom and len(bottom):
 
 				if top == bottom:
-					father = self.commit[top]
-					color = 1 + father.column % 7
-					self.layout += '\x1b[3%dm%s' % (color, '│') # \u2502
 
-				elif bottom == target.hash:
-					father = self.commit[self.top[0]]
-					color = 1 + father.column % 7
-					self.layout += '\x1b[3%dm%s' % (color, '├') # \u251c
+					if bottom in target.parent:
+
+						if target.hash in self.ne:
+
+							father = self.commit[bottom]
+							color = 1 + father.column % 7
+							self.layout += '\x1b[3%dm%s' % (color, '├') # \u251c
+						elif target.hash in self.nw:
+							
+							father = self.commit[top]
+							color = 1 + father.column % 7
+							self.layout += '\x1b[3%dm%s' % (color, '┤') # \u2524
+						else: self.layout += '^'
+
+					else: 
+						father = self.commit[top]
+						color = 1 + father.column % 7
+						self.layout += '\x1b[3%dm%s' % (color, '│') # \u2502
+
+				else: self.layout += '@'
 
 		elif bottom and len(bottom):
 			
@@ -118,8 +131,8 @@ class Layout:
 		self.se = self.bottom.values()
 		self.sw = []
 
-		#print "North %s" % self.ne
-		#print "South %s" % self.se
+		print "North %s" % self.ne
+		print "South %s" % self.se
 
 		if padding:
 			if self.ne[0]: self.layout += '│' # \u2502
