@@ -1,5 +1,7 @@
 # Commit module for Git-Historian
 
+import re
+
 class Commit:
 	def __init__ (self):
 		self.hash = ""

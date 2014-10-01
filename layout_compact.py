@@ -9,6 +9,7 @@ class Layout:
 		self.bottom = {}
 		for i in xrange(size):
 			self.bottom[i] = ''
+		self.last = ''
 
 	def swap (self):
 		self.top = self.bottom.copy()
@@ -79,10 +80,16 @@ class Layout:
 				self.layout += '┐' # \u2510
 				return
 
-			for name in target.parent:
-				if name in self.se:
-					self.put_char(name, '┐') # \u2510
-					return
+			if index > target.column:
+				for name in target.parent:
+					if name in self.se:
+						self.put_char(name, '┐') # \u2510
+						return
+			else:
+				for name in reversed(target.parent):
+					if name in self.se:
+						self.put_char(name, '┌') # \u250c
+						return
 
 			self.layout += '\x1b[m '
 				
