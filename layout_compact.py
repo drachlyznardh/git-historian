@@ -84,25 +84,11 @@ class Layout:
 				return
 
 			if index > target.column:
-				
-				self.put_char(index, '┐')
+				self.put_char(index, '┐') # \u2510
 				return
-				for name in target.parent:
-					if name in self.se:
-						self.put_char(name, '┐') # \u2510
-						return
 			else:
-
-				self.put_char(index, '┌')
+				self.put_char(index, '┌') # \u250c
 				return
-				self.layout += '\x1b[3%dm%s' % (1+index, '┌')
-				return
-				for name in target.parent:
-					if name in self.se:
-						self.put_char(name, '┌') # \u250c
-						return
-
-			self.layout += '\x1b[m '
 				
 		if len(top): # only upper end is present
 
