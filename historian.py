@@ -104,7 +104,8 @@ class Historian:
 		for name in self.vertical:
 			
 			#print ""
-			#order.show()
+			if debug: order.show()
+			#if debug: order.show_wave_front()
 			#print "Processing %s" % name[:7]
 			commit = self.commit[name]
 			if not commit:
@@ -112,11 +113,11 @@ class Historian:
 				break
 
 			for child in commit.child[1:]:
-				#print "Should be archiving branch for %s" % child[:7]
+				if debug: print "  Should be archiving branch for %s" % child[:7]
 				order.archive(name, child)
 
 			for parent in commit.parent:
-				#print "  Inserting (%s, %s)" % (name[:7], parent[:7])
+				if debug: print "  Inserting (%s, %s)" % (name[:7], parent[:7])
 				order.insert(name, parent)
 
 		for index in range(len(order.l)):
