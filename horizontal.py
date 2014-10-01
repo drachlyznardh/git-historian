@@ -59,21 +59,22 @@ class Order:
 			
 		for i in reversed(self.l):
 			if not i.available and i.l[-2] == top:
-				#self.show()
 				index = self.l.index(i) + 1
 				#print "C.Insert (father column index) (%d)" % index
 				self.l.insert(index, Column([top, bottom]))
 				self.trim_one_available(index)
-				#self.show()
 				return
 
 		self.l.append(Column([top, bottom]))
 
 	def archive (self, bottom, target):
+
 		#print "C.Archive (%s, %s)" % (bottom[:7], target[:7])
 		for index in reversed(xrange(len(self.l))):
 			i = self.l[index]
-			if not i.available and i.bottom() == bottom and target in i.l:
+			if i.available: continue
+			if i.bottom() == bottom and target in i.l:
+				
 				#Archiving
 				to_archive = Column(i.l[1:-1])
 				to_archive.index = index
