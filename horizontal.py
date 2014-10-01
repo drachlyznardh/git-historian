@@ -69,17 +69,17 @@ class Order:
 				i.append(bottom.hash)
 				return
 		
-		#print "C.Insert (not found) (%s, %s)" % (top[:7], bottom[:7])
+		print "C.Insert (not found) (%s, %s)" % (top.hash[:7], bottom.hash[:7])
 		for i in reversed(self.l):
 			if i.available: continue
 			if bottom.hash == i.bottom():
-				#print "%s was already inside" % bottom[:7]
+				print "%s was already inside" % bottom.hash[:7]
 				return
 			
 		for i in reversed(self.l):
 			if not i.available and i.last2bottom() == top.hash:
 				index = self.l.index(i) + 1
-				#print "C.Insert (father column index) (%d)" % index
+				print "C.Insert (father column index) (%d)" % index
 				self.l.insert(index, Column([top.hash, bottom.hash]))
 				self.trim_one_available(index)
 				return
