@@ -60,6 +60,7 @@ class Order:
 
 		if bottom.static:
 			self.static_insert(bottom)
+			return
 
 		if top.static and not bottom.static and top.parent[0] == bottom.hash:
 			self.l[top.column].append(bottom.hash)
