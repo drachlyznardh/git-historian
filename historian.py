@@ -104,7 +104,8 @@ class Historian:
 		for name in self.vertical:
 			
 			#print ""
-			#order.show()
+			if debug: order.show()
+			#if debug: order.show_wave_front()
 			#print "Processing %s" % name[:7]
 			commit = self.commit[name]
 			if not commit:
@@ -112,11 +113,11 @@ class Historian:
 				break
 
 			for child in commit.child[1:]:
-				#print "Should be archiving branch for %s" % child[:7]
+				if debug: print "  Should be archiving branch for %s" % child[:7]
 				order.archive(name, child)
 
 			for parent in commit.parent:
-				#print "  Inserting (%s, %s)" % (name[:7], parent[:7])
+				if debug: print "  Inserting (%s, %s)" % (name[:7], parent[:7])
 				order.insert(name, parent)
 
 		for index in range(len(order.l)):
@@ -144,7 +145,7 @@ class Historian:
 			print "Wut!"
 			return
 
-		t = layout.Layout(self.max_column)
+		t = layout.Layout(self.max_column, self.commit)
 
 		for name in self.vertical:
 
@@ -162,18 +163,12 @@ class Historian:
 				parent = self.commit[name]
 				if not parent:
 					print "No parent with name %s" % name[:7]
-				t.bottom[parent.column] = commit.hash
+				t.bottom[parent.column] = name
 
 			if debug: t.plot_top()
 			if debug: t.plot_bottom()
-			print "%s %s" % (t.draw_layout(commit), commit.hash[:7])
+			print "%s %s" % (t.draw_layout(commit), commit.to_oneline())
 			
-			for name in commit.parent:
-				parent = self.commit[name]
-				if not parent:
-					print "No parent with name %s" % name[:7]
-				t.bottom[parent.column] = name
-
 	def tell_the_story(self, debug=0):
 
 		if not self.commit:

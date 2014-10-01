@@ -2,8 +2,10 @@
 # -*- encoding: utf-8 -*-
 
 class Layout:
-	def __init__ (self, size):
+	def __init__ (self, size, commit):
+		
 		self.size = size
+		self.commit = commit
 		self.bottom = {}
 		for i in xrange(size):
 			self.bottom[i] = ''
@@ -27,48 +29,84 @@ class Layout:
 			else: transition += " %s" % "XXXXXXX"
 		print "B {%s}" % transition
 
+	def put_char(self, name, symbol):
+		
+		if name:
+			father = self.commit[name]
+			color = 1 + father.column % 7
+		else: color = 9
+		self.layout += '\x1b[3%dm%s' % (color, symbol)
+
 	def draw_even_column(self, index, target):
 		
 		if index == target.column:
-			self.layout += '⬤' # \u2b24
+			self.put_char(None, '⬤') # \u2b24
 			return
 
 		top = self.top[index]
 		bottom = self.bottom[index]
 		#print "#%02d ^(%s) v(%s)" % (index, top, bottom)
 
-		if top and len(top):
-			'CULO'
+		if len(top) and len(bottom): # both ends are present
 
-			if bottom and len(bottom):
+			if top == bottom:
 
-				if top == bottom:
-					self.layout += '│' # \u2502
+				if bottom in target.parent:
 
-				elif bottom == target.hash:
-					self.layout += '├' # \u251c
-		elif bottom and len(bottom):
-			
+					if target.hash in self.ne or target.hash in self.commit[bottom].child:
+
+						self.put_char(bottom, '├') # \u251c
+					elif target.hash in self.nw:
+						
+						self.puh_char(top, '┤') # \u2524
+					else: self.layout += '^'
+
+				else: 
+					self.put_char(top, '│') # \u2502
+
+			else: self.layout += '@'
+
+			return
+
+		if len(bottom): # only lower end is present
+
 			if bottom == target.hash:
 				self.layout += '┐' # \u2510
-				
-		else:
-			self.layout += ' '
+				return
 
+			for name in target.parent:
+				if name in self.se:
+					self.put_char(name, '┐') # \u2510
+					return
+
+			self.layout += '\x1b[m '
+				
+		if len(top): # only upper end is present
+
+			self.put_char(None, '_')
+			return
+
+		self.layout += ' '
 
 	def draw_odd_column(self, index, target):
 
-		west = target.hash in self.nw or target.hash in self.sw
-		east = target.hash in self.ne or target.hash in self.se
+		father = None
 
-		if west and east:
+		if index > target.column:
+			
+			for name in target.parent:
+				if name in self.se:
+					self.put_char(name, '←')
+					return
+		
+		else:
 
-			if index > target.column:
-				self.layout += '←'
-			else:
-				self.layout += '→'
+			for name in reversed(target.parent):
+				if name in self.sw:
+					self.put_char(name, '→')
+					return
 
-		else: self.layout += ' '
+		self.put_char(None, ' ')
 
 	def draw_layout (self, target, padding = 0):
 		
@@ -78,6 +116,9 @@ class Layout:
 		self.nw = []
 		self.se = self.bottom.values()
 		self.sw = []
+
+		#print "North %s" % self.ne
+		#print "South %s" % self.se
 
 		if padding:
 			if self.ne[0]: self.layout += '│' # \u2502
