@@ -33,18 +33,6 @@ class Commit:
 		
 		return '%s\x1b[m%s' % (line, self.hash[:7])
 
-		return '(%s) %s' % (self.ref, self.hash[:7])
-
-		if self.column > 0:
-			offset = ('%%%ds' % (2 * self.column) % '')
-		else: offset = ''
-		if max_column - self.column:
-			padding = ('%%%ds' % (2 * (max_column - self.column)) % '')
-		else: padding = ''
-		if self.static: t = 'St'
-		else: t = 'Dy'
-		return "%s(%02d) %s*%s %s" % (t, self.column, offset, padding, self.hash)
-
 	def to_string(self):
 		if self.column > 0:
 			indent = ('%%%ds' % (2 * self.column)) % (' ')
