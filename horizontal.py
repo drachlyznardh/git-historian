@@ -20,7 +20,7 @@ class Column:
 		return self.l[-1]
 
 	def last2bottom (self):
-		if len(self.l) == 0: return ''
+		if len(self.l) < 2: return ''
 		return self.l[-2]
 
 	def append (self, bottom):
