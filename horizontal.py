@@ -51,6 +51,9 @@ class Order:
 				self.l.pop(i)
 				break
 
+	def static_insert (self, target):
+		self.l[target.column].append(target.hash)
+
 	def insert (self, top, bottom):
 
 		for i in self.l:

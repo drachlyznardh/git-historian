@@ -122,6 +122,8 @@ class Historian:
 
 			if commit.static:
 				print "%s has fixed column %d" % (commit.hash[:7], commit .column)
+				order.static_insert(commit)
+
 			for parent in commit.parent:
 				if debug: print "  Inserting (%s, %s)" % (name[:7], parent[:7])
 				order.insert(commit, self.commit[parent])
