@@ -53,6 +53,9 @@ class Order:
 				self.l.pop(i)
 				break
 
+	def head_insert (self, target):
+		self.l.append(Column([target.hash]))
+
 	def static_insert (self, target):
 		self.l[target.column].append(target.hash)
 
@@ -60,6 +63,7 @@ class Order:
 
 		if bottom.static:
 			self.static_insert(bottom)
+			return
 
 		if top.static and not bottom.static and top.parent[0] == bottom.hash:
 			self.l[top.column].append(bottom.hash)
@@ -106,7 +110,7 @@ class Order:
 			if i.bottom() == bottom and target in i.l:
 				
 				#Archiving
-				to_archive = Column(i.l[1:-1])
+				to_archive = Column(i.l[:-1])
 				to_archive.index = index
 				self.archived.append(to_archive)
 				self.l[index].make_available()
