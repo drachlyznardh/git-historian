@@ -48,7 +48,7 @@ class Layout:
 
 					if bottom in target.parent:
 
-						if target.hash in self.ne:
+						if target.hash in self.ne or target.hash in self.commit[bottom].child:
 
 							father = self.commit[bottom]
 							color = 1 + father.column % 7
