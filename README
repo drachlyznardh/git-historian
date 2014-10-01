@@ -24,3 +24,5 @@ Layout
 ======
 
 The first layout is working in many cases. It takes only one line per commit.
+
+Now I'm trying to have consistent colors on the lines.

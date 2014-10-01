@@ -45,19 +45,44 @@ class Layout:
 			if bottom and len(bottom):
 
 				if top == bottom:
-					father = self.commit[top]
-					color = 1 + father.column % 7
-					self.layout += '\x1b[3%dm%s' % (color, '│') # \u2502
 
-				elif bottom == target.hash:
-					father = self.commit[self.top[0]]
-					color = 1 + father.column % 7
-					self.layout += '\x1b[3%dm%s' % (color, '├') # \u251c
+					if bottom in target.parent:
+
+						if target.hash in self.ne or target.hash in self.commit[bottom].child:
+
+							father = self.commit[bottom]
+							color = 1 + father.column % 7
+							self.layout += '\x1b[3%dm%s' % (color, '├') # \u251c
+						elif target.hash in self.nw:
+							
+							father = self.commit[top]
+							color = 1 + father.column % 7
+							self.layout += '\x1b[3%dm%s' % (color, '┤') # \u2524
+						else: self.layout += '^'
+
+					else: 
+						father = self.commit[top]
+						color = 1 + father.column % 7
+						self.layout += '\x1b[3%dm%s' % (color, '│') # \u2502
+
+				else: self.layout += '@'
 
 		elif bottom and len(bottom):
 			
 			if bottom == target.hash:
 				self.layout += '┐' # \u2510
+				return
+
+			father = None
+
+			for name in target.parent:
+				if name in self.se:
+					father = self.commit[name]
+					color = 1 + father.column % 7
+					self.layout += '\x1b[3%dm%s' % (color, '┐') # \u2510
+					return
+
+			self.layout += '\x1b[m '
 				
 		else:
 			self.layout += ' '
@@ -65,17 +90,37 @@ class Layout:
 
 	def draw_odd_column(self, index, target):
 
-		west = target.hash in self.nw or target.hash in self.sw
-		east = target.hash in self.ne or target.hash in self.se
+		father = None
 
-		if west and east:
+		if index > target.column:
+			
+			for name in target.parent:
+				if name in self.se:
+					father = self.commit[name]
+					break
 
-			if index > target.column:
-				self.layout += '←'
-			else:
-				self.layout += '→'
+			if father == None:
+				self.layout += '\x1b[m '
+				return
 
-		else: self.layout += ' '
+			color = 1 + father.column % 7
+			self.layout += '\x1b[3%dm%s' % (color, '←')
+			return
+
+		else:
+
+			for name in reversed(target.parent):
+				if name in self.sw:
+					father = self.commit[name]
+					break
+
+			if father == None:
+				self.layout += '\x1b[m '
+				return
+
+			color = 1 + father.column % 7
+			self.layout += '\x1b[3%dm%s' % (color, '→')
+			return
 
 	def draw_layout (self, target, padding = 0):
 		
