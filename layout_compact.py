@@ -117,8 +117,8 @@ class Layout:
 		self.se = self.bottom.values()
 		self.sw = []
 
-		print "North %s" % self.ne
-		print "South %s" % self.se
+		#print "North %s" % self.ne
+		#print "South %s" % self.se
 
 		if padding:
 			if self.ne[0]: self.layout += '│' # \u2502
