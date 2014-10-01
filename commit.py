@@ -22,7 +22,19 @@ class Commit:
 		for i in reversed(self.parent):
 			commit_map[i].print_graph(commit_map)
 
-	def to_oneline(self, max_column):
+	def to_oneline(self):
+	
+		line = ''
+		if len(self.ref):
+			line += '\x1b[32;1m(' + self.ref[0]
+			for i in self.ref[1:]:
+				line += ', ' + i
+			line += ') '
+		
+		return '%s\x1b[m%s' % (line, self.hash[:7])
+
+		return '(%s) %s' % (self.ref, self.hash[:7])
+
 		if self.column > 0:
 			offset = ('%%%ds' % (2 * self.column) % '')
 		else: offset = ''
