@@ -79,3 +79,11 @@ class Order:
 			i.show()
 		print '}'
 
+	def show_wave_front (self):
+		message = '<'
+		for i in self.l:
+			if len(i.l): message += ' %s' % (i.l[0][:7])
+			else: message += ' XXXXXXX'
+		message += ' >'
+		print message
+

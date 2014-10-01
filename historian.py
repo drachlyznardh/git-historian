@@ -104,7 +104,8 @@ class Historian:
 		for name in self.vertical:
 			
 			#print ""
-			#order.show()
+			#if debug: order.show()
+			if debug: order.show_wave_front()
 			#print "Processing %s" % name[:7]
 			commit = self.commit[name]
 			if not commit:
@@ -177,6 +178,6 @@ class Historian:
 			self.commit[i].know_your_parents(self.commit)
 	
 		self.unroll_vertically(debug)
-		self.unroll_horizontally(debug)
+		self.unroll_horizontally(1)#debug)
 		self.print_graph(debug)
 
