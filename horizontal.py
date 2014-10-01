@@ -56,15 +56,18 @@ class Order:
 
 	def insert (self, top, bottom):
 
+		if bottom.static:
+			self.static_insert(bottom)
+
+		if top.static and not bottom.static and top.parent[0] == bottom.hash:
+			self.l[top.column].append(bottom.hash)
+			print "  %s statically assigned to %d, thanks to %s" % (
+				bottom.hash[:7], top.column, top.hash[:7])
+			return
+		
 		for i in self.l:
 			if i.available: continue
-			
-			if top.static and not bottom.static and top.parent[0] == bottom.hash:
-				self.l[top.column].append(bottom.hash)
-				print "  %s statically assigned to %d, thanks to %s" % (
-					bottom.hash[:7], top.column, top.hash[:7])
-				return
-			
+		
 			if top.hash == i.bottom():
 				i.append(bottom.hash)
 				return
