@@ -102,6 +102,10 @@ class Historian:
 			if commit: commit.know_your_parents(self.commit)
 
 		for name in self.vertical:
+			commit = self.commit[name]
+			if commit: commit.know_your_column()
+
+		for name in self.vertical:
 			
 			#print ""
 			if debug: order.show()
