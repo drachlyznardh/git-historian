@@ -32,8 +32,11 @@ class Column:
 		print "%s" % line
 
 class Order:
-	def __init__ (self):
+
+	def __init__ (self, reserved):
 		self.l = []
+		for i in range(reserved):
+			self.l.append(Column([]))
 		self.archived = []
 
 	def trim_one_available (self, target):

@@ -89,8 +89,8 @@ class Historian:
 
 	def unroll_horizontally(self, debug):
 
-		leftmost = 2
-		order = horizontal.Order()
+		reserved = 2
+		order = horizontal.Order(reserved)
 
 		# Children must appear in their vertical order
 		for name in self.vertical:
