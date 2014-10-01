@@ -55,8 +55,6 @@ class Order:
 
 	def head_insert (self, target):
 		self.l.append(Column([target.hash]))
-		print "  %s is a new head on column %d" % (
-			target.hash[:7], len(self.l))
 
 	def static_insert (self, target):
 		self.l[target.column].append(target.hash)
