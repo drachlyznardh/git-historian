@@ -47,35 +47,32 @@ class Layout:
 		bottom = self.bottom[index]
 		#print "#%02d ^(%s) v(%s)" % (index, top, bottom)
 
-		if top and len(top):
-			'CULO'
+		if len(top) and len(bottom): # both ends are present
 
-			if bottom and len(bottom):
+			if top == bottom:
 
-				if top == bottom:
+				if bottom in target.parent:
 
-					if bottom in target.parent:
+					if target.hash in self.ne or target.hash in self.commit[bottom].child:
 
-						if target.hash in self.ne or target.hash in self.commit[bottom].child:
+						self.put_char(bottom, '├') # \u251c
+					elif target.hash in self.nw:
+						
+						self.puh_char(top, '┤') # \u2524
+					else: self.layout += '^'
 
-							self.put_char(bottom, '├') # \u251c
-						elif target.hash in self.nw:
-							
-							self.puh_char(top, '┤') # \u2524
-						else: self.layout += '^'
+				else: 
+					self.put_char(top, '│') # \u2502
 
-					else: 
-						self.put_char(top, '│') # \u2502
+			else: self.layout += '@'
 
-				else: self.layout += '@'
+			return
 
-		elif bottom and len(bottom):
-			
+		if len(bottom): # only lower end is present
+
 			if bottom == target.hash:
 				self.layout += '┐' # \u2510
 				return
-
-			father = None
 
 			for name in target.parent:
 				if name in self.se:
@@ -84,9 +81,12 @@ class Layout:
 
 			self.layout += '\x1b[m '
 				
-		else:
-			self.layout += ' '
+		if len(top): # only upper end is present
 
+			self.put_char(None, '_')
+			return
+
+		self.layout += ' '
 
 	def draw_odd_column(self, index, target):
 
