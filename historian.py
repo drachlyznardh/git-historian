@@ -119,7 +119,7 @@ class Historian:
 			if commit.static:
 				if debug: print "%s has fixed column %d" % (commit.hash[:7], commit .column)
 				order.static_insert(commit)
-			elif len(commit.child) == 0: order.head_insert(commit)
+			#elif len(commit.child) == 0: order.head_insert(commit)
 
 			for child in commit.child[1:]:
 				if debug: print "  Should be archiving branch for %s" % child[:7]
