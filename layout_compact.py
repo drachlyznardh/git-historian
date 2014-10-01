@@ -41,7 +41,6 @@ class Layout:
 		
 		if index == target.column:
 			self.put_char(None, '⬤') # \u2b24
-			#self.layout += '\x1b[m%s' % '⬤' # \u2b24
 			return
 
 		top = self.top[index]
@@ -60,22 +59,13 @@ class Layout:
 						if target.hash in self.ne or target.hash in self.commit[bottom].child:
 
 							self.put_char(bottom, '├') # \u251c
-							#father = self.commit[bottom]
-							#color = 1 + father.column % 7
-							#self.layout += '\x1b[3%dm%s' % (color, '├') # \u251c
 						elif target.hash in self.nw:
 							
 							self.puh_char(top, '┤') # \u2524
-							#father = self.commit[top]
-							#color = 1 + father.column % 7
-							#self.layout += '\x1b[3%dm%s' % (color, '┤') # \u2524
 						else: self.layout += '^'
 
 					else: 
 						self.put_char(top, '│') # \u2502
-						#father = self.commit[top]
-						#color = 1 + father.column % 7
-						#self.layout += '\x1b[3%dm%s' % (color, '│') # \u2502
 
 				else: self.layout += '@'
 
@@ -90,9 +80,6 @@ class Layout:
 			for name in target.parent:
 				if name in self.se:
 					self.put_char(name, '┐') # \u2510
-					#father = self.commit[name]
-					#color = 1 + father.column % 7
-					#self.layout += '\x1b[3%dm%s' % (color, '┐') # \u2510
 					return
 
 			self.layout += '\x1b[m '
@@ -109,31 +96,17 @@ class Layout:
 			
 			for name in target.parent:
 				if name in self.se:
-					father = self.commit[name]
-					break
-
-			if father == None:
-				self.layout += '\x1b[m '
-				return
-
-			color = 1 + father.column % 7
-			self.layout += '\x1b[3%dm%s' % (color, '←')
-			return
-
+					self.put_char(name, '←')
+					return
+		
 		else:
 
 			for name in reversed(target.parent):
 				if name in self.sw:
-					father = self.commit[name]
-					break
+					self.put_char(name, '→')
+					return
 
-			if father == None:
-				self.layout += '\x1b[m '
-				return
-
-			color = 1 + father.column % 7
-			self.layout += '\x1b[3%dm%s' % (color, '→')
-			return
+		self.put_char(None, ' ')
 
 	def draw_layout (self, target, padding = 0):
 		
