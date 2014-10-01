@@ -32,10 +32,13 @@ class Layout:
 
 	def put_char(self, name, symbol):
 		
-		if name:
+		if name == None:
+			color = 9
+		elif isinstance(name, basestring):
 			father = self.commit[name]
 			color = 1 + father.column % 7
-		else: color = 9
+		elif isinstance(name, int):
+			color = 1 + name
 
 		self.last = symbol
 		self.layout += '\x1b[3%dm%s' % (color, symbol)
@@ -81,12 +84,20 @@ class Layout:
 				return
 
 			if index > target.column:
+				
+				self.put_char(index, '┐')
+				return
 				for name in target.parent:
 					if name in self.se:
 						self.put_char(name, '┐') # \u2510
 						return
 			else:
-				for name in reversed(target.parent):
+
+				self.put_char(index, '┌')
+				return
+				self.layout += '\x1b[3%dm%s' % (1+index, '┌')
+				return
+				for name in target.parent:
 					if name in self.se:
 						self.put_char(name, '┌') # \u250c
 						return
