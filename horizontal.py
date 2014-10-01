@@ -1,6 +1,7 @@
 # Column module for Git-Historian
 
 class Column:
+
 	def __init__ (self, l):
 		self.l = l
 		self.index = -1
@@ -39,8 +40,9 @@ class Column:
 
 class Order:
 
-	def __init__ (self, reserved):
+	def __init__ (self, reserved, debug):
 		self.l = []
+		self.debug = debug
 		for i in range(reserved):
 			self.l.append(Column([]))
 		self.archived = []
@@ -61,7 +63,8 @@ class Order:
 
 		if top.static and not bottom.static and top.parent[0] == bottom.hash:
 			self.l[top.column].append(bottom.hash)
-			print "  %s statically assigned to %d, thanks to %s" % (
+			if self.debug:
+				print "  %s statically assigned to %d, thanks to %s" % (
 				bottom.hash[:7], top.column, top.hash[:7])
 			return
 		
@@ -72,17 +75,22 @@ class Order:
 				i.append(bottom.hash)
 				return
 		
-		print "C.Insert (not found) (%s, %s)" % (top.hash[:7], bottom.hash[:7])
+		if self.debug:
+			print "C.Insert (not found) (%s, %s)" % (
+			top.hash[:7], bottom.hash[:7])
+
 		for i in reversed(self.l):
 			if i.available: continue
 			if bottom.hash == i.bottom():
-				print "%s was already inside" % bottom.hash[:7]
+				if self.debug:
+					print "%s was already inside" % bottom.hash[:7]
 				return
 			
 		for i in reversed(self.l):
 			if not i.available and i.last2bottom() == top.hash:
 				index = self.l.index(i) + 1
-				print "C.Insert (father column index) (%d)" % index
+				if self.debug:
+					print "C.Insert (father column index) (%d)" % index
 				self.l.insert(index, Column([top.hash, bottom.hash]))
 				self.trim_one_available(index)
 				return

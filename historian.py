@@ -90,7 +90,7 @@ class Historian:
 	def unroll_horizontally(self, debug):
 
 		reserved = 2
-		order = horizontal.Order(reserved)
+		order = horizontal.Order(reserved, debug)
 
 		# Children must appear in their vertical order
 		for name in self.vertical:
@@ -121,7 +121,7 @@ class Historian:
 				order.archive(name, child)
 
 			if commit.static:
-				print "%s has fixed column %d" % (commit.hash[:7], commit .column)
+				if debug: print "%s has fixed column %d" % (commit.hash[:7], commit .column)
 				order.static_insert(commit)
 
 			for parent in commit.parent:
@@ -186,6 +186,6 @@ class Historian:
 			self.commit[i].know_your_parents(self.commit)
 	
 		self.unroll_vertically(debug)
-		self.unroll_horizontally(1)#debug)
+		self.unroll_horizontally(debug)
 		self.print_graph(debug)
 
