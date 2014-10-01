@@ -112,7 +112,7 @@ class Order:
 			if i.bottom() == bottom and target in i.l:
 				
 				#Archiving
-				to_archive = Column(i.l[1:-1])
+				to_archive = Column(i.l[:-1])
 				to_archive.index = index
 				self.archived.append(to_archive)
 				self.l[index].make_available()

@@ -89,6 +89,8 @@ class Historian:
 
 	def unroll_horizontally(self, debug):
 
+		debug = 1
+
 		reserved = 2
 		order = horizontal.Order(reserved, debug)
 
@@ -131,16 +133,18 @@ class Historian:
 
 		for index in range(len(order.l)):
 			for name in order.l[index].l:
-				#print "Calling %s with %d" % (name[:7], index)
+				print "Calling %s with %d from column" % (name[:7], index)
 				target = self.commit[name]
 				if target and target.column == -1:
 					target.column = index
 
-		for i in xrange(len(order.archived)):
+		#for i in xrange(len(order.archived) - 1, -1, -1):
+		#for i in xrange(len(order.archived)):
+		for i in reversed(range(len(order.archived))):
 			column = order.archived[i]
 			index = column.index
 			for name in column.l:
-				#print "Calling %s with %d" % (name[:7], index)
+				print "Calling %s with %d from archive" % (name[:7], index)
 				target = self.commit[name]
 				if target and target.column == -1:
 					target.column = index
