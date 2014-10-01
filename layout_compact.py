@@ -35,6 +35,8 @@ class Layout:
 			father = self.commit[name]
 			color = 1 + father.column % 7
 		else: color = 9
+
+		self.last = symbol
 		self.layout += '\x1b[3%dm%s' % (color, symbol)
 
 	def draw_even_column(self, index, target):
@@ -89,7 +91,9 @@ class Layout:
 			self.put_char(None, '_')
 			return
 
-		self.layout += ' '
+		if self.last == '←' or self.last == '→':
+			self.layout += '─' # \u2500
+		else: self.layout += ' '
 
 	def draw_odd_column(self, index, target):
 
