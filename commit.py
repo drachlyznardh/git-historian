@@ -26,12 +26,12 @@ class Commit:
 	
 		line = ''
 		if len(self.ref):
-			line += '\x1b[32;1m(' + self.ref[0]
+			line += ' \x1b[32;1m(' + self.ref[0]
 			for i in self.ref[1:]:
 				line += ', ' + i
-			line += ') '
+			line += ')'
 		
-		return '%s\x1b[m%s' % (line, self.hash[:7])
+		return '\x1b[m%s%s\x1b[m' % (self.hash[:7], line)
 
 	def to_string(self):
 		if self.column > 0:
