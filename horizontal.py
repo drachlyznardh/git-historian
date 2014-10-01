@@ -56,18 +56,20 @@ class Order:
 		for i in self.l:
 			if i.available: continue
 			
-			if top.static:
-				self.l[top.column].append(bottom)
+			if top.static and not bottom.static and top.parent[0] == bottom.hash:
+				self.l[top.column].append(bottom.hash)
+				print "  %s statically assigned to %d, thanks to %s" % (
+					bottom.hash[:7], top.column, top.hash[:7])
 				return
 			
 			if top.hash == i.bottom():
-				i.append(bottom)
+				i.append(bottom.hash)
 				return
 		
 		#print "C.Insert (not found) (%s, %s)" % (top[:7], bottom[:7])
 		for i in reversed(self.l):
 			if i.available: continue
-			if bottom == i.bottom():
+			if bottom.hash == i.bottom():
 				#print "%s was already inside" % bottom[:7]
 				return
 			
@@ -75,11 +77,11 @@ class Order:
 			if not i.available and i.last2bottom() == top.hash:
 				index = self.l.index(i) + 1
 				#print "C.Insert (father column index) (%d)" % index
-				self.l.insert(index, Column([top.hash, bottom]))
+				self.l.insert(index, Column([top.hash, bottom.hash]))
 				self.trim_one_available(index)
 				return
 
-		self.l.append(Column([top.hash, bottom]))
+		self.l.append(Column([top.hash, bottom.hash]))
 
 	def archive (self, bottom, target):
 
