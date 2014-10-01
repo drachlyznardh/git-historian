@@ -120,9 +120,11 @@ class Historian:
 				if debug: print "  Should be archiving branch for %s" % child[:7]
 				order.archive(name, child)
 
+			if commit.static:
+				print "%s has fixed column %d" % (commit.hash[:7], commit .column)
 			for parent in commit.parent:
 				if debug: print "  Inserting (%s, %s)" % (name[:7], parent[:7])
-				order.insert(name, parent)
+				order.insert(self.commit[name], parent)
 
 		for index in range(len(order.l)):
 			for name in order.l[index].l:

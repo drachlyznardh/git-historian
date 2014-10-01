@@ -49,7 +49,7 @@ class Order:
 
 		for i in self.l:
 			if i.available: continue
-			if top == i.bottom():
+			if top.hash == i.bottom():
 				i.append(bottom)
 				return
 		
@@ -61,14 +61,14 @@ class Order:
 				return
 			
 		for i in reversed(self.l):
-			if not i.available and i.l[-2] == top:
+			if not i.available and i.l[-2] == top.hash:
 				index = self.l.index(i) + 1
 				#print "C.Insert (father column index) (%d)" % index
-				self.l.insert(index, Column([top, bottom]))
+				self.l.insert(index, Column([top.hash, bottom]))
 				self.trim_one_available(index)
 				return
 
-		self.l.append(Column([top, bottom]))
+		self.l.append(Column([top.hash, bottom]))
 
 	def archive (self, bottom, target):
 
