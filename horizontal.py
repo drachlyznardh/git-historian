@@ -12,10 +12,16 @@ class Column:
 		self.available = 1
 
 	def top (self):
+		if len(self.l) == 0: return ''
 		return self.l[0]
 	
 	def bottom (self):
+		if len(self.l) == 0: return ''
 		return self.l[-1]
+
+	def last2bottom (self):
+		if len(self.l) == 0: return ''
+		return self.l[-2]
 
 	def append (self, bottom):
 		self.l.append(bottom)
@@ -49,6 +55,11 @@ class Order:
 
 		for i in self.l:
 			if i.available: continue
+			
+			if top.static:
+				self.l[top.column].append(bottom)
+				return
+			
 			if top.hash == i.bottom():
 				i.append(bottom)
 				return
@@ -61,7 +72,7 @@ class Order:
 				return
 			
 		for i in reversed(self.l):
-			if not i.available and i.l[-2] == top.hash:
+			if not i.available and i.last2bottom() == top.hash:
 				index = self.l.index(i) + 1
 				#print "C.Insert (father column index) (%d)" % index
 				self.l.insert(index, Column([top.hash, bottom]))

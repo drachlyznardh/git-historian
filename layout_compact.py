@@ -9,6 +9,7 @@ class Layout:
 		self.bottom = {}
 		for i in xrange(size):
 			self.bottom[i] = ''
+		self.last = ''
 
 	def swap (self):
 		self.top = self.bottom.copy()

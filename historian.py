@@ -184,6 +184,6 @@ class Historian:
 			self.commit[i].know_your_parents(self.commit)
 	
 		self.unroll_vertically(debug)
-		self.unroll_horizontally(debug)
+		self.unroll_horizontally(1)#debug)
 		self.print_graph(debug)
 
