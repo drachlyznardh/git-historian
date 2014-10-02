@@ -1,6 +1,7 @@
 # Column module for Git-Historian
 
 class Column:
+
 	def __init__ (self, l):
 		self.l = l
 		self.index = -1
@@ -12,12 +13,19 @@ class Column:
 		self.available = 1
 
 	def top (self):
+		if len(self.l) == 0: return ''
 		return self.l[0]
 	
 	def bottom (self):
+		if len(self.l) == 0: return ''
 		return self.l[-1]
 
+	def last2bottom (self):
+		if len(self.l) < 2: return ''
+		return self.l[-2]
+
 	def append (self, bottom):
+		self.available = 0
 		self.l.append(bottom)
 
 	def show (self):
@@ -32,8 +40,13 @@ class Column:
 		print "%s" % line
 
 class Order:
-	def __init__ (self):
+
+	def __init__ (self, reserved, debug):
 		self.l = []
+		self.reserved = reserved
+		self.debug = debug
+		for i in range(reserved):
+			self.l.append(Column([]))
 		self.archived = []
 
 	def trim_one_available (self, target):
@@ -42,47 +55,85 @@ class Order:
 				self.l.pop(i)
 				break
 
+	def head_insert (self, target):
+		self.l.append(Column([target.hash]))
+
+	def static_insert (self, target):
+		if self.l[target.column].bottom() == target.hash:
+			if self.debug:
+				print "%s is already at the bottom" % target.hash[:7]
+			return
+		self.l[target.column].append(target.hash)
+
 	def insert (self, top, bottom):
 
-		for i in self.l:
-			if i.available: continue
-			if top == i.bottom():
-				i.append(bottom)
-				return
-		
-		#print "C.Insert (not found) (%s, %s)" % (top[:7], bottom[:7])
+		if bottom.static:
+			self.static_insert(bottom)
+			return
+
+		if top.static and not bottom.static and top.parent[0] == bottom.hash:
+			self.l[top.column].append(bottom.hash)
+			if self.debug:
+				print "  %s statically assigned to %d, thanks to %s" % (
+				bottom.hash[:7], top.column, top.hash[:7])
+			return
+
 		for i in reversed(self.l):
 			if i.available: continue
-			if bottom == i.bottom():
-				#print "%s was already inside" % bottom[:7]
+			if bottom.hash == i.bottom():
+				if self.debug:
+					print "%s is already at the bottom of %d" % (
+					bottom.hash, self.l.index(i))
+				return
+
+		for i in self.l[self.reserved:]:
+			if i.available:
+				#if i < self.reserved: continue
+				if len(top.parent) > 1:
+					i.append(bottom.hash)
+					return
+			if top.hash == i.bottom():
+				i.append(bottom.hash)
+				return
+		
+		if self.debug:
+			print "C.Insert (not found) (%s, %s)" % (
+			top.hash[:7], bottom.hash[:7])
+
+		for i in reversed(self.l):
+			if i.available: continue
+			if bottom.hash == i.bottom():
+				if self.debug:
+					print "%s was already inside" % bottom.hash[:7]
 				return
 			
 		for i in reversed(self.l):
-			if not i.available and i.l[-2] == top:
+			if not i.available and i.last2bottom() == top.hash:
 				index = self.l.index(i) + 1
-				#print "C.Insert (father column index) (%d)" % index
-				self.l.insert(index, Column([top, bottom]))
+				if self.debug:
+					print "C.Insert (father column index) (%d)" % index
+				self.l.insert(index, Column([top.hash, bottom.hash]))
 				self.trim_one_available(index)
 				return
 
-		self.l.append(Column([top, bottom]))
+		self.l.append(Column([top.hash, bottom.hash]))
 
 	def archive (self, bottom, target):
 
 		#print "C.Archive (%s, %s)" % (bottom[:7], target[:7])
-		for index in reversed(xrange(len(self.l))):
-			i = self.l[index]
-			if i.available: continue
-			if i.bottom() == bottom and target in i.l:
-				
-				#Archiving
-				to_archive = Column(i.l[1:-1])
+		for l in reversed(self.l):
+			if l.available: continue
+			if l.bottom() == target:
+				to_archive = Column(l.l)
+				index = self.l.index(l)
 				to_archive.index = index
 				self.archived.append(to_archive)
 				self.l[index].make_available()
-				
-				#print "Archiving %s at index %d" % (target[:7], index)
-				break
+				if self.debug:
+					print "Archiving %s at index %d" % (target[:7], index)
+				return
+
+		if self.debug: print "Oops. %s not archived" % (target[:7])
 
 	def show (self):
 		print '{'

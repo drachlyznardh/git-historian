@@ -23,6 +23,5 @@ Done.
 Layout
 ======
 
-The first layout is working in many cases. It takes only one line per commit.
-
-Now I'm trying to have consistent colors on the lines.
+Whenever branch do not cross-merge, things work well. Colors are also working
+properly.

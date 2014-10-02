@@ -9,6 +9,7 @@ class Layout:
 		self.bottom = {}
 		for i in xrange(size):
 			self.bottom[i] = ''
+		self.last = ''
 
 	def swap (self):
 		self.top = self.bottom.copy()
@@ -31,10 +32,15 @@ class Layout:
 
 	def put_char(self, name, symbol):
 		
-		if name:
+		if name == None:
+			color = 9
+		elif isinstance(name, basestring):
 			father = self.commit[name]
 			color = 1 + father.column % 7
-		else: color = 9
+		elif isinstance(name, int):
+			color = 1 + name
+
+		self.last = symbol
 		self.layout += '\x1b[3%dm%s' % (color, symbol)
 
 	def draw_even_column(self, index, target):
@@ -53,12 +59,15 @@ class Layout:
 
 				if bottom in target.parent:
 
-					if target.hash in self.ne or target.hash in self.commit[bottom].child:
-
+					if target.hash in self.ne:
+						
 						self.put_char(bottom, '├') # \u251c
 					elif target.hash in self.nw:
 						
-						self.puh_char(top, '┤') # \u2524
+						self.put_char(top, '┤') # \u2524
+					elif target.hash in self.commit[bottom].child:
+
+						self.put_char(bottom, '├') # \u251c
 					else: self.layout += '^'
 
 				else: 
@@ -74,19 +83,21 @@ class Layout:
 				self.layout += '┐' # \u2510
 				return
 
-			for name in target.parent:
-				if name in self.se:
-					self.put_char(name, '┐') # \u2510
-					return
-
-			self.layout += '\x1b[m '
+			if index > target.column:
+				self.put_char(index, '┐') # \u2510
+				return
+			else:
+				self.put_char(index, '┌') # \u250c
+				return
 				
 		if len(top): # only upper end is present
 
 			self.put_char(None, '_')
 			return
 
-		self.layout += ' '
+		if self.last == '←' or self.last == '→':
+			self.layout += '─' # \u2500
+		else: self.layout += ' '
 
 	def draw_odd_column(self, index, target):
 

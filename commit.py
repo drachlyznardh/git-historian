@@ -1,5 +1,7 @@
 # Commit module for Git-Historian
 
+import re
+
 class Commit:
 	def __init__ (self):
 		self.hash = ""
@@ -62,7 +64,15 @@ class Commit:
 					self.static = 1
 					self.column = 1
 					break
+				if 'release-' in i:
+					self.static = 1
+					self.column = 1
+					break
 				if re.match(r'''^tag: h[0-9]+''', i):
+					self.static = 1
+					self.column = 0
+					break
+				if 'hotfix-' in i:
 					self.static = 1
 					self.column = 0
 					break
