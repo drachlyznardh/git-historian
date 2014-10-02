@@ -113,25 +113,33 @@ class Historian:
 			#print "Processing %s" % name[:7]
 			commit = self.commit[name]
 			if not commit:
-				if debug: print "No Commit for name %s" % name[:7]
+				if debug:
+					print "No Commit for name %s" % name[:7]
 				break
 
 			if commit.static:
-				if debug: print "%s has fixed column %d" % (commit.hash[:7], commit .column)
+				if debug:
+					print "%s has fixed column %d" % (
+					commit.hash[:7], commit .column)
 				order.static_insert(commit)
 			#elif len(commit.child) == 0: order.head_insert(commit)
 
 			for child in commit.child[1:]:
-				if debug: print "  Should be archiving branch for %s" % child[:7]
+				if debug:
+					print "  Should be archiving branch for %s" % child[:7]
 				order.archive(name, child)
 
 			for parent in commit.parent:
-				if debug: print "  Inserting (%s, %s)" % (name[:7], parent[:7])
+				if debug:
+					print "  Inserting (%s, %s)" % (
+					name[:7], parent[:7])
 				order.insert(commit, self.commit[parent])
 
 		for index in range(len(order.l)):
 			for name in order.l[index].l:
-				#print "Calling %s with %d from column" % (name[:7], index)
+				if debug:
+					print "Calling %s with %d from column" % (
+					name[:7], index)
 				target = self.commit[name]
 				if target and target.column == -1:
 					target.column = index
@@ -142,7 +150,9 @@ class Historian:
 			column = order.archived[i]
 			index = column.index
 			for name in column.l:
-				#print "Calling %s with %d from archive" % (name[:7], index)
+				if debug:
+					print "Calling %s with %d from archive" % (
+					name[:7], index)
 				target = self.commit[name]
 				if target and target.column == -1:
 					target.column = index
