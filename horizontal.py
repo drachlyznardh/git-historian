@@ -25,6 +25,7 @@ class Column:
 		return self.l[-2]
 
 	def append (self, bottom):
+		self.available = 0
 		self.l.append(bottom)
 
 	def show (self):
@@ -42,6 +43,7 @@ class Order:
 
 	def __init__ (self, reserved, debug):
 		self.l = []
+		self.reserved = reserved
 		self.debug = debug
 		for i in range(reserved):
 			self.l.append(Column([]))
@@ -57,6 +59,10 @@ class Order:
 		self.l.append(Column([target.hash]))
 
 	def static_insert (self, target):
+		if self.l[target.column].bottom() == target.hash:
+			if self.debug:
+				print "%s is already at the bottom" % target.hash[:7]
+			return
 		self.l[target.column].append(target.hash)
 
 	def insert (self, top, bottom):
@@ -71,10 +77,21 @@ class Order:
 				print "  %s statically assigned to %d, thanks to %s" % (
 				bottom.hash[:7], top.column, top.hash[:7])
 			return
-		
-		for i in self.l:
+
+		for i in reversed(self.l):
 			if i.available: continue
-		
+			if bottom.hash == i.bottom():
+				if self.debug:
+					print "%s is already at the bottom of %d" % (
+					bottom.hash, self.l.index(i))
+				return
+
+		for i in self.l[self.reserved:]:
+			if i.available:
+				#if i < self.reserved: continue
+				if len(top.parent) > 1:
+					i.append(bottom.hash)
+					return
 			if top.hash == i.bottom():
 				i.append(bottom.hash)
 				return
@@ -104,19 +121,19 @@ class Order:
 	def archive (self, bottom, target):
 
 		#print "C.Archive (%s, %s)" % (bottom[:7], target[:7])
-		for index in reversed(xrange(len(self.l))):
-			i = self.l[index]
-			if i.available: continue
-			if i.bottom() == bottom and target in i.l:
-				
-				#Archiving
-				to_archive = Column(i.l[:-1])
+		for l in reversed(self.l):
+			if l.available: continue
+			if l.bottom() == target:
+				to_archive = Column(l.l)
+				index = self.l.index(l)
 				to_archive.index = index
 				self.archived.append(to_archive)
 				self.l[index].make_available()
-				
-				#print "Archiving %s at index %d" % (target[:7], index)
-				break
+				if self.debug:
+					print "Archiving %s at index %d" % (target[:7], index)
+				return
+
+		if self.debug: print "Oops. %s not archived" % (target[:7])
 
 	def show (self):
 		print '{'
