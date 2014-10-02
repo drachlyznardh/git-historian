@@ -57,6 +57,10 @@ class Order:
 		self.l.append(Column([target.hash]))
 
 	def static_insert (self, target):
+		if self.l[target.column].bottom() == target.hash:
+			if self.debug:
+				print "%s is already at the bottom" % target.hash[:7]
+			return
 		self.l[target.column].append(target.hash)
 
 	def insert (self, top, bottom):
