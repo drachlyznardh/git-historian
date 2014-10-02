@@ -43,6 +43,7 @@ class Order:
 
 	def __init__ (self, reserved, debug):
 		self.l = []
+		self.reserved = reserved
 		self.debug = debug
 		for i in range(reserved):
 			self.l.append(Column([]))
@@ -85,8 +86,12 @@ class Order:
 					bottom.hash, self.l.index(i))
 				return
 
-		for i in self.l:
-			if i.available: continue
+		for i in self.l[self.reserved:]:
+			if i.available:
+				#if i < self.reserved: continue
+				if len(top.parent) > 1:
+					i.append(bottom.hash)
+					return
 			if top.hash == i.bottom():
 				i.append(bottom.hash)
 				return
