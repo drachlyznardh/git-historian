@@ -75,7 +75,9 @@ class Order:
 		for i in reversed(self.l):
 			if i.available: continue
 			if bottom.hash == i.bottom():
-				print "%s is already at the bottom of %d" % (bottom.hash, self.l.index(i))
+				if self.debug:
+					print "%s is already at the bottom of %d" % (
+					bottom.hash, self.l.index(i))
 				return
 
 		for i in self.l:
@@ -132,10 +134,11 @@ class Order:
 				to_archive.index = index
 				self.archived.append(to_archive)
 				self.l[index].make_available()
-				print "Archiving %s at index %d" % (target[:7], index)
+				if self.debug:
+					print "Archiving %s at index %d" % (target[:7], index)
 				return
 
-		print "Oops. %s not archived" % (target[:7])
+		if self.debug: print "Oops. %s not archived" % (target[:7])
 
 	def show (self):
 		print '{'
