@@ -115,21 +115,6 @@ class Order:
 	def archive (self, bottom, target):
 
 		#print "C.Archive (%s, %s)" % (bottom[:7], target[:7])
-		'''
-		for index in reversed(xrange(len(self.l))):
-			i = self.l[index]
-			if i.available: continue
-			if i.bottom() == bottom and target in i.l:
-				
-				#Archiving
-				to_archive = Column(i.l[:-1])
-				to_archive.index = index
-				self.archived.append(to_archive)
-				self.l[index].make_available()
-				
-				print "Archiving %s at index %d" % (target[:7], index)
-				break
-		'''
 		for l in reversed(self.l):
 			if l.available: continue
 			if l.bottom() == target:
