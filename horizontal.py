@@ -71,10 +71,15 @@ class Order:
 				print "  %s statically assigned to %d, thanks to %s" % (
 				bottom.hash[:7], top.column, top.hash[:7])
 			return
-		
+
+		for i in reversed(self.l):
+			if i.available: continue
+			if bottom.hash == i.bottom():
+				print "%s is already at the bottom of %d" % (bottom.hash, self.l.index(i))
+				return
+
 		for i in self.l:
 			if i.available: continue
-		
 			if top.hash == i.bottom():
 				i.append(bottom.hash)
 				return
