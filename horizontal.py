@@ -25,6 +25,7 @@ class Column:
 		return self.l[-2]
 
 	def append (self, bottom):
+		self.available = 0
 		self.l.append(bottom)
 
 	def show (self):
