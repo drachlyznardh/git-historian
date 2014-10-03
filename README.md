@@ -97,3 +97,15 @@ git-flow sample image.
 I tested it against some other projects of mine, and also against the Git repo
 itself: I got 37k lines and 410 columns after a wait of ~3 minutes, but it
 worked.
+
+TODO
+====
+
+First of all, cmdline options: everything is currently hard coded.
+
+**Display options**: the layout could be mirrored both vertically and horizontally,
+the charset could be different (for those terminals / fonts without full unicode
+support), colors could be optional, there could be more colors (with fade and
+bold modes, or with full 256 color if supported), user-defined display message
+for commits (the `--pretty="<format>"` option), map-only display mode could
+ignore any non-merge / non-fork commit…
