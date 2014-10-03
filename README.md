@@ -63,6 +63,10 @@ any; more columns are added whenever necessary. Commit with multiple children
 collect the branches they close, which columns become available. Columns may
 remain available indefinitely, but are never destroyed.
 
+Many different small tweaks (and bugs, most probably) affect this behaviour and
+the final layout. This is mostly due to personal taste, instead to rules; I did
+what I did out of hope, to enhance readability.
+
 Testing
 -------
 
