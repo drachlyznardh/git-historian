@@ -31,7 +31,7 @@ Implementation
 
 It is a Python script, which queries the git repo for all its history (commit
 relations) and crunches it to build a graph, then it spreads the commits on a
-grid and dumps it.
+grid and dumps it all on the terminal.
 
 ### Vertical spread
 
