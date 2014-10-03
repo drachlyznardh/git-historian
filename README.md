@@ -22,6 +22,10 @@ left.
 Proof of existence
 ------------------
 
+This whole project exists only to prove that a different, more readable layout
+for the graph of a repo is possible, and that I could actually write it. It is
+incomplete, vastly inefficient and completely outside Git.
+
 Implementation
 --------------
 
