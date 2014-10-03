@@ -67,6 +67,25 @@ Many different small tweaks (and bugs, most probably) affect this behaviour and
 the final layout. This is mostly due to personal taste, instead to rules; I did
 what I did out of hope, to enhance readability.
 
+### Display
+
+Each commit is displayed as a white, very big bullet character '⬤' (\U2b24) is
+its assigned column. Fork and merge relations are displayed with arrows, which
+move on vertical straight lines until they reach the target row, then bend by 90
+degrees and move horizontally until they touch the target commit. Each arrow
+gets it color from its source's column and keeps it until the end.
+
+All arrows start from the father and point towards the child. The parent order
+is not preserved, so you cannot longer assume that the leftmost arrows comes
+from the first parent, as you can do with the usual `git log --graph` layout.
+
+Closer arrows (those with less horizontal gap from the respective target) take
+precedence over other arrows.
+
+At the end of its row, each commit is marked by its short hash (7 characters) in
+white, padded by the whole graph's width, and by its refs, if any, in bold
+green.
+
 Testing
 -------
 
