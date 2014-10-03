@@ -3,7 +3,7 @@
 from subprocess import check_output
 import re
 
-import commit
+import node
 import vertical
 import horizontal
 
@@ -30,14 +30,14 @@ class Historian:
 				hashes = line[1:-1].split()
 				refs = ""
 
-			node = commit.Commit()
+			current = node.Node()
 			if hashes:
-				node.hash = hashes[0]
-				for i in hashes[1:]: node.parent.append(i)
-			for i in refs: node.ref.append(i.strip())
+				current.hash = hashes[0]
+				for i in hashes[1:]: current.parent.append(i)
+			for i in refs: current.ref.append(i.strip())
 
-			if not self.head: self.head = node.hash
-			self.commit[node.hash] = node
+			if not self.head: self.head = current.hash
+			self.commit[current.hash] = current
 	
 	def unroll_vertically(self, debug):
 		
