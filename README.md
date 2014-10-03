@@ -109,3 +109,9 @@ support), colors could be optional, there could be more colors (with fade and
 bold modes, or with full 256 color if supported), user-defined display message
 for commits (the `--pretty="<format>"` option), map-only display mode could
 ignore any non-merge / non-fork commit…
+
+**Efficency**: there are no intermediate steps in the layout computation, no
+checkpoints, no nothing. Even with no change in the repo, each invocation must
+read the whole history, rebuild the graph and recompute the column for each
+commit. I am not sure how I could keep the graph in memory (or on file) and add
+a single commit (or arrow) to it without starting from scratch.
