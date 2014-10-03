@@ -57,6 +57,12 @@ As rules of thumb, it should work more or less like this:
    to a different column;
  - no commit can belong to the column of another active branch
 
+This is computed in order, top-to-bottom, by tracking active branches and
+available columns. Merge commits spread their parents on available columns, if
+any; more columns are added whenever necessary. Commit with multiple children
+collect the branches they close, which columns become available. Columns may
+remain available indefinitely, but are never destroyed.
+
 Testing
 -------
 
