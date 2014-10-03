@@ -70,3 +70,11 @@ what I did out of hope, to enhance readability.
 Testing
 -------
 
+For testing, I used a bunch of repos. First, this one; in addition, I built a
+series of artificial repos with different histories, to check the behaviour with
+octopus merges, crossing branches, multiple heads, multiple bases, a copy of the
+git-flow sample image.
+
+I tested it against some other projects of mine, and also against the Git repo
+itself: I got 37k lines and 410 columns after a wait of ~3 minutes, but it
+worked.
