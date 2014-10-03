@@ -2,7 +2,7 @@ git-historian
 =============
 
 Alternative layout for git log --graph, inspired by
-https://gist.github.com/datagrok/4221767
+[this GIST thread](https://gist.github.com/datagrok/4221767).
 
 Concept
 -------
