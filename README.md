@@ -101,7 +101,7 @@ worked.
 TODO
 ====
 
-First of all, cmdline options: everything is currently hard coded.
+First of all, **Options**: everything is currently hard coded.
 
 **Display options**: the layout could be mirrored both vertically and horizontally,
 the charset could be different (for those terminals / fonts without full unicode
