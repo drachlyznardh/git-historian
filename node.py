@@ -1,8 +1,8 @@
-# Commit module for Git-Historian
+# Node module for Git-Historian
 
 import re
 
-class Commit:
+class Node:
 	def __init__ (self):
 		self.hash = ""
 		self.parent = []

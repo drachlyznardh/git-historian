@@ -88,7 +88,6 @@ class Order:
 
 		for i in self.l[self.reserved:]:
 			if i.available:
-				#if i < self.reserved: continue
 				if len(top.parent) > 1:
 					i.append(bottom.hash)
 					return
@@ -120,7 +119,6 @@ class Order:
 
 	def archive (self, bottom, target):
 
-		#print "C.Archive (%s, %s)" % (bottom[:7], target[:7])
 		for l in reversed(self.l):
 			if l.available: continue
 			if l.bottom() == target:
@@ -140,12 +138,4 @@ class Order:
 		for i in self.l:
 			i.show()
 		print '}'
-
-	def show_wave_front (self):
-		message = '<'
-		for i in self.l:
-			if len(i.l): message += ' %s' % (i.l[-1][:7])
-			else: message += ' XXXXXXX'
-		message += ' >'
-		print message
 

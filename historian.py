@@ -3,11 +3,11 @@
 from subprocess import check_output
 import re
 
-import commit
+import node
 import vertical
 import horizontal
 
-import layout_compact as layout
+import layout as layout
 
 class Historian:
 	def __init__ (self):
@@ -30,14 +30,14 @@ class Historian:
 				hashes = line[1:-1].split()
 				refs = ""
 
-			node = commit.Commit()
+			current = node.Node()
 			if hashes:
-				node.hash = hashes[0]
-				for i in hashes[1:]: node.parent.append(i)
-			for i in refs: node.ref.append(i.strip())
+				current.hash = hashes[0]
+				for i in hashes[1:]: current.parent.append(i)
+			for i in refs: current.ref.append(i.strip())
 
-			if not self.head: self.head = node.hash
-			self.commit[node.hash] = node
+			if not self.head: self.head = current.hash
+			self.commit[current.hash] = current
 	
 	def unroll_vertically(self, debug):
 		
@@ -107,10 +107,7 @@ class Historian:
 
 		for name in self.vertical:
 			
-			#print ""
 			if debug: order.show()
-			#if debug: order.show_wave_front()
-			#print "Processing %s" % name[:7]
 			commit = self.commit[name]
 			if not commit:
 				if debug:
@@ -122,7 +119,6 @@ class Historian:
 					print "%s has fixed column %d" % (
 					commit.hash[:7], commit .column)
 				order.static_insert(commit)
-			#elif len(commit.child) == 0: order.head_insert(commit)
 
 			for child in commit.child[1:]:
 				if debug:
@@ -144,8 +140,6 @@ class Historian:
 				if target and target.column == -1:
 					target.column = index
 
-		#for i in xrange(len(order.archived) - 1, -1, -1):
-		#for i in xrange(len(order.archived)):
 		for i in reversed(range(len(order.archived))):
 			column = order.archived[i]
 			index = column.index
@@ -157,7 +151,7 @@ class Historian:
 				if target and target.column == -1:
 					target.column = index
 		
-		self.max_column = len(order.l)# + 1
+		self.max_column = len(order.l)
 
 	def print_graph (self, debug):
 		
