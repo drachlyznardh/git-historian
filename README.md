@@ -18,3 +18,13 @@ in Git.
 There is also a static priority assignement which allows tagged commits to
 appear in specific columns, so that commit of great importance can sink to the
 left.
+
+Proof of existence
+------------------
+
+Implementation
+--------------
+
+Testing
+-------
+
