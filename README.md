@@ -29,6 +29,22 @@ incomplete, vastly inefficient and completely outside Git.
 Implementation
 --------------
 
+It is a Python script, which queries the git repo for all its history (commit
+relations) and crunches it to build a graph, then it spreads the commits on a
+grid and dumps it.
+
+### Vertical spread
+
+Each line can contain but a single commit. No commit can be displayed before its
+child(ren), and no commit can displayed after its parent(s); commit with no
+relation at all (heads with completely independent history) should appear in
+order.
+
+This is computed by walking the graph iteratively. Each commit holds until all
+its children are in order, and then it calls its parents.
+
+### Horizontal spread
+
 Testing
 -------
 
