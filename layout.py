@@ -51,7 +51,6 @@ class Layout:
 
 		top = self.top[index]
 		bottom = self.bottom[index]
-		#print "#%02d ^(%s) v(%s)" % (index, top, bottom)
 
 		if len(top) and len(bottom): # both ends are present
 
