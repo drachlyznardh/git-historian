@@ -115,3 +115,15 @@ checkpoints, no nothing. Even with no change in the repo, each invocation must
 read the whole history, rebuild the graph and recompute the column for each
 commit. I am not sure how I could keep the graph in memory (or on file) and add
 a single commit (or arrow) to it without starting from scratch.
+
+**Standalone**: there is no integration with Git, for a number of reasons.
+
+ - Git integration is hard. I have been using Git for years, but I have no
+   experience with its source, its internal structure and its community. I took
+   a look at the graph's sourcecode and then I ran away;
+ - I don't know what I want, nor what people would like; the GIST thread I
+   mentioned as inspiration gave me some ideas, but many more details need to be
+   established before the project “gets serious”;
+ - the resulting layout takes a very wide space to display, much more than the
+   default Git graph; this whole project may be nearly-unusable on repos with
+   very long histories, or with a great deal of open branches;
