@@ -45,6 +45,18 @@ its children are in order, and then it calls its parents.
 
 ### Horizontal spread
 
+Branches should occupy the same column, as long as they are but a sequence of
+commits. Plus, tagged commits which matches the criteria are moved to a specific
+column.
+
+As rules of thumb, it should work more or less like this:
+
+ - commits with matching tags go to assigned column;
+ - lone parents belong to the same line as their child;
+ - parents of a same commit, as also children of a same commit, must belong each
+   to a different column;
+ - no commit can belong to the column of another active branch
+
 Testing
 -------
 
