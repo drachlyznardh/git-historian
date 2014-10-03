@@ -1,4 +1,4 @@
-# Compact Layout module for Git-Historian
+# Layout module for Git-Historian
 # -*- encoding: utf-8 -*-
 
 class Layout:

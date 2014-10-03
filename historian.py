@@ -7,7 +7,7 @@ import node
 import vertical
 import horizontal
 
-import layout_compact as layout
+import layout as layout
 
 class Historian:
 	def __init__ (self):
