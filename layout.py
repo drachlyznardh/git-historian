@@ -1,7 +1,16 @@
 # Layout module for Git-Historian
 # -*- encoding: utf-8 -*-
 
+class Column:
+
+	def __init__ (self, color, style, transition, padding):
+		self.color = color
+		self.style = style
+		self.transition = transition
+		self.padding = padding
+
 class Layout:
+
 	def __init__ (self, size, commit):
 		
 		self.size = size
