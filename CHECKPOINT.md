@@ -10,6 +10,15 @@ This file contains a TODO list and keeps track of progress.
  - I have code for vertical padding, which is inaccesible; must have it react to
    an option of some kind…
 
+## FOCUS: Vertical Padding
+
+The day I'll have to display full messages, the graph will have to be padded in
+order to span the number of lines required. That should be independent from the
+single line for the target.
+
+Let's have a separate method, since it'll have a different – simpler –
+behaviour.
+
 ## Done
 
 Here's the list of registered progress.

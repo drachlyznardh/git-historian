@@ -118,7 +118,7 @@ class Layout:
 
 		self.put_char(None, ' ')
 
-	def draw_layout (self, target, padding = 0):
+	def draw_layout (self, target, padding = 1):
 		
 		self.layout = ''
 
