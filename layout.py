@@ -46,7 +46,7 @@ class Layout:
 	def draw_even_column(self, index, target):
 		
 		if index == target.column:
-			self.put_char(None, '⬤') # \u2b24
+			self.put_char(None, '•') # \u2022
 			return
 
 		top = self.top[index]
