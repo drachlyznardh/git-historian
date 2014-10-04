@@ -20,6 +20,8 @@ class Layout:
 			self.bottom[i] = ''
 		self.last = ''
 
+		self.layout = []
+
 	def swap (self):
 		self.top = self.bottom.copy()
 
@@ -42,15 +44,21 @@ class Layout:
 	def put_char(self, name, symbol):
 		
 		if name == None:
-			color = 9
+			color = 39
+			style = 22
 		elif isinstance(name, basestring):
 			father = self.commit[name]
-			color = 1 + father.column % 7
+			color = 31 + father.column % 6
+			if father.column / 6 % 2: style = 1
+			else: style = 22
 		elif isinstance(name, int):
-			color = 1 + name
+			color = 31 + name
+			if name / 6 % 2: style = 1
+			else: style = 22
 
+		self.layout.append(Column(color, style, symbol, symbol))
 		self.last = symbol
-		self.layout += '\x1b[3%dm%s' % (color, symbol)
+		#self.layout += '\x1b[3%dm%s' % (color, symbol)
 
 	def draw_even_column(self, index, target):
 		
@@ -129,7 +137,7 @@ class Layout:
 
 	def draw_layout (self, target, padding = 1):
 		
-		self.layout = ''
+		#self.layout = ''
 
 		self.ne = self.top.values()
 		self.nw = []
