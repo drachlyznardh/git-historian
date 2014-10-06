@@ -60,7 +60,7 @@ class Layout:
 		#self.last = symbol
 		#self.layout += '\x1b[3%dm%s' % (color, symbol)
 
-	def draw_even_column(self, index, target):
+	def compute_even_column(self, index, target):
 		
 		if index == target.column:
 			self.put_char(None, '•', '│') # \u2022 \u2502
@@ -114,13 +114,14 @@ class Layout:
 			self.put_char(None, '_', '_')
 			return
 
-		last = self.layout[-1]
-		if last.transition == '←' or last.transition == '→':
-			transition = '─' # \u2500
-		else: transition = ' '
+		transition = ' '
+		if len(self.layout):
+			last = self.layout[-1]
+			if last.transition == '←' or last.transition == '→':
+				transition = '─' # \u2500
 		self.put_char(None, transition, ' ')
 
-	def draw_odd_column(self, index, target):
+	def compute_odd_column(self, index, target):
 
 		father = None
 
@@ -140,8 +141,8 @@ class Layout:
 
 		self.put_char(None, ' ', ' ')
 
-	def draw_layout (self, target, padding = 1):
-		
+	def compute_layout (self, target):
+
 		#self.layout = ''
 
 		self.ne = self.top.values()
@@ -152,6 +153,7 @@ class Layout:
 		#print "North %s" % self.ne
 		#print "South %s" % self.se
 
+		'''
 		if padding:
 			if self.ne[0]: #self.layout += '│' # \u2502
 				self.put_char(None, '│', '│') # \u2502
@@ -163,15 +165,24 @@ class Layout:
 				else: #self.layout += '  '
 					self.put_char(None, ' ', ' ')
 			#self.layout += '\n'
+		'''
 
 		if self.size:
-			self.draw_even_column(0, target)
+			self.compute_even_column(0, target)
 		for i in xrange(1, self.size):
 			self.nw.append(self.ne.pop(0))
 			self.sw.append(self.se.pop(0))
 			#print "N (%s) (%s)" % (self.nw, self.ne)
 			#print "S (%s) (%s)" % (self.sw, self.se)
-			self.draw_odd_column(i, target)
-			self.draw_even_column(i, target)
+			self.compute_odd_column(i, target)
+			self.compute_even_column(i, target)
 		return self.layout
+
+	def draw_padding (self):
+
+		""
+
+	def draw_layout (self):
+		
+		""
 
