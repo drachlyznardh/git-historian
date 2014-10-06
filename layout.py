@@ -63,7 +63,9 @@ class Layout:
 	def compute_even_column(self, index, target):
 		
 		if index == target.column:
-			self.put_char(target.column, '•', '│') # \u2022 \u2502
+			if len(self.bottom[index]): padding = '│' # \u2502
+			else: padding = ' '
+			self.put_char(target.column, '•', padding) # \u2022 \u2502
 			return
 
 		top = self.top[index]
