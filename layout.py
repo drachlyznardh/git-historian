@@ -18,7 +18,6 @@ class Layout:
 		self.bottom = {}
 		for i in xrange(size):
 			self.bottom[i] = ''
-		#self.last = ''
 
 		self.layout = []
 
@@ -57,8 +56,6 @@ class Layout:
 			else: style = 22
 
 		self.layout.append(Column(color, style, transition, padding))
-		#self.last = symbol
-		#self.layout += '\x1b[3%dm%s' % (color, symbol)
 
 	def compute_even_column(self, index, target):
 		
@@ -154,20 +151,6 @@ class Layout:
 
 		#print "North %s" % self.ne
 		#print "South %s" % self.se
-
-		'''
-		if padding:
-			if self.ne[0]: #self.layout += '│' # \u2502
-				self.put_char(None, '│', '│') # \u2502
-			else: #self.layout += ' '
-				self.put_char(None, ' ', ' ')
-			for i in self.ne[1:]:
-				if i: #self.layout += ' │'
-					self.put_char(None, '│', '│') # \u2502
-				else: #self.layout += '  '
-					self.put_char(None, ' ', ' ')
-			#self.layout += '\n'
-		'''
 
 		if self.size:
 			self.compute_even_column(0, target)
