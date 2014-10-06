@@ -20,6 +20,8 @@ class Layout:
 			self.bottom[i] = ''
 
 		self.layout = []
+		self.last_color = 39
+		self.last_style = 22
 
 	def swap (self):
 		self.top = self.bottom.copy()
@@ -40,11 +42,15 @@ class Layout:
 			else: transition += " %s" % "XXXXXXX"
 		print "B {%s}" % transition
 
-	def put_char(self, name, transition, padding):
+	def put_char(self, name, transition, padding, save):
 		
 		if name == None:
-			color = 39
-			style = 22
+			try:
+				color = self.last_color #39
+				style = self.last_style #22
+			except:
+				print 'Oh noes!!! [%s][%s][%s]' % (name, transition, padding)
+				raise
 		elif isinstance(name, basestring):
 			father = self.commit[name]
 			color = 31 + father.column % 6
@@ -56,13 +62,18 @@ class Layout:
 			else: style = 22
 
 		self.layout.append(Column(color, style, transition, padding))
+		if save:
+			self.last_color = color
+			self.last_style = style
 
 	def compute_even_column(self, index, target):
 		
 		if index == target.column:
+
 			if len(self.bottom[index]): padding = '│' # \u2502
 			else: padding = ' '
-			self.put_char(target.column, '•', padding) # \u2022 \u2502
+			
+			self.put_char(target.column, '•', padding, 0) # \u2022 \u2502
 			return
 
 		top = self.top[index]
@@ -76,21 +87,21 @@ class Layout:
 
 					if target.hash in self.ne:
 						
-						self.put_char(bottom, '├', '│') # \u251c
+						self.put_char(bottom, '├', '│', 1) # \u251c
 					elif target.hash in self.nw:
 						
-						self.put_char(top, '┤', '│') # \u2524
+						self.put_char(top, '┤', '│', 1) # \u2524
 					elif target.hash in self.commit[bottom].child:
 
-						self.put_char(bottom, '├', '│') # \u251c
+						self.put_char(bottom, '├', '│', 1) # \u251c
 					else: #self.layout += '^'
-						self.put_char(None, '^', '^')
+						self.put_char(None, '^', '^', 0)
 
 				else: 
-					self.put_char(top, '│', '│') # \u2502
+					self.put_char(top, '│', '│', 0) # \u2502
 
 			else: #self.layout += '@'
-				self.put_char(None, '@', '@')
+				self.put_char(None, '@', '@', 0)
 
 			return
 
@@ -98,19 +109,19 @@ class Layout:
 
 			if bottom == target.hash:
 				#self.layout += '┐' # \u2510
-				self.put_char(None, '┐', '│') # \u2510 \u2502
+				self.put_char(None, '┐', '│', 1) # \u2510 \u2502
 				return
 
 			if index > target.column:
-				self.put_char(index, '┐', '│') # \u2510 \u2502
+				self.put_char(index, '┐', '│', 1) # \u2510 \u2502
 				return
 			else:
-				self.put_char(index, '┌', '│') # \u250c \u2502
+				self.put_char(index, '┌', '│', 1) # \u250c \u2502
 				return
 				
 		if len(top): # only upper end is present
 
-			self.put_char(None, '_', '_')
+			self.put_char(None, '_', '_', 0)
 			return
 
 		transition = ' '
@@ -118,7 +129,7 @@ class Layout:
 			last = self.layout[-1]
 			if last.transition == '←' or last.transition == '→':
 				transition = '─' # \u2500
-		self.put_char(None, transition, ' ')
+		self.put_char(None, transition, ' ', 0)
 
 	def compute_odd_column(self, index, target):
 
@@ -128,17 +139,17 @@ class Layout:
 			
 			for name in target.parent:
 				if name in self.se:
-					self.put_char(name, '←', ' ')
+					self.put_char(name, '←', ' ', 1)
 					return
 		
 		else:
 
 			for name in reversed(target.parent):
 				if name in self.sw:
-					self.put_char(name, '→', ' ')
+					self.put_char(name, '→', ' ', 1)
 					return
 
-		self.put_char(None, ' ', ' ')
+		self.put_char(index, ' ', ' ', 0)
 
 	def compute_layout (self, target):
 
