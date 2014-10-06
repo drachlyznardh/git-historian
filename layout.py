@@ -143,7 +143,7 @@ class Layout:
 
 	def compute_layout (self, target):
 
-		#self.layout = ''
+		self.layout = []
 
 		self.ne = self.top.values()
 		self.nw = []
@@ -176,13 +176,19 @@ class Layout:
 			#print "S (%s) (%s)" % (self.sw, self.se)
 			self.compute_odd_column(i, target)
 			self.compute_even_column(i, target)
-		return self.layout
+		#return self.layout
 
 	def draw_padding (self):
 
-		""
+		padding = ''
+		for i in self.layout:
+			padding += '\x1b[%d;%dm%s' % (i.color, i.style, i.padding)
+		return padding
 
 	def draw_layout (self):
 		
-		""
+		padding = ''
+		for i in self.layout:
+			padding += '\x1b[%d;%dm%s' % (i.color, i.style, i.transition)
+		return padding
 
