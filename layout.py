@@ -189,6 +189,7 @@ class Layout:
 		
 		padding = ''
 		for i in self.layout:
-			padding += '\x1b[%d;%dm%s' % (i.color, i.style, i.transition)
+			if i.transition == '•': padding += '\x1b[m•'
+			else: padding += '\x1b[%d;%dm%s' % (i.color, i.style, i.transition)
 		return padding
 
