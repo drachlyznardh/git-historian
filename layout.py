@@ -187,7 +187,7 @@ class Layout:
 			padding += '\x1b[%d;%dm%s' % (i.color, i.style, i.padding)
 		return padding
 
-	def draw_layout (self):
+	def draw_transition (self):
 		
 		padding = ''
 		for i in self.layout:
