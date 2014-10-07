@@ -48,7 +48,8 @@ class Order:
 		self.debug = debug
 		for i in range(reserved):
 			self.active.append(Column([]))
-		self.archived = []
+		self.archived = [[] for i in range(reserved)]
+		self.columns = reserved
 
 	def trim_one_available (self, target):
 		for i in xrange(target + 1, len(self.active)):
@@ -62,6 +63,8 @@ class Order:
 				column.append(target)
 				return
 		self.active.append(Column([target]))
+		self.archived.append([])
+		self.columns += 1
 
 	def insert_on_child_column (self, target, child):
 		for column in self.active:
@@ -72,15 +75,23 @@ class Order:
 		self.insert_from_left(target)
 
 	def insert_before_or_on_any_child(self, target, children):
+		
+		missing = 1
 		for column in self.active:
-			if column.available:
+			if column.available or column.bottom() in children:
 				column.append(target)
-				return
+				missing = 1
+				break
+		if missing:
+			print "No child of %s found" % target
+			self.insert_from_left(target)
+
+		for column in self.active:
+			if column.available: continue
 			if column.bottom() in children:
-				column.append(target)
-				return
-		print "No child of %s found" % target
-		self.insert_from_left(target)
+				index = self.active.index(column)
+				self.archive_column(index, column)
+				column.make_available()
 
 	def head_insert (self, target):
 		self.active.append(Column([target.hash]))
@@ -181,6 +192,11 @@ class Order:
 				return
 
 		if self.debug: print "Oops. %s not archived" % (target[:7])
+
+	def archive_column (self, index, column):
+		
+		for e in column.content:
+			self.archived[index].append(e)
 
 	def show (self):
 		print '{'
