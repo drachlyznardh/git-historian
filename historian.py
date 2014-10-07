@@ -161,8 +161,8 @@ class Historian:
 					name[:7], parent[:7])
 				order.insert(commit, self.commit[parent])
 
-		for index in range(len(order.l)):
-			for name in order.l[index].l:
+		for index in range(len(order.active)):
+			for name in order.active[index].content:
 				if self.debug:
 					print "Calling %s with %d from column" % (
 					name[:7], index)
@@ -173,7 +173,7 @@ class Historian:
 		for i in reversed(range(len(order.archived))):
 			column = order.archived[i]
 			index = column.index
-			for name in column.l:
+			for name in column.content:
 				if self.debug:
 					print "Calling %s with %d from archive" % (
 					name[:7], index)
@@ -181,7 +181,7 @@ class Historian:
 				if target and target.column == -1:
 					target.column = index
 		
-		self.max_column = len(order.l)
+		self.max_column = len(order.active)
 
 	def print_graph (self):
 		
