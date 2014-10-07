@@ -66,6 +66,28 @@ class Order:
 			return
 		self.l[target.column].append(target.hash)
 
+	def self_insert (self, target):
+
+		children = len(target.child)
+
+		# A head just takes the first slot available
+		if children == 0:
+			for column in self.l:
+				if column.available:
+					column.append(target.hash)
+					return
+			self.l.append(Column([target.hash]))
+
+		# A lone father should fall in line with its child
+		if children == 1:
+			''
+
+		for name in target.child:
+			child = self.commit[name]
+			if not child: continue # Missing commit: skip
+			if child.static: continue # Child on static column, not eligible
+
+
 	def insert (self, top, bottom):
 
 		if bottom.static:

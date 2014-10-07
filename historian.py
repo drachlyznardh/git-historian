@@ -151,6 +151,10 @@ class Historian:
 					print "  Should be archiving branch for %s" % child[:7]
 				order.archive(name, child)
 
+			# Unless it has static precedence or stuff, a commit should
+			# self-insert
+			order.self_insert(commit)
+
 			for parent in commit.parent:
 				if self.debug:
 					print "  Inserting (%s, %s)" % (
