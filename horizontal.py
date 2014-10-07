@@ -41,8 +41,9 @@ class Column:
 
 class Order:
 
-	def __init__ (self, reserved, debug):
+	def __init__ (self, commit, reserved, debug):
 		self.l = []
+		self.commit = commit
 		self.reserved = reserved
 		self.debug = debug
 		for i in range(reserved):

@@ -112,7 +112,7 @@ class Historian:
 			print '\n-- Horizontal unrolling --'
 
 		reserved = 2
-		order = horizontal.Order(reserved, self.debug)
+		order = horizontal.Order(self.commit, reserved, self.debug)
 
 		# Children must appear in their vertical order
 		for name in self.vertical:
