@@ -200,7 +200,7 @@ class Historian:
 	def print_version(self):
 		print "Git-Historian %s (C) 2014 Ivan Simonini" % VERSION
 
-	def help(self):
+	def print_help(self):
 		print "Usage: %s " % sys.argv[0]
 
 	def tell_the_story(self):
@@ -210,12 +210,12 @@ class Historian:
 				['help', 'verbose', 'version', 'debug'])
 		except getopt.GetoptError as err:
 			print str(err)
-			self.help()
+			self.print_help()
 			sys.exit(2)
 
 		for key, value in optlist:
 			if key in ('-h', '--help'):
-				self.help()
+				self.print_help()
 			elif key in ('-v', '--verbose'):
 				self.verbose = 1
 			elif key in ('-d', '--debug'):
