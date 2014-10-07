@@ -137,10 +137,13 @@ class Historian:
 				break
 
 			children = len(commit.child)
+			parents = len(commit.parent)
+			if self.debug:
+				print "Vertical unrolling of %s (%d, %d)" % (
+					name[:7], children, parents)
+
 			if commit.static:
 				order.insert_static(commit)
-			elif order.at_bottom(name):
-				'' # Commit is already ordered, skip
 			elif children == 0:
 				order.insert_from_left(name)
 			elif children == 1:
@@ -150,16 +153,15 @@ class Historian:
 				else:
 					order.insert_on_child_column(name, commit.child[0])
 			else:
-				candidates = []
+				#candidates = []
 				for child in commit.child:
-					if not self.commit[child].static:
-						candidates.append(child)
-				order.insert_before_or_on_any_child(name, candidates)
+					#if not self.commit[child].static:
+						#candidates.append(child)
+					order.archive_commit(child)
+				#for candidate in candidates:
+				#	order.archive_commit(candidate)
+				order.insert_from_left(name)
 
-			# I archive all but the first child
-			# I should be archiving all children but the leftmost one
-			# Maybe, I could just archive them all, and then choose for myself
-			parents = len(commit.parent)
 			if parents == 0:
 				order.archive_commit(name)
 			else:
@@ -167,20 +169,7 @@ class Historian:
 				for parent in commit.parent:
 					if not self.commit[parent].static:
 						candidates.append(parent)
-				order.insert_from_right_of(name, candidates)
-			'''
-			# any available column
-			for child in commit.child[1:]:
-				if self.debug:
-					print "  Should be archiving branch for %s" % child[:7]
-				order.archive(name, child)
-
-			for parent in commit.parent:
-				if self.debug:
-					print "  Inserting (%s, %s)" % (
-					name[:7], parent[:7])
-				order.insert(commit, self.commit[parent])
-			'''
+				order.insert_from_right_of(name, candidates, commit.static)
 
 		order.flush_active()
 

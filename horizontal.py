@@ -67,6 +67,7 @@ class Order:
 				break
 
 	def insert_from_left (self, target):
+		if self.at_bottom(target): return
 		if self.debug:
 			print "Insert from left (%s)" % target[:7]
 		for column in self.active:
@@ -76,6 +77,7 @@ class Order:
 		self.active.append(Column([target]))
 
 	def insert_on_child_column (self, target, child):
+		if self.at_bottom(target): return
 		if self.debug:
 			print "Insert on child column (%s) (%s)" % (target[:7], child[:7])
 		for column in self.active:
@@ -87,6 +89,7 @@ class Order:
 
 	def insert_before_or_on_any_child(self, target, children):
 	
+		#if self.at_bottom(target): return
 		if self.debug:
 			print "Insert before or on children (%s)" % target[:7]
 			print children
@@ -100,13 +103,15 @@ class Order:
 			print "No child of %s found" % target
 			self.insert_from_left(target)
 
+		self.show()
 		for column in self.active:
 			if column.available: continue
+			print "Now purgin closed branches (%s)" % column.bottom()
 			if column.bottom() in children:
 				index = self.active.index(column)
 				self.archive_column(index, column)
 
-	def insert_from_right_of(self, child, targets):
+	def insert_from_right_of(self, child, targets, static):
 		
 		if self.debug:
 			print "Inserting from right of %s" % child[:7]
@@ -115,11 +120,25 @@ class Order:
 		for column in self.active:
 			if column.available: continue
 			if column.bottom() == child:
-				index = 1 + self.active.index(column)
+				index = self.active.index(column)
 				break
 
+		# Child is static: its column cannot be inherited
+		if static:
+			for target in targets:
+				if self.at_bottom(target): continue
+				self.active.insert(index + 1, Column([target]))
+				self.trim_one_available(index + 1)
+			return
+
+		free = 1
 		for target in targets:
 			if self.at_bottom(target): continue
+			if free:
+				self.active[index].append(targets[0])
+				free = 0
+				continue
+			index += 1
 			self.active.insert(index, Column([target]))
 			self.trim_one_available(index)
 
