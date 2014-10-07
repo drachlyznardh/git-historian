@@ -7,8 +7,16 @@ This file contains a TODO list and keeps track of progress.
    arrows, or commits; column inheritance has to take the number of parents into
    consideration, and act accordingly;
  - I definitely must add at least the commit message to the output;
- - I have code for vertical padding, which is inaccesible; must have it react to
-   an option of some kind…
+
+## FOCUS: Vertical Padding
+
+The day I'll have to display full messages, the graph will have to be padded in
+order to span the number of lines required. That should be independent from the
+single line for the target.
+
+Layout is now separated in transition and padding. Computation and drawing are
+also separated, so that each line can be computed once and invoked as many times
+as needed.
 
 ## Done
 

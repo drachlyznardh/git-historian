@@ -182,7 +182,11 @@ class Historian:
 
 			if debug: t.plot_top()
 			if debug: t.plot_bottom()
-			print "%s %s" % (t.draw_layout(commit), commit.to_oneline())
+			
+			#print "%s %s" % (t.draw_layout(commit), commit.to_oneline())
+			print "%s" % t.draw_padding()
+			t.compute_layout(commit)
+			print "%s %s" % (t.draw_transition(), commit.to_oneline())
 			
 	def tell_the_story(self, debug=0):
 
