@@ -58,6 +58,8 @@ class Order:
 				break
 
 	def insert_from_left (self, target):
+		if self.debug:
+			print "Insert from left (%s)" % target[:7]
 		for column in self.active:
 			if column.available:
 				column.append(target)
@@ -67,6 +69,8 @@ class Order:
 		self.columns += 1
 
 	def insert_on_child_column (self, target, child):
+		if self.debug:
+			print "Insert on child column (%s) (%s)" % (target[:7], child[:7])
 		for column in self.active:
 			if column.bottom() == child:
 				column.append(target)
@@ -75,7 +79,9 @@ class Order:
 		self.insert_from_left(target)
 
 	def insert_before_or_on_any_child(self, target, children):
-		
+	
+		if self.debug:
+			print "Insert before or on children (%s)" % target[:7]
 		missing = 1
 		for column in self.active:
 			if column.available or column.bottom() in children:
@@ -194,13 +200,17 @@ class Order:
 
 	def archive_column (self, index, column):
 		
+		if self.debug:
+			print "Archiving column (%d)" % index
 		for e in column.content:
 			self.archived[index].append(e)
 		
 		column.make_available()
 
 	def archive_commit (self, target):
-		
+	
+		if self.debug:
+			print "Archiving commit (%s)" % target[:7]
 		for column in self.active:
 			if column.available: continue
 			if column.bottom() == target:
