@@ -91,7 +91,6 @@ class Order:
 			if column.bottom() in children:
 				index = self.active.index(column)
 				self.archive_column(index, column)
-				column.make_available()
 
 	def head_insert (self, target):
 		self.active.append(Column([target.hash]))
@@ -197,6 +196,16 @@ class Order:
 		
 		for e in column.content:
 			self.archived[index].append(e)
+		
+		column.make_available()
+
+	def archive_commit (self, target):
+		
+		for column in self.active:
+			if column.available: continue
+			if column.bottom() == target:
+				index = self.active.index(column)
+				self.archive_column(index, column)
 
 	def show (self):
 		print '{'
