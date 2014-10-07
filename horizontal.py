@@ -55,9 +55,8 @@ class Order:
 		for column in self.active:
 			if column.available: continue
 			if column.bottom() == target:
+				print "%s at the bottom" % target[:7]
 				return 1
-
-		print "%s in not at the bottom" % target[:7]
 		return 0
 
 	def trim_one_available (self, target):
