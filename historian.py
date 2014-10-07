@@ -1,7 +1,10 @@
 # Main module for Git-Historian
+# -*- encoding: utf-8 -*-
 
 from subprocess import check_output
 import re
+import sys
+import getopt
 
 import node
 import vertical
@@ -9,8 +12,13 @@ import horizontal
 
 import layout as layout
 
+VERSION="0.0-a"
+
 class Historian:
 	def __init__ (self):
+
+		debug = 0
+
 		self.head = 0
 		self.commit = {}
 		self.vertical = []
@@ -187,8 +195,32 @@ class Historian:
 			print "%s" % t.draw_padding()
 			t.compute_layout(commit)
 			print "%s %s" % (t.draw_transition(), commit.to_oneline())
-			
-	def tell_the_story(self, debug=0):
+
+	def print_version(self):
+		print "Git-Historian %s (C) 2014 Ivan Simonini" % VERSION
+
+	def help(self):
+		print "Usage: %s " % sys.argv[0]
+
+	def tell_the_story(self):
+
+		try:
+			optlist, args = getopt.getopt(sys.argv[1:], 'hvd',
+				['help', 'verbose', 'version', 'debug'])
+		except getopt.GetoptError as err:
+			print str(err)
+			self.help()
+			sys.exit(2)
+
+		for key, value in optlist:
+			if key in ('-h', '--help'):
+				self.help()
+			elif key in ('-v', '--verbose'):
+				self.verbose = 1
+			elif key == '--version':
+				self.print_version()
+
+		return
 
 		if not self.commit:
 			self.get_history()
