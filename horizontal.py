@@ -69,6 +69,7 @@ class Order:
 				column.append(target)
 				return
 		print "Child %s in nowhere to be found!" % child
+		self.insert_from_left(target)
 
 	def insert_before_or_on_any_child(self, target, children):
 		for column in self.active:
@@ -79,6 +80,7 @@ class Order:
 				column.append(target)
 				return
 		print "No child of %s found" % target
+		self.insert_from_left(target)
 
 	def head_insert (self, target):
 		self.active.append(Column([target.hash]))
