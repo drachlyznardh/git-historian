@@ -140,7 +140,7 @@ class Historian:
 				if self.debug:
 					print "%s has fixed column %d" % (
 					commit.hash[:7], commit .column)
-				order.static_insert(commit)
+				order.insert_static(commit)
 
 			# I archive all but the first child
 			# I should be archiving all children but the leftmost one

@@ -66,7 +66,7 @@ class Order:
 	def head_insert (self, target):
 		self.active.append(Column([target.hash]))
 
-	def static_insert (self, target):
+	def insert_static (self, target):
 		if self.active[target.column].bottom() == target.hash:
 			if self.debug:
 				print "%s is already at the bottom" % target.hash[:7]
@@ -98,7 +98,7 @@ class Order:
 	def insert (self, top, bottom):
 
 		if bottom.static:
-			self.static_insert(bottom)
+			self.insert_static(bottom)
 			return
 
 		if top.static and not bottom.static and top.parent[0] == bottom.hash:
