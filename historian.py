@@ -52,49 +52,56 @@ class Historian:
 		
 		visit = vertical.Order(self.head)
 
-		while 1:
+		for name, commit in self.commit.items():
 
-			target = visit.pop()
-			if not target:
-				if self.debug: print "No Target"
-				break
-
-			commit = self.commit[target]
-			if not commit:
-				if self.debug: print "No Commit"
-				break
 			if commit.done:
-				if self.debug: print "%s is done, skipping" % commit.hash[:7]
 				continue
 
-			if len(commit.child) > 1:
-				skip = 0
-				for i in reversed(commit.child):
-					child = self.commit[i]
-					if child and not child.done:
-						visit.cpush(i)
-						skip = 1
-				if skip: continue
-			elif len(commit.child) > 0:
-				child = self.commit[commit.child[0]]
-				if child and not child.done:
-					visit.cpush(commit.child[0])
-					continue
-			
-			self.vertical.append(commit.hash)
+			visit.push(name)
 
-			if len(commit.parent) > 1:
-				for i in commit.parent:
-					parent = self.commit[i]
+			while 1:
+
+				target = visit.pop()
+				if not target:
+					if self.debug: print "No Target"
+					break
+
+				commit = self.commit[target]
+				if not commit:
+					if self.debug: print "No Commit"
+					break
+				if commit.done:
+					if self.debug: print "%s is done, skipping" % commit.hash[:7]
+					continue
+
+				if len(commit.child) > 1:
+					skip = 0
+					for i in reversed(commit.child):
+						child = self.commit[i]
+						if child and not child.done:
+							visit.cpush(i)
+							skip = 1
+					if skip: continue
+				elif len(commit.child) > 0:
+					child = self.commit[commit.child[0]]
+					if child and not child.done:
+						visit.cpush(commit.child[0])
+						continue
+				
+				self.vertical.append(commit.hash)
+
+				if len(commit.parent) > 1:
+					for i in commit.parent:
+						parent = self.commit[i]
+						if parent and not parent.done:
+							visit.ppush(i)
+				elif len(commit.parent) > 0:
+					parent = self.commit[commit.parent[0]]
 					if parent and not parent.done:
-						visit.ppush(i)
-			elif len(commit.parent) > 0:
-				parent = self.commit[commit.parent[0]]
-				if parent and not parent.done:
-					visit.push(commit.parent[0])
-			
-			if self.debug: visit.show()
-			commit.done = 1
+						visit.push(commit.parent[0])
+				
+				if self.debug: visit.show()
+				commit.done = 1
 
 	def unroll_horizontally(self):
 
