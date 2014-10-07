@@ -6,6 +6,10 @@ This file contains a TODO list and keeps track of progress.
  - I witnessed some cases of arrows being completely overwritten by other
    arrows, or commits; column inheritance has to take the number of parents into
    consideration, and act accordingly;
+ - When branches cross-merge between fixed and dynamic columns, some are never
+   assigned and get lost;
+ - When multiple independet heads are present, some of them are not plotted at
+   all;
  - I definitely must add at least the commit message to the output;
 
 ## FOCUS: Vertical Padding
