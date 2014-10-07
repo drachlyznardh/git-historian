@@ -142,6 +142,14 @@ class Historian:
 					commit.hash[:7], commit .column)
 				order.insert_static(commit)
 
+			children = len(commit.child)
+			if children == 0:
+				order.insert_from_left(name)
+				continue
+			if children == 1:
+				order.insert_on_child_column(name, commit.child[0])
+				continue
+
 			# I archive all but the first child
 			# I should be archiving all children but the leftmost one
 			# Maybe, I could just archive them all, and then choose for myself

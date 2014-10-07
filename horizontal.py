@@ -59,9 +59,16 @@ class Order:
 	def insert_from_left (self, target):
 		for column in self.active:
 			if column.available:
-				column.append(target.hash)
+				column.append(target)
 				return
-		self.active.append(Column([target.hash]))
+		self.active.append(Column([target]))
+
+	def insert_on_child_column (self, target, child):
+		for column in self.active:
+			if column.bottom() == child:
+				column.append(target)
+				return
+		print "Child %s in nowhere to be found!" % child
 
 	def head_insert (self, target):
 		self.active.append(Column([target.hash]))
