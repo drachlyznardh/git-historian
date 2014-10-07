@@ -70,6 +70,16 @@ class Order:
 				return
 		print "Child %s in nowhere to be found!" % child
 
+	def insert_before_or_on_any_child(self, target, children):
+		for column in self.active:
+			if column.available:
+				column.append(target)
+				return
+			if column.bottom() in children:
+				column.append(target)
+				return
+		print "No child of %s found" % target
+
 	def head_insert (self, target):
 		self.active.append(Column([target.hash]))
 
