@@ -216,12 +216,14 @@ class Historian:
 		for key, value in optlist:
 			if key in ('-h', '--help'):
 				self.print_help()
+				return
 			elif key in ('-v', '--verbose'):
 				self.verbose = 1
 			elif key in ('-d', '--debug'):
 				self.debug = 1
 			elif key == '--version':
 				self.print_version()
+				return
 
 		if not self.commit:
 			self.get_history()
