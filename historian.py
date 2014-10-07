@@ -136,14 +136,10 @@ class Historian:
 					print "No Commit for name %s" % name[:7]
 				break
 
-			if commit.static:
-				if self.debug:
-					print "%s has fixed column %d" % (
-					commit.hash[:7], commit .column)
-				order.insert_static(commit)
-
 			children = len(commit.child)
-			if children == 0:
+			if commit.static:
+				order.insert_static(commit)
+			elif children == 0:
 				order.insert_from_left(name)
 			elif children == 1:
 				child = self.commit[commit.child[0]]
@@ -166,10 +162,6 @@ class Historian:
 				if self.debug:
 					print "  Should be archiving branch for %s" % child[:7]
 				order.archive(name, child)
-
-			# Unless it has static precedence or stuff, a commit should
-			# self-insert
-			order.self_insert(commit)
 
 			for parent in commit.parent:
 				if self.debug:
