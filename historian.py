@@ -144,6 +144,8 @@ class Historian:
 
 			# I archive all but the first child
 			# I should be archiving all children but the leftmost one
+			# Maybe, I could just archive them all, and then choose for myself
+			# any available column
 			for child in commit.child[1:]:
 				if self.debug:
 					print "  Should be archiving branch for %s" % child[:7]
