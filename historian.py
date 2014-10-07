@@ -152,7 +152,11 @@ class Historian:
 				else:
 					order.insert_on_child_column(name, commit.child[0])
 			else:
-				order.insert_before_or_on_any_child(name, commit.child)
+				candidates = []
+				for child in commit.child:
+					if not self.commit[child].static:
+						candidates.append(child)
+				order.insert_before_or_on_any_child(name, candidates)
 
 			# I archive all but the first child
 			# I should be archiving all children but the leftmost one
