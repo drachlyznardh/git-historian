@@ -116,6 +116,7 @@ class Order:
 		if self.debug:
 			print "Inserting from right of %s" % child[:7]
 			print targets
+
 		index = len(self.active)
 		for column in self.active:
 			if column.available: continue

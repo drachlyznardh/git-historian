@@ -164,12 +164,14 @@ class Historian:
 
 			if parents == 0:
 				order.archive_commit(name)
-			else:
-				candidates = []
+			elif parents > 1:
+				order.archive_commit(name)
+				#candidates = []
 				for parent in commit.parent:
 					if not self.commit[parent].static:
-						candidates.append(parent)
-				order.insert_from_right_of(name, candidates, commit.static)
+						#candidates.append(parent)
+						order.insert_from_left(parent)
+				#order.insert_from_right_of(name, candidates, commit.static)
 
 		order.flush_active()
 
