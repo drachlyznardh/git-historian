@@ -17,7 +17,8 @@ VERSION="0.0-a"
 class Historian:
 	def __init__ (self):
 
-		debug = 0
+		self.verbose = 0
+		self.debug = 0
 
 		self.head = 0
 		self.commit = {}
@@ -47,7 +48,7 @@ class Historian:
 			if not self.head: self.head = current.hash
 			self.commit[current.hash] = current
 	
-	def unroll_vertically(self, debug):
+	def unroll_vertically(self):
 		
 		visit = vertical.Order(self.head)
 
@@ -55,15 +56,15 @@ class Historian:
 
 			target = visit.pop()
 			if not target:
-				if debug: print "No Target"
+				if self.debug: print "No Target"
 				break
 
 			commit = self.commit[target]
 			if not commit:
-				if debug: print "No Commit"
+				if self.debug: print "No Commit"
 				break
 			if commit.done:
-				if debug: print "%s is done, skipping" % commit.hash[:7]
+				if self.debug: print "%s is done, skipping" % commit.hash[:7]
 				continue
 
 			if len(commit.child) > 1:
@@ -92,13 +93,13 @@ class Historian:
 				if parent and not parent.done:
 					visit.push(commit.parent[0])
 			
-			if debug: visit.show()
+			if self.debug: visit.show()
 			commit.done = 1
 
-	def unroll_horizontally(self, debug):
+	def unroll_horizontally(self):
 
 		reserved = 2
-		order = horizontal.Order(reserved, debug)
+		order = horizontal.Order(reserved, self.debug)
 
 		# Children must appear in their vertical order
 		for name in self.vertical:
@@ -115,33 +116,33 @@ class Historian:
 
 		for name in self.vertical:
 			
-			if debug: order.show()
+			if self.debug: order.show()
 			commit = self.commit[name]
 			if not commit:
-				if debug:
+				if self.debug:
 					print "No Commit for name %s" % name[:7]
 				break
 
 			if commit.static:
-				if debug:
+				if self.debug:
 					print "%s has fixed column %d" % (
 					commit.hash[:7], commit .column)
 				order.static_insert(commit)
 
 			for child in commit.child[1:]:
-				if debug:
+				if self.debug:
 					print "  Should be archiving branch for %s" % child[:7]
 				order.archive(name, child)
 
 			for parent in commit.parent:
-				if debug:
+				if self.debug:
 					print "  Inserting (%s, %s)" % (
 					name[:7], parent[:7])
 				order.insert(commit, self.commit[parent])
 
 		for index in range(len(order.l)):
 			for name in order.l[index].l:
-				if debug:
+				if self.debug:
 					print "Calling %s with %d from column" % (
 					name[:7], index)
 				target = self.commit[name]
@@ -152,7 +153,7 @@ class Historian:
 			column = order.archived[i]
 			index = column.index
 			for name in column.l:
-				if debug:
+				if self.debug:
 					print "Calling %s with %d from archive" % (
 					name[:7], index)
 				target = self.commit[name]
@@ -161,7 +162,7 @@ class Historian:
 		
 		self.max_column = len(order.l)
 
-	def print_graph (self, debug):
+	def print_graph (self):
 		
 		head = self.commit[self.head]
 		if not head:
@@ -177,7 +178,7 @@ class Historian:
 				print "No Commit for name %s" % name[:7]
 				break
 
-			if debug: print "\nP %s" % name[:7]
+			if self.debug: print "\nP %s" % name[:7]
 			
 			t.swap()
 
@@ -188,8 +189,8 @@ class Historian:
 					print "No parent with name %s" % name[:7]
 				t.bottom[parent.column] = name
 
-			if debug: t.plot_top()
-			if debug: t.plot_bottom()
+			if self.debug: t.plot_top()
+			if self.debug: t.plot_bottom()
 			
 			#print "%s %s" % (t.draw_layout(commit), commit.to_oneline())
 			print "%s" % t.draw_padding()
@@ -217,10 +218,10 @@ class Historian:
 				self.help()
 			elif key in ('-v', '--verbose'):
 				self.verbose = 1
+			elif key in ('-d', '--debug'):
+				self.debug = 1
 			elif key == '--version':
 				self.print_version()
-
-		return
 
 		if not self.commit:
 			self.get_history()
@@ -228,7 +229,7 @@ class Historian:
 		for i in self.commit:
 			self.commit[i].know_your_parents(self.commit)
 	
-		self.unroll_vertically(debug)
-		self.unroll_horizontally(debug)
-		self.print_graph(debug)
+		self.unroll_vertically()
+		self.unroll_horizontally()
+		self.print_graph()
 
