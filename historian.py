@@ -139,6 +139,8 @@ class Historian:
 			children = len(commit.child)
 			if commit.static:
 				order.insert_static(commit)
+			elif order.at_bottom(name):
+				'' # Commit is already ordered, skip
 			elif children == 0:
 				order.insert_from_left(name)
 			elif children == 1:
@@ -159,8 +161,13 @@ class Historian:
 			# Maybe, I could just archive them all, and then choose for myself
 			parents = len(commit.parent)
 			if parents == 0:
-				order.archive_commit(commit.hash)
-
+				order.archive_commit(name)
+			else:
+				candidates = []
+				for parent in commit.parent:
+					if not self.commit[parent].static:
+						candidates.append(parent)
+				order.insert_from_right_of(name, candidates)
 			'''
 			# any available column
 			for child in commit.child[1:]:
@@ -175,6 +182,8 @@ class Historian:
 				order.insert(commit, self.commit[parent])
 			'''
 
+		order.flush_active()
+
 		for index in range(len(order.active)):
 			for name in order.active[index].content:
 				if self.debug:
@@ -185,8 +194,7 @@ class Historian:
 					target.column = index
 
 		#for i in reversed(range(len(order.archived))):
-		for index in range(order.columns):
-			column = order.archived[index]
+		for index, column in order.archived.items():
 			#index = column.index
 			for name in column:#.content:
 				if self.debug:

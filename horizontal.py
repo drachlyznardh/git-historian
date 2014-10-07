@@ -48,8 +48,17 @@ class Order:
 		self.debug = debug
 		for i in range(reserved):
 			self.active.append(Column([]))
-		self.archived = [[] for i in range(reserved)]
-		self.columns = reserved
+		self.archived = {}
+
+	def at_bottom(self, target):
+		
+		for column in self.active:
+			if column.available: continue
+			if column.bottom() == target:
+				return 1
+
+		print "%s in not at the bottom" % target[:7]
+		return 0
 
 	def trim_one_available (self, target):
 		for i in xrange(target + 1, len(self.active)):
@@ -65,8 +74,6 @@ class Order:
 				column.append(target)
 				return
 		self.active.append(Column([target]))
-		self.archived.append([])
-		self.columns += 1
 
 	def insert_on_child_column (self, target, child):
 		if self.debug:
@@ -82,6 +89,7 @@ class Order:
 	
 		if self.debug:
 			print "Insert before or on children (%s)" % target[:7]
+			print children
 		missing = 1
 		for column in self.active:
 			if column.available or column.bottom() in children:
@@ -97,6 +105,23 @@ class Order:
 			if column.bottom() in children:
 				index = self.active.index(column)
 				self.archive_column(index, column)
+
+	def insert_from_right_of(self, child, targets):
+		
+		if self.debug:
+			print "Inserting from right of %s" % child[:7]
+			print targets
+		index = len(self.active)
+		for column in self.active:
+			if column.available: continue
+			if column.bottom() == child:
+				index = 1 + self.active.index(column)
+				break
+
+		for target in targets:
+			if self.at_bottom(target): continue
+			self.active.insert(index, Column([target]))
+			self.trim_one_available(index)
 
 	def head_insert (self, target):
 		self.active.append(Column([target.hash]))
@@ -203,7 +228,8 @@ class Order:
 		if self.debug:
 			print "Archiving column (%d)" % index
 		for e in column.content:
-			self.archived[index].append(e)
+			try: self.archived[index].append(e)
+			except: self.archived[index] = [e]
 		
 		column.make_available()
 
@@ -216,6 +242,15 @@ class Order:
 			if column.bottom() == target:
 				index = self.active.index(column)
 				self.archive_column(index, column)
+
+	# When every commit has been assigned to a column, it's time to archive any
+	# current data
+	def flush_active (self):
+		
+		for index in range(len(self.active)):
+			for element in self.active[index].content:
+				try: self.archived[index].append(element)
+				except: self.archived[index] = [element]
 
 	def show (self):
 		print '{'
