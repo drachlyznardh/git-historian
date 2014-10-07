@@ -142,6 +142,8 @@ class Historian:
 					commit.hash[:7], commit .column)
 				order.static_insert(commit)
 
+			# I archive all but the first child
+			# I should be archiving all children but the leftmost one
 			for child in commit.child[1:]:
 				if self.debug:
 					print "  Should be archiving branch for %s" % child[:7]
