@@ -69,7 +69,7 @@ class Order:
 		if self.at_bottom(target): return
 		if self.debug:
 			print "Insert from left (%s)" % target[:7]
-		for column in self.active:
+		for column in self.active[self.reserved:]:
 			if column.available:
 				column.append(target)
 				return
