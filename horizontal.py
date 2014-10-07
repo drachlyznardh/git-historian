@@ -48,7 +48,8 @@ class Order:
 		self.debug = debug
 		for i in range(reserved):
 			self.active.append(Column([]))
-		self.archived = []
+		self.archived = [[] for i in range(reserved)]
+		self.columns = reserved
 
 	def trim_one_available (self, target):
 		for i in xrange(target + 1, len(self.active)):
@@ -57,16 +58,50 @@ class Order:
 				break
 
 	def insert_from_left (self, target):
+		if self.debug:
+			print "Insert from left (%s)" % target[:7]
 		for column in self.active:
 			if column.available:
-				column.append(target.hash)
+				column.append(target)
 				return
-		self.active.append(Column([target.hash]))
+		self.active.append(Column([target]))
+		self.archived.append([])
+		self.columns += 1
+
+	def insert_on_child_column (self, target, child):
+		if self.debug:
+			print "Insert on child column (%s) (%s)" % (target[:7], child[:7])
+		for column in self.active:
+			if column.bottom() == child:
+				column.append(target)
+				return
+		print "Child %s in nowhere to be found!" % child
+		self.insert_from_left(target)
+
+	def insert_before_or_on_any_child(self, target, children):
+	
+		if self.debug:
+			print "Insert before or on children (%s)" % target[:7]
+		missing = 1
+		for column in self.active:
+			if column.available or column.bottom() in children:
+				column.append(target)
+				missing = 1
+				break
+		if missing:
+			print "No child of %s found" % target
+			self.insert_from_left(target)
+
+		for column in self.active:
+			if column.available: continue
+			if column.bottom() in children:
+				index = self.active.index(column)
+				self.archive_column(index, column)
 
 	def head_insert (self, target):
 		self.active.append(Column([target.hash]))
 
-	def static_insert (self, target):
+	def insert_static (self, target):
 		if self.active[target.column].bottom() == target.hash:
 			if self.debug:
 				print "%s is already at the bottom" % target.hash[:7]
@@ -98,7 +133,7 @@ class Order:
 	def insert (self, top, bottom):
 
 		if bottom.static:
-			self.static_insert(bottom)
+			self.insert_static(bottom)
 			return
 
 		if top.static and not bottom.static and top.parent[0] == bottom.hash:
@@ -162,6 +197,25 @@ class Order:
 				return
 
 		if self.debug: print "Oops. %s not archived" % (target[:7])
+
+	def archive_column (self, index, column):
+		
+		if self.debug:
+			print "Archiving column (%d)" % index
+		for e in column.content:
+			self.archived[index].append(e)
+		
+		column.make_available()
+
+	def archive_commit (self, target):
+	
+		if self.debug:
+			print "Archiving commit (%s)" % target[:7]
+		for column in self.active:
+			if column.available: continue
+			if column.bottom() == target:
+				index = self.active.index(column)
+				self.archive_column(index, column)
 
 	def show (self):
 		print '{'

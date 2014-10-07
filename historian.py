@@ -136,30 +136,44 @@ class Historian:
 					print "No Commit for name %s" % name[:7]
 				break
 
+			children = len(commit.child)
 			if commit.static:
-				if self.debug:
-					print "%s has fixed column %d" % (
-					commit.hash[:7], commit .column)
-				order.static_insert(commit)
+				order.insert_static(commit)
+			elif children == 0:
+				order.insert_from_left(name)
+			elif children == 1:
+				child = self.commit[commit.child[0]]
+				if child.static:
+					order.insert_from_left(name)
+				else:
+					order.insert_on_child_column(name, commit.child[0])
+			else:
+				candidates = []
+				for child in commit.child:
+					if not self.commit[child].static:
+						candidates.append(child)
+				order.insert_before_or_on_any_child(name, candidates)
 
 			# I archive all but the first child
 			# I should be archiving all children but the leftmost one
 			# Maybe, I could just archive them all, and then choose for myself
+			parents = len(commit.parent)
+			if parents == 0:
+				order.archive_commit(commit.hash)
+
+			'''
 			# any available column
 			for child in commit.child[1:]:
 				if self.debug:
 					print "  Should be archiving branch for %s" % child[:7]
 				order.archive(name, child)
 
-			# Unless it has static precedence or stuff, a commit should
-			# self-insert
-			order.self_insert(commit)
-
 			for parent in commit.parent:
 				if self.debug:
 					print "  Inserting (%s, %s)" % (
 					name[:7], parent[:7])
 				order.insert(commit, self.commit[parent])
+			'''
 
 		for index in range(len(order.active)):
 			for name in order.active[index].content:
@@ -170,10 +184,11 @@ class Historian:
 				if target and target.column == -1:
 					target.column = index
 
-		for i in reversed(range(len(order.archived))):
-			column = order.archived[i]
-			index = column.index
-			for name in column.content:
+		#for i in reversed(range(len(order.archived))):
+		for index in range(order.columns):
+			column = order.archived[index]
+			#index = column.index
+			for name in column:#.content:
 				if self.debug:
 					print "Calling %s with %d from archive" % (
 					name[:7], index)
