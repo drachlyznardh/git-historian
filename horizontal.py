@@ -56,6 +56,13 @@ class Order:
 				self.l.pop(i)
 				break
 
+	def insert_from_left (self, target):
+		for column in self.l:
+			if column.available:
+				column.append(target.hash)
+				return
+		self.l.append(Column([target.hash]))
+
 	def head_insert (self, target):
 		self.l.append(Column([target.hash]))
 
@@ -87,7 +94,6 @@ class Order:
 			child = self.commit[name]
 			if not child: continue # Missing commit: skip
 			if child.static: continue # Child on static column, not eligible
-
 
 	def insert (self, top, bottom):
 
