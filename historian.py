@@ -157,6 +157,10 @@ class Historian:
 			# I archive all but the first child
 			# I should be archiving all children but the leftmost one
 			# Maybe, I could just archive them all, and then choose for myself
+			parents = len(commit.parent)
+			if parents == 0:
+				order.archive_commit(commit.hash)
+
 			'''
 			# any available column
 			for child in commit.child[1:]:
