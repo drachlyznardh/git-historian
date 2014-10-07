@@ -146,7 +146,11 @@ class Historian:
 			if children == 0:
 				order.insert_from_left(name)
 			elif children == 1:
-				order.insert_on_child_column(name, commit.child[0])
+				child = self.commit[commit.child[0]]
+				if child.static:
+					order.insert_from_left(name)
+				else:
+					order.insert_on_child_column(name, commit.child[0])
 			else:
 				order.insert_before_or_on_any_child(name, commit.child)
 
