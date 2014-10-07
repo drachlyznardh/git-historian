@@ -230,7 +230,9 @@ class Historian:
 
 		for i in self.commit:
 			self.commit[i].know_your_parents(self.commit)
-	
+
+		if self.debug:
+			print "%d commits in history" % len(self.commit)
 		self.unroll_vertically()
 		self.unroll_horizontally()
 		self.print_graph()
