@@ -77,6 +77,7 @@ class Order:
 					column.append(target.hash)
 					return
 			self.l.append(Column([target.hash]))
+			return
 
 		# A lone father should fall in line with its child
 		if children == 1:
