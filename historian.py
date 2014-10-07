@@ -49,7 +49,10 @@ class Historian:
 			self.commit[current.hash] = current
 	
 	def unroll_vertically(self):
-		
+
+		if self.debug:
+			print '\n-- Vertical unrolling --'
+
 		visit = vertical.Order(self.head)
 
 		for name, commit in self.commit.items():
@@ -104,6 +107,9 @@ class Historian:
 				commit.done = 1
 
 	def unroll_horizontally(self):
+
+		if self.debug:
+			print '\n-- Horizontal unrolling --'
 
 		reserved = 2
 		order = horizontal.Order(reserved, self.debug)
