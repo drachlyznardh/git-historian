@@ -193,9 +193,6 @@ class Layout:
 		#print "North %s" % self.ne
 		#print "South %s" % self.se
 			
-		for name in target.parent:
-			self.track[target.column].add(name)
-
 		if self.debug:
 			self.plot_track()
 			print target.child
@@ -211,9 +208,11 @@ class Layout:
 			self.compute_even_column(i, target)
 		#return self.layout
 
-		for name in target.child:
-			for track in self.track.values():
-				track.discard(name)
+		for track in self.track.values():
+			track.discard(target.hash)
+
+		for name in target.parent:
+			self.track[target.column].add(name)
 
 	def draw_padding (self):
 
