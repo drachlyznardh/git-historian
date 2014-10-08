@@ -120,13 +120,13 @@ class Historian:
 				print '%s' % name[:7]
 			print '  --'
 
-	def unroll_horizontally(self):
+	def unroll_horizontally(self, debug):
 
-		if self.debug:
+		if debug:
 			print '\n-- Horizontal unrolling --'
 
 		reserved = 2
-		order = horizontal.Order(self.commit, reserved, self.debug)
+		order = horizontal.Order(self.commit, reserved, debug)
 
 		# Children must appear in their vertical order
 		for name in self.vertical:
@@ -143,16 +143,16 @@ class Historian:
 
 		for name in self.vertical:
 			
-			if self.debug: order.show()
+			if debug: order.show()
 			commit = self.commit[name]
 			if not commit:
-				if self.debug:
+				if debug:
 					print "No Commit for name %s" % name[:7]
 				break
 
 			children = len(commit.child)
 			parents = len(commit.parent)
-			if self.debug:
+			if debug:
 				print "Vertical unrolling of %s (%d, %d)" % (
 					name[:7], children, parents)
 
@@ -191,7 +191,7 @@ class Historian:
 
 		for index in range(len(order.active)):
 			for name in order.active[index].content:
-				if self.debug:
+				if debug:
 					print "Calling %s with %d from column" % (
 					name[:7], index)
 				target = self.commit[name]
@@ -202,7 +202,7 @@ class Historian:
 		for index, column in order.archived.items():
 			#index = column.index
 			for name in column:#.content:
-				if self.debug:
+				if debug:
 					print "Calling %s with %d from archive" % (
 					name[:7], index)
 				target = self.commit[name]
@@ -211,7 +211,7 @@ class Historian:
 		
 		self.max_column = len(order.active)
 
-	def print_graph (self):
+	def print_graph (self, debug):
 		
 		head = self.commit[self.head]
 		if not head:
@@ -227,7 +227,7 @@ class Historian:
 				print "No Commit for name %s" % name[:7]
 				break
 
-			if self.debug: print "\nP %s" % name[:7]
+			if debug: print "\nP %s" % name[:7]
 			
 			t.swap()
 
@@ -238,8 +238,8 @@ class Historian:
 					print "No parent with name %s" % name[:7]
 				t.bottom[parent.column] = name
 
-			if self.debug: t.plot_top()
-			if self.debug: t.plot_bottom()
+			if debug: t.plot_top()
+			if debug: t.plot_bottom()
 			
 			#print "%s %s" % (t.draw_layout(commit), commit.to_oneline())
 			print "%s" % t.draw_padding()
@@ -294,6 +294,6 @@ class Historian:
 		if self.debug:
 			print "%d commits in history" % len(self.commit)
 		self.unroll_vertically(self.debug or vdebug)
-		self.unroll_horizontally()
-		self.print_graph()
+		self.unroll_horizontally(self.debug or hdebug)
+		self.print_graph(self.debug or ldebug)
 
