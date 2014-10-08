@@ -2,15 +2,17 @@
 
 class Column:
 
-	def __init__ (self, l):
+	def __init__ (self, l, count):
 		self.content = l
 		self.index = -1
 		self.available = 0
+		self.count = count
 	
 	def make_available (self):
 		self.content = []
 		self.index = -1
 		self.available = 1
+		self.count = 0
 
 	def top (self):
 		if len(self.content) == 0: return ''
@@ -47,7 +49,7 @@ class Order:
 		self.reserved = reserved
 		self.debug = debug
 		for i in range(reserved):
-			self.active.append(Column([]))
+			self.active.append(Column([], 0))
 		self.archived = {}
 
 	def at_bottom(self, target):
@@ -72,8 +74,9 @@ class Order:
 		for column in self.active[self.reserved:]:
 			if column.available:
 				column.append(target.hash)
+				column.count = len(target.parent)
 				return
-		self.active.append(Column([target.hash]))
+		self.active.append(Column([target.hash], len(target.parent)))
 
 	def insert_on_child_column (self, target, child):
 		if self.at_bottom(target): return
@@ -163,7 +166,7 @@ class Order:
 				if column.available:
 					column.append(target.hash)
 					return
-			self.active.append(Column([target.hash]))
+			self.active.append(Column([target.hash], len(target.parent)))
 			return
 
 		# A lone father should fall in line with its child
