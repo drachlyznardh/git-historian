@@ -53,7 +53,7 @@ class Historian:
 		if debug:
 			print '\n-- Vertical unrolling --'
 
-		visit = vertical.Order(self.head)
+		visit = vertical.Order()
 
 		for name, commit in self.commit.items():
 
