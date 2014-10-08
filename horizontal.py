@@ -263,8 +263,11 @@ class Order:
 		for column in self.active:
 			if column.available: continue
 			if column.bottom() == target:
-				index = self.active.index(column)
-				self.archive_column(index, column)
+				if column.count == 1:
+					index = self.active.index(column)
+					self.archive_column(index, column)
+				else:
+					column.count -= 1
 
 	# When every commit has been assigned to a column, it's time to archive any
 	# current data
