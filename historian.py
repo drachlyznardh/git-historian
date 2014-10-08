@@ -57,6 +57,8 @@ class Historian:
 
 		for name, commit in self.commit.items():
 
+			if debug: visit.show()
+
 			if commit.done:
 				if debug: print '%s is done, skipping' % name[:7]
 				continue
@@ -65,6 +67,8 @@ class Historian:
 			visit.push(name)
 
 			while 1:
+
+				if debug: visit.show()
 
 				target = visit.pop()
 				if not target:
@@ -75,6 +79,8 @@ class Historian:
 				if not commit:
 					if debug: print "No Commit"
 					break
+
+				if debug: print 'Unrolling %s' % target[:7]
 				if commit.done:
 					if debug: print "%s is done, skipping" % commit.hash[:7]
 					continue
