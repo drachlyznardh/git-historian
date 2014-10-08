@@ -32,10 +32,10 @@ class Column:
 
 	def show (self):
 		if len(self.content) == 0:
-			print '[Avail]'
+			print '%d [Avail]' % self.count
 			return
 
-		line = '[' + self.content[0][:7]
+		line = '%d [%s' % (self.count, self.content[0][:7])
 		for i in self.content[1:]:
 			line += ', ' + i[:7]
 		line += ']'
