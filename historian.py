@@ -249,18 +249,13 @@ class Historian:
 			if debug: t.plot_top()
 			if debug: t.plot_bottom()
 			
-			#print "%s %s" % (t.draw_layout(commit), commit.to_oneline())
-			#print "%s" % t.draw_padding()
 			t.compute_layout(commit)
-			#print "%s %s" % (t.draw_transition(), commit.to_oneline())
 
 			cmdargs.pop() # Remove previous commit from list
 			cmdargs.append(commit.hash)
 
-			#print cmdargs
 			message = check_output(cmdargs).split('\n')
 
-			#print len(message), message
 			print '%s\x1b[m %s' % (t.draw_transition(), message[0])
 			for i in message[1:-1]:
 				print '%s\x1b[m %s' % (t.draw_padding(), i)
