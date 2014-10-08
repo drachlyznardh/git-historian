@@ -162,8 +162,6 @@ class Historian:
 
 			if commit.static:
 				order.insert_static(commit)
-			#elif children == 0:
-			#	order.insert_from_left(name)
 			elif children == 1:
 				child = self.commit[commit.child[0]]
 				if child.static:
@@ -171,25 +169,15 @@ class Historian:
 				else:
 					order.insert_on_child_column(name, commit.child[0])
 			else:
-				#candidates = []
-				#for child in commit.child:
-					#if not self.commit[child].static:
-						#candidates.append(child)
-				#	order.archive_commit(child)
-				#for candidate in candidates:
-				#	order.archive_commit(candidate)
 				order.insert_from_left(name)
 
 			if parents == 0:
 				order.archive_commit(name)
 			elif parents > 1:
 				order.archive_commit(name)
-				#candidates = []
 				for parent in commit.parent:
 					if not self.commit[parent].static:
-						#candidates.append(parent)
 						order.insert_from_left(parent)
-				#order.insert_from_right_of(name, candidates, commit.static)
 
 		order.flush_active()
 
@@ -202,10 +190,8 @@ class Historian:
 				if target and target.column == -1:
 					target.column = index
 
-		#for i in reversed(range(len(order.archived))):
 		for index, column in order.archived.items():
-			#index = column.index
-			for name in column:#.content:
+			for name in column:
 				if debug:
 					print "Calling %s with %d from archive" % (
 					name[:7], index)
