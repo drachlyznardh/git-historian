@@ -200,7 +200,7 @@ class Historian:
 				if target and target.column == -1:
 					target.column = index
 		
-		self.max_column = len(order.active)
+		self.max_column = len(order.archived)
 
 	def print_graph (self, debug):
 		
