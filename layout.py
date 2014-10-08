@@ -70,7 +70,7 @@ class Layout:
 		
 		if index == target.column:
 
-			if len(self.bottom[index]): padding = '│' # \u2502
+			if len(target.parent): padding = '│' # \u2502
 			else: padding = ' '
 			
 			self.put_char(target.column, '•', padding, 0) # \u2022 \u2502
@@ -78,6 +78,12 @@ class Layout:
 
 		top = self.top[index]
 		bottom = self.bottom[index]
+
+		if index > target.column:
+
+			for name in target.child:
+				if name in self.track[index]:
+					self.put_char(index, '┘', ' ', 0) # \u2518
 
 		if len(top) and len(bottom): # both ends are present
 
@@ -133,7 +139,7 @@ class Layout:
 
 	def compute_odd_column(self, index, target):
 
-		father = None
+		#father = None
 
 		if index > target.column:
 			
