@@ -43,14 +43,11 @@ class Column:
 
 class Order:
 
-	def __init__ (self, commit, reserved, debug):
+	def __init__ (self, commit, debug):
 		self.active = []
 		self.commit = commit
-		self.reserved = reserved
 		self.debug = debug
 		self.archived = {}
-		for i in range(self.reserved):
-			self.archived[i] = []
 
 	def at_bottom(self, target):
 		
@@ -111,7 +108,7 @@ class Order:
 			if column.available: continue
 			print "Now purgin closed branches (%s)" % column.bottom()
 			if column.bottom() in children:
-				index = self.reserved + self.active.index(column)
+				index = self.active.index(column)
 				self.archive_column(index, column)
 
 	def insert_from_right_of(self, child, targets, static):
@@ -265,7 +262,7 @@ class Order:
 			if column.available: continue
 			if column.bottom() == target:
 				if column.count == 1:
-					index = self.reserved + self.active.index(column)
+					index = self.active.index(column)
 					self.archive_column(index, column)
 				else:
 					column.count -= 1

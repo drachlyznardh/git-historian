@@ -126,7 +126,7 @@ class Historian:
 			print '\n-- Horizontal unrolling --'
 
 		reserved = 2
-		order = horizontal.Order(self.commit, reserved, debug)
+		order = horizontal.Order(self.commit, debug)
 
 		# Children must appear in their vertical order
 		for name in self.vertical:
@@ -198,9 +198,9 @@ class Historian:
 					name[:7], index)
 				target = self.commit[name]
 				if target and target.column == -1:
-					target.column = index
+					target.column = reserved + index
 		
-		self.max_column = len(order.archived)
+		self.max_column = reserved + len(order.archived)
 
 	def print_graph (self, debug):
 		
