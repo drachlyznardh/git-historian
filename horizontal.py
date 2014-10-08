@@ -150,6 +150,7 @@ class Order:
 		self.active.append(Column([target.hash]))
 
 	def insert_static (self, target):
+		return
 		if self.active[target.column].bottom() == target.hash:
 			if self.debug:
 				print "%s is already at the bottom" % target.hash[:7]
