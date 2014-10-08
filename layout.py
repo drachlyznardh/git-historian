@@ -136,8 +136,8 @@ class Layout:
 		
 		else:
 
-			for name in reversed(target.parent):
-				if name in self.sw:
+			for name in reversed(self.sw):
+				if name in target.parent:
 					self.put_char(name, '→', ' ', 1)
 					return
 
