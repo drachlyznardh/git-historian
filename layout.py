@@ -84,6 +84,20 @@ class Layout:
 			for name in target.child:
 				if name in self.track[index]:
 					self.put_char(index, '┘', ' ', 0) # \u2518
+					return
+
+			self.put_char(index, '1', '1', 0)
+
+		else:
+
+			for name in target.child:
+				if name in self.track[index]:
+					self.put_char(index, '├', ' ', 0) # \u251c
+					return
+
+			self.put_char(index, '1', '1', 0)
+
+		return
 
 		if len(top) and len(bottom): # both ends are present
 
