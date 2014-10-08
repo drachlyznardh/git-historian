@@ -157,6 +157,9 @@ class Historian:
 					name[:7], children, parents)
 
 			# deal with children: it this a split?
+			if children > 1:
+				for child in commit.child:
+					order.archive_commit(child)
 			# deal with self: it this static?
 			if not commit.static:
 				order.insert_from_left(name)
