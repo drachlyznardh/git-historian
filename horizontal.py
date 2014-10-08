@@ -66,14 +66,14 @@ class Order:
 				break
 
 	def insert_from_left (self, target):
-		if self.at_bottom(target): return
+		if self.at_bottom(target.hash): return
 		if self.debug:
-			print "Insert from left (%s)" % target[:7]
+			print "Insert from left (%s)" % target.hash[:7]
 		for column in self.active[self.reserved:]:
 			if column.available:
-				column.append(target)
+				column.append(target.hash)
 				return
-		self.active.append(Column([target]))
+		self.active.append(Column([target.hash]))
 
 	def insert_on_child_column (self, target, child):
 		if self.at_bottom(target): return
