@@ -55,7 +55,7 @@ class Order:
 		for column in self.active:
 			if column.available: continue
 			if column.bottom() == target:
-				print "%s at the bottom" % target[:7]
+				if self.debug: print "%s at the bottom" % target[:7]
 				return 1
 		return 0
 

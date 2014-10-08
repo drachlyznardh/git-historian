@@ -48,7 +48,7 @@ class Historian:
 			if not self.head: self.head = current.hash
 			self.commit[current.hash] = current
 	
-	def unroll_vertically(self, debug):
+	def vertical_unrolling(self, debug):
 
 		if debug:
 			print '\n-- Vertical unrolling --'
@@ -120,7 +120,7 @@ class Historian:
 				print '%s' % name[:7]
 			print '  --'
 
-	def unroll_horizontally(self, debug):
+	def horizontal_unroll(self, debug):
 
 		if debug:
 			print '\n-- Horizontal unrolling --'
@@ -156,10 +156,14 @@ class Historian:
 				print "Vertical unrolling of %s (%d, %d)" % (
 					name[:7], children, parents)
 
+			if children != 1:
+				for child in commit.child:
+					order.archive_commit(child)
+
 			if commit.static:
 				order.insert_static(commit)
-			elif children == 0:
-				order.insert_from_left(name)
+			#elif children == 0:
+			#	order.insert_from_left(name)
 			elif children == 1:
 				child = self.commit[commit.child[0]]
 				if child.static:
@@ -168,10 +172,10 @@ class Historian:
 					order.insert_on_child_column(name, commit.child[0])
 			else:
 				#candidates = []
-				for child in commit.child:
+				#for child in commit.child:
 					#if not self.commit[child].static:
 						#candidates.append(child)
-					order.archive_commit(child)
+				#	order.archive_commit(child)
 				#for candidate in candidates:
 				#	order.archive_commit(candidate)
 				order.insert_from_left(name)
@@ -220,6 +224,10 @@ class Historian:
 
 		t = layout.Layout(self.max_column, self.commit)
 
+		cmdargs = 'git show -s --oneline --decorate --color'.split(' ')
+		#cmdargs.append(optargs)
+		cmdargs.append('<commit>')
+
 		for name in self.vertical:
 
 			commit = self.commit[name]
@@ -241,10 +249,16 @@ class Historian:
 			if debug: t.plot_top()
 			if debug: t.plot_bottom()
 			
-			#print "%s %s" % (t.draw_layout(commit), commit.to_oneline())
-			print "%s" % t.draw_padding()
 			t.compute_layout(commit)
-			print "%s %s" % (t.draw_transition(), commit.to_oneline())
+
+			cmdargs.pop() # Remove previous commit from list
+			cmdargs.append(commit.hash)
+
+			message = check_output(cmdargs).split('\n')
+
+			print '%s\x1b[m %s' % (t.draw_transition(), message[0])
+			for i in message[1:-1]:
+				print '%s\x1b[m %s' % (t.draw_padding(), i)
 
 	def print_version(self):
 		print "Git-Historian %s (C) 2014 Ivan Simonini" % VERSION
@@ -293,7 +307,7 @@ class Historian:
 
 		if self.debug:
 			print "%d commits in history" % len(self.commit)
-		self.unroll_vertically(self.debug or vdebug)
-		self.unroll_horizontally(self.debug or hdebug)
+		self.vertical_unrolling(self.debug or vdebug)
+		self.horizontal_unroll(self.debug or hdebug)
 		self.print_graph(self.debug or ldebug)
 
