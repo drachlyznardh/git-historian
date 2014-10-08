@@ -156,6 +156,13 @@ class Historian:
 				print "Vertical unrolling of %s (%d, %d)" % (
 					name[:7], children, parents)
 
+			# deal with children: it this a split?
+			# deal with self: it this static?
+			if not commit.static:
+				order.insert_from_left(name)
+			# deal with parents: it this a merge?
+			continue
+
 			if children != 1:
 				for child in commit.child:
 					order.archive_commit(child)
