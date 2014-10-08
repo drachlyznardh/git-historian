@@ -71,7 +71,7 @@ class Order:
 		if self.at_bottom(target.hash): return
 		if self.debug:
 			print "Insert from left (%s)" % target.hash[:7]
-		for column in self.active:#[self.reserved:]:
+		for column in self.active:
 			if column.available:
 				column.append(target.hash)
 				column.count = len(target.parent)
@@ -96,7 +96,7 @@ class Order:
 			print "Insert before or on children (%s)" % target[:7]
 			print children
 		missing = 1
-		for column in self.active:#[self.reserved:]:
+		for column in self.active:
 			if column.available or column.bottom() == child:
 				column.append(father)
 				missing = 1
@@ -199,7 +199,7 @@ class Order:
 					bottom.hash, self.active.index(i))
 				return
 
-		for i in self.active:#[self.reserved:]:
+		for i in self.active:
 			if i.available:
 				if len(top.parent) > 1:
 					i.append(bottom.hash)
