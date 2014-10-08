@@ -3,9 +3,8 @@
 
 class Column:
 
-	def __init__ (self, color, style, transition, padding):
+	def __init__ (self, color, transition, padding):
 		self.color = color
-		self.style = style
 		self.transition = transition
 		self.padding = padding
 
@@ -21,7 +20,6 @@ class Layout:
 
 		self.layout = []
 		self.last_color = 39
-		self.last_style = 22
 
 	def swap (self):
 		self.top = self.bottom.copy()
@@ -47,24 +45,18 @@ class Layout:
 		if name == None:
 			try:
 				color = self.last_color #39
-				style = self.last_style #22
 			except:
 				print 'Oh noes!!! [%s][%s][%s]' % (name, transition, padding)
 				raise
 		elif isinstance(name, basestring):
 			father = self.commit[name]
 			color = 31 + father.column % 6
-			if father.column / 6 % 2: style = 1
-			else: style = 22
 		elif isinstance(name, int):
-			color = 31 + name
-			if name / 6 % 2: style = 1
-			else: style = 22
+			color = 31 + name % 6
 
-		self.layout.append(Column(color, style, transition, padding))
+		self.layout.append(Column(color, transition, padding))
 		if save:
 			self.last_color = color
-			self.last_style = style
 
 	def compute_even_column(self, index, target):
 		
@@ -178,7 +170,7 @@ class Layout:
 
 		padding = ''
 		for i in self.layout:
-			padding += '\x1b[%d;%dm%s' % (i.color, i.style, i.padding)
+			padding += '\x1b[%d;%dm%s' % (i.color, i.padding)
 		return padding
 
 	def draw_transition (self):
@@ -186,6 +178,6 @@ class Layout:
 		padding = ''
 		for i in self.layout:
 			if i.transition == '•': padding += '\x1b[m•'
-			else: padding += '\x1b[%d;%dm%s' % (i.color, i.style, i.transition)
+			else: padding += '\x1b[%dm%s' % (i.color, i.transition)
 		return padding
 
