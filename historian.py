@@ -48,9 +48,9 @@ class Historian:
 			if not self.head: self.head = current.hash
 			self.commit[current.hash] = current
 	
-	def unroll_vertically(self):
+	def unroll_vertically(self, debug):
 
-		if self.debug:
+		if debug:
 			print '\n-- Vertical unrolling --'
 
 		visit = vertical.Order(self.head)
@@ -66,15 +66,15 @@ class Historian:
 
 				target = visit.pop()
 				if not target:
-					if self.debug: print "No Target"
+					if debug: print "No Target"
 					break
 
 				commit = self.commit[target]
 				if not commit:
-					if self.debug: print "No Commit"
+					if debug: print "No Commit"
 					break
 				if commit.done:
-					if self.debug: print "%s is done, skipping" % commit.hash[:7]
+					if debug: print "%s is done, skipping" % commit.hash[:7]
 					continue
 
 				if len(commit.child) > 1:
@@ -103,7 +103,7 @@ class Historian:
 					if parent and not parent.done:
 						visit.push(commit.parent[0])
 				
-				if self.debug: visit.show()
+				if debug: visit.show()
 				commit.done = 1
 
 	def unroll_horizontally(self):
@@ -242,11 +242,16 @@ class Historian:
 
 		try:
 			optlist, args = getopt.getopt(sys.argv[1:], 'hvd',
-				['help', 'verbose', 'version', 'debug'])
+				['help', 'verbose', 'version',
+				'debug', 'vdebug', 'hdebug', 'ldebug'])
 		except getopt.GetoptError as err:
 			print str(err)
 			self.print_help()
 			sys.exit(2)
+
+		vdebug = 0
+		hdebug = 0
+		ldebug = 0
 
 		for key, value in optlist:
 			if key in ('-h', '--help'):
@@ -256,6 +261,12 @@ class Historian:
 				self.verbose = 1
 			elif key in ('-d', '--debug'):
 				self.debug = 1
+			elif key == '--vdebug':
+				vdebug = 1
+			elif key == '--hdebug':
+				hdebug = 1
+			elif key == '--ldebug':
+				ldebug = 1
 			elif key == '--version':
 				self.print_version()
 				return
@@ -268,7 +279,7 @@ class Historian:
 
 		if self.debug:
 			print "%d commits in history" % len(self.commit)
-		self.unroll_vertically()
+		self.unroll_vertically(self.debug or vdebug)
 		self.unroll_horizontally()
 		self.print_graph()
 
