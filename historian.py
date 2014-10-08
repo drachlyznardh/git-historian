@@ -248,7 +248,13 @@ class Historian:
 			#print "%s %s" % (t.draw_layout(commit), commit.to_oneline())
 			print "%s" % t.draw_padding()
 			t.compute_layout(commit)
-			print "%s %s" % (t.draw_transition(), commit.to_oneline())
+			#print "%s %s" % (t.draw_transition(), commit.to_oneline())
+
+			commit_content = check_output(['git', 'show',
+				'-s', '--oneline', commit.hash])
+
+			for i in commit_content.split('\n')[:-1]:
+				print '%s\x1b[m %s' % (t.draw_transition(), i)
 
 	def print_version(self):
 		print "Git-Historian %s (C) 2014 Ivan Simonini" % VERSION
