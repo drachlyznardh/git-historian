@@ -21,6 +21,10 @@ class Layout:
 		self.layout = []
 		self.last_color = 39
 
+		self.track = {}
+		for i in xrange(size):
+			self.track[i] = set()
+
 	def swap (self):
 		self.top = self.bottom.copy()
 
@@ -39,6 +43,10 @@ class Layout:
 			if c: transition += " %s" % c[:7]
 			else: transition += " %s" % "XXXXXXX"
 		print "B {%s}" % transition
+
+	def plot_track (self):
+		for track in self.track.values():
+			print track
 
 	def put_char(self, name, transition, padding, save):
 		
@@ -129,17 +137,25 @@ class Layout:
 
 		if index > target.column:
 			
-			for name in target.parent:
-				if name in self.se:
-					self.put_char(name, '←', ' ', 1)
+			for name in target.child:
+				if name in self.track[index]:
+					self.put_char(index, '→', ' ', 1)
 					return
+			#for name in target.parent:
+			#	if name in self.se:
+			#		self.put_char(name, '←', ' ', 1)
+			#		return
 		
 		else:
 
-			for name in reversed(self.sw):
-				if name in target.parent:
-					self.put_char(name, '→', ' ', 1)
+			for name in target.child:
+				if name in self.track[index - 1]:
+					self.put_char(index, '←', ' ', 1)
 					return
+			#for name in reversed(self.sw):
+			#	if name in target.parent:
+			#		self.put_char(name, '→', ' ', 1)
+			#		return
 
 		self.put_char(index, ' ', ' ', 0)
 
@@ -154,6 +170,11 @@ class Layout:
 
 		#print "North %s" % self.ne
 		#print "South %s" % self.se
+			
+		for name in target.parent:
+			self.track[target.column].add(name)
+
+		self.plot_track()
 
 		if self.size:
 			self.compute_even_column(0, target)
@@ -166,11 +187,15 @@ class Layout:
 			self.compute_even_column(i, target)
 		#return self.layout
 
+		for name in target.child:
+			for track in self.track.values():
+				track.discard(name)
+
 	def draw_padding (self):
 
 		padding = ''
 		for i in self.layout:
-			padding += '\x1b[%d;%dm%s' % (i.color, i.padding)
+			padding += '\x1b[%dm%s' % (i.color, i.padding)
 		return padding
 
 	def draw_transition (self):
