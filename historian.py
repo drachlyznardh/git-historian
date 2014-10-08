@@ -58,8 +58,10 @@ class Historian:
 		for name, commit in self.commit.items():
 
 			if commit.done:
+				if debug: print '%s is done, skipping' % name[:7]
 				continue
 
+			if debug: print 'pushing %s' % name[:7]
 			visit.push(name)
 
 			while 1:
@@ -105,6 +107,12 @@ class Historian:
 				
 				if debug: visit.show()
 				commit.done = 1
+
+		if debug:
+			print '  --'
+			for name in self.vertical:
+				print '%s' % name[:7]
+			print '  --'
 
 	def unroll_horizontally(self):
 
