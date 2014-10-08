@@ -2,15 +2,17 @@
 
 class Column:
 
-	def __init__ (self, l):
+	def __init__ (self, l, count):
 		self.content = l
 		self.index = -1
 		self.available = 0
+		self.count = count
 	
 	def make_available (self):
 		self.content = []
 		self.index = -1
 		self.available = 1
+		self.count = 0
 
 	def top (self):
 		if len(self.content) == 0: return ''
@@ -30,10 +32,10 @@ class Column:
 
 	def show (self):
 		if len(self.content) == 0:
-			print '[Avail]'
+			print '%d [Avail]' % self.count
 			return
 
-		line = '[' + self.content[0][:7]
+		line = '%d [%s' % (self.count, self.content[0][:7])
 		for i in self.content[1:]:
 			line += ', ' + i[:7]
 		line += ']'
@@ -41,13 +43,10 @@ class Column:
 
 class Order:
 
-	def __init__ (self, commit, reserved, debug):
+	def __init__ (self, commit, debug):
 		self.active = []
 		self.commit = commit
-		self.reserved = reserved
 		self.debug = debug
-		for i in range(reserved):
-			self.active.append(Column([]))
 		self.archived = {}
 
 	def at_bottom(self, target):
@@ -66,27 +65,29 @@ class Order:
 				break
 
 	def insert_from_left (self, target):
-		if self.at_bottom(target): return
+		if self.at_bottom(target.hash): return
 		if self.debug:
-			print "Insert from left (%s)" % target[:7]
-		for column in self.active[self.reserved:]:
+			print "Insert from left (%s)" % target.hash[:7]
+		for column in self.active:
 			if column.available:
-				column.append(target)
+				column.append(target.hash)
+				column.count = len(target.parent)
 				return
-		self.active.append(Column([target]))
+		self.active.append(Column([target.hash], len(target.parent)))
 
-	def insert_on_child_column (self, target, child):
-		if self.at_bottom(target): return
+	def insert_on_child_column (self, target):
+		if self.at_bottom(target.hash): return
+		child = target.child[0]
 		if self.debug:
-			print "Insert on child column (%s) (%s)" % (target[:7], child[:7])
+			print "Insert on child column (%s) (%s)" % (target.hash[:7], child[:7])
 		for column in self.active:
 			if column.bottom() == child:
-				column.append(target)
+				column.append(target.hash)
 				return
 		print "Child %s in nowhere to be found!" % child
 		self.insert_from_left(target)
 
-	def insert_before_or_on_any_child(self, target, children):
+	def insert_before_or_on_child(self, child, father):
 	
 		#if self.at_bottom(target): return
 		if self.debug:
@@ -94,13 +95,14 @@ class Order:
 			print children
 		missing = 1
 		for column in self.active:
-			if column.available or column.bottom() in children:
-				column.append(target)
+			if column.available or column.bottom() == child:
+				column.append(father)
 				missing = 1
 				break
 		if missing:
-			print "No child of %s found" % target
-			self.insert_from_left(target)
+			print "No child of %s found" % father
+			self.insert_from_left(father)
+		return
 
 		self.show()
 		for column in self.active:
@@ -142,16 +144,6 @@ class Order:
 			self.active.insert(index, Column([target]))
 			self.trim_one_available(index)
 
-	def head_insert (self, target):
-		self.active.append(Column([target.hash]))
-
-	def insert_static (self, target):
-		if self.active[target.column].bottom() == target.hash:
-			if self.debug:
-				print "%s is already at the bottom" % target.hash[:7]
-			return
-		self.active[target.column].append(target.hash)
-
 	def self_insert (self, target):
 
 		children = len(target.child)
@@ -162,7 +154,7 @@ class Order:
 				if column.available:
 					column.append(target.hash)
 					return
-			self.active.append(Column([target.hash]))
+			self.active.append(Column([target.hash], len(target.parent)))
 			return
 
 		# A lone father should fall in line with its child
@@ -195,7 +187,7 @@ class Order:
 					bottom.hash, self.active.index(i))
 				return
 
-		for i in self.active[self.reserved:]:
+		for i in self.active:
 			if i.available:
 				if len(top.parent) > 1:
 					i.append(bottom.hash)
@@ -259,8 +251,11 @@ class Order:
 		for column in self.active:
 			if column.available: continue
 			if column.bottom() == target:
-				index = self.active.index(column)
-				self.archive_column(index, column)
+				if column.count == 1:
+					index = self.active.index(column)
+					self.archive_column(index, column)
+				else:
+					column.count -= 1
 
 	# When every commit has been assigned to a column, it's time to archive any
 	# current data

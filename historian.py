@@ -126,7 +126,7 @@ class Historian:
 			print '\n-- Horizontal unrolling --'
 
 		reserved = 2
-		order = horizontal.Order(self.commit, reserved, debug)
+		order = horizontal.Order(self.commit, debug)
 
 		# Children must appear in their vertical order
 		for name in self.vertical:
@@ -156,64 +156,31 @@ class Historian:
 				print "Vertical unrolling of %s (%d, %d)" % (
 					name[:7], children, parents)
 
-			if children != 1:
+			# deal with children: it this a split?
+			if children > 1:
 				for child in commit.child:
 					order.archive_commit(child)
-
-			if commit.static:
-				order.insert_static(commit)
-			#elif children == 0:
-			#	order.insert_from_left(name)
-			elif children == 1:
-				child = self.commit[commit.child[0]]
-				if child.static:
-					order.insert_from_left(name)
+			# deal with self: it this static?
+			if not commit.static:
+				if children == 1:
+					order.insert_on_child_column(commit)
 				else:
-					order.insert_on_child_column(name, commit.child[0])
-			else:
-				#candidates = []
-				#for child in commit.child:
-					#if not self.commit[child].static:
-						#candidates.append(child)
-				#	order.archive_commit(child)
-				#for candidate in candidates:
-				#	order.archive_commit(candidate)
-				order.insert_from_left(name)
-
-			if parents == 0:
-				order.archive_commit(name)
-			elif parents > 1:
-				order.archive_commit(name)
-				#candidates = []
-				for parent in commit.parent:
-					if not self.commit[parent].static:
-						#candidates.append(parent)
-						order.insert_from_left(parent)
-				#order.insert_from_right_of(name, candidates, commit.static)
+					order.insert_from_left(commit)
+			# deal with parents: it this a merge?
+			continue
 
 		order.flush_active()
 
-		for index in range(len(order.active)):
-			for name in order.active[index].content:
-				if debug:
-					print "Calling %s with %d from column" % (
-					name[:7], index)
-				target = self.commit[name]
-				if target and target.column == -1:
-					target.column = index
-
-		#for i in reversed(range(len(order.archived))):
 		for index, column in order.archived.items():
-			#index = column.index
-			for name in column:#.content:
+			for name in column:
 				if debug:
 					print "Calling %s with %d from archive" % (
 					name[:7], index)
 				target = self.commit[name]
 				if target and target.column == -1:
-					target.column = index
+					target.column = reserved + index
 		
-		self.max_column = len(order.active)
+		self.max_column = reserved + len(order.archived)
 
 	def print_graph (self, debug):
 		
