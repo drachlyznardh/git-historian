@@ -156,10 +156,14 @@ class Historian:
 				print "Vertical unrolling of %s (%d, %d)" % (
 					name[:7], children, parents)
 
+			if children != 1:
+				for child in commit.child:
+					order.archive_commit(child)
+
 			if commit.static:
 				order.insert_static(commit)
-			elif children == 0:
-				order.insert_from_left(name)
+			#elif children == 0:
+			#	order.insert_from_left(name)
 			elif children == 1:
 				child = self.commit[commit.child[0]]
 				if child.static:
@@ -168,10 +172,10 @@ class Historian:
 					order.insert_on_child_column(name, commit.child[0])
 			else:
 				#candidates = []
-				for child in commit.child:
+				#for child in commit.child:
 					#if not self.commit[child].static:
 						#candidates.append(child)
-					order.archive_commit(child)
+				#	order.archive_commit(child)
 				#for candidate in candidates:
 				#	order.archive_commit(candidate)
 				order.insert_from_left(name)
