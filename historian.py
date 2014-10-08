@@ -48,7 +48,7 @@ class Historian:
 			if not self.head: self.head = current.hash
 			self.commit[current.hash] = current
 	
-	def unroll_vertically(self, debug):
+	def vertical_unrolling(self, debug):
 
 		if debug:
 			print '\n-- Vertical unrolling --'
@@ -120,7 +120,7 @@ class Historian:
 				print '%s' % name[:7]
 			print '  --'
 
-	def unroll_horizontally(self, debug):
+	def horizontal_unroll(self, debug):
 
 		if debug:
 			print '\n-- Horizontal unrolling --'
@@ -293,7 +293,7 @@ class Historian:
 
 		if self.debug:
 			print "%d commits in history" % len(self.commit)
-		self.unroll_vertically(self.debug or vdebug)
-		self.unroll_horizontally(self.debug or hdebug)
+		self.vertical_unrolling(self.debug or vdebug)
+		self.horizontal_unroll(self.debug or hdebug)
 		self.print_graph(self.debug or ldebug)
 
