@@ -224,7 +224,7 @@ class Historian:
 
 		t = layout.Layout(self.max_column, self.commit)
 
-		cmdargs = 'git show -s --oneline'.split(' ')
+		cmdargs = 'git show -s --oneline --decorate --color'.split(' ')
 		#cmdargs.append(optargs)
 		cmdargs.append('<commit>')
 
