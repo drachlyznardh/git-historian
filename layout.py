@@ -159,10 +159,10 @@ class Layout:
 
 		if index > target.column:
 			
-			for name in target.child:
-				if name in self.track[index]:
-					self.put_char(index, '→', ' ', 1)
-					return
+			#for name in target.child:
+			if target.hash in self.track[index]:
+				self.put_char(index, '→', ' ', 1)
+				return
 			#for name in target.parent:
 			#	if name in self.se:
 			#		self.put_char(name, '←', ' ', 1)
@@ -170,10 +170,10 @@ class Layout:
 		
 		else:
 
-			for name in target.child:
-				if name in self.track[index - 1]:
-					self.put_char(index - 1, '←', ' ', 1)
-					return
+			#for name in target.child:
+			if target.hash in self.track[index - 1]:
+				self.put_char(index - 1, '←', ' ', 1)
+				return
 			#for name in reversed(self.sw):
 			#	if name in target.parent:
 			#		self.put_char(name, '→', ' ', 1)
