@@ -172,7 +172,7 @@ class Layout:
 
 			for name in target.child:
 				if name in self.track[index - 1]:
-					self.put_char(index, '←', ' ', 1)
+					self.put_char(index - 1, '←', ' ', 1)
 					return
 			#for name in reversed(self.sw):
 			#	if name in target.parent:
