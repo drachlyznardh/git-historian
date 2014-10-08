@@ -162,7 +162,10 @@ class Historian:
 					order.archive_commit(child)
 			# deal with self: it this static?
 			if not commit.static:
-				order.insert_from_left(commit)
+				if children == 1:
+					order.insert_on_child_column(commit)
+				else:
+					order.insert_from_left(commit)
 			# deal with parents: it this a merge?
 			continue
 
