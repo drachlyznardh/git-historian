@@ -175,13 +175,16 @@ class Historian:
 					parent = self.commit[name]
 					if not parent.static: candidates.append(name)
 
-				if len(candidates):
-					first = self.commit[candidates[0]]
-					order.insert_on_child_column(first, commit.hash)
-				for name in candidates[1:]:
+				for name in candidates:
 					parent = self.commit[name]
-					if not parent.static:
-						order.insert_from_left(parent)
+					order.insert_before_or_on_child_column(parent, commit.hash)
+				#if len(candidates):
+				#	first = self.commit[candidates[0]]
+				#	order.insert_on_child_column(first, commit.hash)
+				#for name in candidates[1:]:
+				#	parent = self.commit[name]
+				#	if not parent.static:
+				#		order.insert_from_left(parent)
 
 		order.flush_active()
 

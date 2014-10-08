@@ -86,21 +86,20 @@ class Order:
 		print "Child %s in nowhere to be found!" % child
 		self.insert_from_left(target)
 
-	def insert_before_or_on_child(self, child, father):
+	def insert_before_or_on_child_column(self, target, child):
 	
 		#if self.at_bottom(target): return
 		if self.debug:
-			print "Insert before or on children (%s)" % target[:7]
-			print children
+			print "Insert %s before or on child %s" % (target.hash[:7], child[:7])
 		missing = 1
 		for column in self.active:
 			if column.available or column.bottom() == child:
-				column.append(father)
+				column.append(target.hash)
 				missing = 1
 				break
 		if missing:
-			print "No child of %s found" % father
-			self.insert_from_left(father)
+			print "No child of %s found" % target
+			self.insert_from_left(target)
 		return
 
 		self.show()
