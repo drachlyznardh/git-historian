@@ -224,6 +224,10 @@ class Historian:
 
 		t = layout.Layout(self.max_column, self.commit)
 
+		cmdargs = 'git show -s --oneline'.split(' ')
+		#cmdargs.append(optargs)
+		cmdargs.append('<commit>')
+
 		for name in self.vertical:
 
 			commit = self.commit[name]
@@ -250,9 +254,13 @@ class Historian:
 			t.compute_layout(commit)
 			#print "%s %s" % (t.draw_transition(), commit.to_oneline())
 
-			message = check_output(['git', 'show',
-				'-s', '--oneline', commit.hash]).split('\n')
+			cmdargs.pop() # Remove previous commit from list
+			cmdargs.append(commit.hash)
 
+			#print cmdargs
+			message = check_output(cmdargs).split('\n')
+
+			#print len(message), message
 			print '%s\x1b[m %s' % (t.draw_transition(), message[0])
 			for i in message[1:-1]:
 				print '%s\x1b[m %s' % (t.draw_padding(), i)
