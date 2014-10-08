@@ -48,9 +48,9 @@ class Order:
 		self.commit = commit
 		self.reserved = reserved
 		self.debug = debug
-		#for i in range(reserved):
-		#	self.active.append(Column([], 0))
 		self.archived = {}
+		for i in range(self.reserved):
+			self.archived[i] = []
 
 	def at_bottom(self, target):
 		
