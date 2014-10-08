@@ -177,7 +177,7 @@ class Historian:
 
 				if len(candidates):
 					first = self.commit[candidates[0]]
-					order.insert_on_child_column(first, name)
+					order.insert_on_child_column(first, commit.hash)
 				for name in candidates[1:]:
 					parent = self.commit[name]
 					if not parent.static:
