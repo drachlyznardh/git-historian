@@ -78,7 +78,7 @@ class Order:
 	def insert_on_child_column (self, target, child):
 		if self.at_bottom(target.hash): return
 		if self.debug:
-			print "Insert on child column (%s) (%s)" % (target.hash[:7], child[:7])
+			print "Insert %s on child column %s" % (target.hash[:7], child[:7])
 		for column in self.active:
 			if column.bottom() == child:
 				column.append(target.hash)
