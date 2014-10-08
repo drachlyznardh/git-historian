@@ -143,17 +143,6 @@ class Order:
 			self.active.insert(index, Column([target]))
 			self.trim_one_available(index)
 
-	def head_insert (self, target):
-		self.active.append(Column([target.hash]))
-
-	def insert_static (self, target):
-		return
-		if self.active[target.column].bottom() == target.hash:
-			if self.debug:
-				print "%s is already at the bottom" % target.hash[:7]
-			return
-		self.active[target.column].append(target.hash)
-
 	def self_insert (self, target):
 
 		children = len(target.child)
