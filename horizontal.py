@@ -75,13 +75,14 @@ class Order:
 				return
 		self.active.append(Column([target.hash], len(target.parent)))
 
-	def insert_on_child_column (self, target, child):
-		if self.at_bottom(target): return
+	def insert_on_child_column (self, target):
+		if self.at_bottom(target.hash): return
+		child = target.child[0]
 		if self.debug:
-			print "Insert on child column (%s) (%s)" % (target[:7], child[:7])
+			print "Insert on child column (%s) (%s)" % (target.hash[:7], child[:7])
 		for column in self.active:
 			if column.bottom() == child:
-				column.append(target)
+				column.append(target.hash)
 				return
 		print "Child %s in nowhere to be found!" % child
 		self.insert_from_left(target)
