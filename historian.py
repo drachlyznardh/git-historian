@@ -174,10 +174,10 @@ class Historian:
 			if parents == 0:
 				order.archive_commit(name)
 			elif parents > 1:
-				order.archive_commit(name)
+				#order.archive_commit(name)
 				for parent in commit.parent:
 					if not self.commit[parent].static:
-						order.insert_from_left(parent)
+						order.insert_before_or_on_child(name, parent)
 
 		order.flush_active()
 
