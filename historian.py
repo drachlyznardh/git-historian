@@ -191,15 +191,6 @@ class Historian:
 
 		order.flush_active()
 
-		for index in range(len(order.active)):
-			for name in order.active[index].content:
-				if debug:
-					print "Calling %s with %d from column" % (
-					name[:7], index)
-				target = self.commit[name]
-				if target and target.column == -1:
-					target.column = index
-
 		for index, column in order.archived.items():
 			for name in column:
 				if debug:
