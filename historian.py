@@ -166,29 +166,6 @@ class Historian:
 			# deal with parents: it this a merge?
 			continue
 
-			if children != 1:
-				for child in commit.child:
-					order.archive_commit(child)
-
-			if commit.static:
-				order.insert_static(commit)
-			elif children == 1:
-				child = self.commit[commit.child[0]]
-				if child.static:
-					order.insert_from_left(name)
-				else:
-					order.insert_on_child_column(name, commit.child[0])
-			else:
-				order.insert_from_left(name)
-
-			if parents == 0:
-				order.archive_commit(name)
-			elif parents > 1:
-				#order.archive_commit(name)
-				for parent in commit.parent:
-					if not self.commit[parent].static:
-						order.insert_before_or_on_child(name, parent)
-
 		order.flush_active()
 
 		for index, column in order.archived.items():
