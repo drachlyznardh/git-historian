@@ -211,7 +211,7 @@ class Historian:
 		
 		self.max_column = len(order.active)
 
-	def print_graph (self):
+	def print_graph (self, debug):
 		
 		head = self.commit[self.head]
 		if not head:
@@ -227,7 +227,7 @@ class Historian:
 				print "No Commit for name %s" % name[:7]
 				break
 
-			if self.debug: print "\nP %s" % name[:7]
+			if debug: print "\nP %s" % name[:7]
 			
 			t.swap()
 
@@ -238,8 +238,8 @@ class Historian:
 					print "No parent with name %s" % name[:7]
 				t.bottom[parent.column] = name
 
-			if self.debug: t.plot_top()
-			if self.debug: t.plot_bottom()
+			if debug: t.plot_top()
+			if debug: t.plot_bottom()
 			
 			#print "%s %s" % (t.draw_layout(commit), commit.to_oneline())
 			print "%s" % t.draw_padding()
@@ -295,5 +295,5 @@ class Historian:
 			print "%d commits in history" % len(self.commit)
 		self.unroll_vertically(self.debug or vdebug)
 		self.unroll_horizontally(self.debug or hdebug)
-		self.print_graph()
+		self.print_graph(self.debug or ldebug)
 
