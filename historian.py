@@ -206,7 +206,7 @@ class Historian:
 			print "Wut!"
 			return
 
-		t = layout.Layout(self.max_column, self.commit)
+		t = layout.Layout(self.max_column, self.commit, debug)
 
 		cmdargs = 'git show -s --oneline --decorate --color'.split(' ')
 		#cmdargs.append(optargs)

@@ -10,10 +10,12 @@ class Column:
 
 class Layout:
 
-	def __init__ (self, size, commit):
+	def __init__ (self, size, commit, debug):
 		
 		self.size = size
 		self.commit = commit
+		self.debug = debug
+
 		self.bottom = {}
 		for i in xrange(size):
 			self.bottom[i] = ''
@@ -194,7 +196,9 @@ class Layout:
 		for name in target.parent:
 			self.track[target.column].add(name)
 
-		self.plot_track()
+		if self.debug:
+			self.plot_track()
+			print target.child
 
 		if self.size:
 			self.compute_even_column(0, target)
