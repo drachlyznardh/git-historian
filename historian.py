@@ -163,11 +163,25 @@ class Historian:
 			# deal with self: it this static?
 			if not commit.static:
 				if children == 1:
-					order.insert_on_child_column(commit)
+					order.insert_on_child_column(commit, commit.child[0])
 				else:
 					order.insert_from_left(commit)
 			# deal with parents: it this a merge?
-			continue
+
+			if parents > 1:
+				# selecting non-static parents
+				candidates = []
+				for name in commit.parent:
+					parent = self.commit[name]
+					if not parent.static: candidates.append(name)
+
+				if len(candidates):
+					first = self.commit[candidates[0]]
+					order.insert_on_child_column(first, name)
+				for name in candidates[1:]:
+					parent = self.commit[name]
+					if not parent.static:
+						order.insert_from_left(parent)
 
 		order.flush_active()
 
