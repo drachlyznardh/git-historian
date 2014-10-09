@@ -89,7 +89,8 @@ class Order:
 		if self.debug:
 			print "Insert %s on child column %s" % (target.hash[:7], child[:7])
 		for column in self.active:
-			if column.bottom() == child:
+			bottom = column.bottom()
+			if bottom and bottom.name == child:
 				column.append(target)
 				return
 		print "Child %s in nowhere to be found!" % child
