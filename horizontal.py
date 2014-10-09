@@ -193,8 +193,8 @@ class Order:
 		self.active.insert(cindex, next_column)
 		self.trim_one_available(cindex)
 
-		for i in xrange(eindex, len(column.content)-1):
-			next_column.content.append(column.content.pop(i))
+		while len(column.content) > eindex:
+			next_column.content.append(column.content.pop(eindex))
 
 	def insert(self, commit):
 		
