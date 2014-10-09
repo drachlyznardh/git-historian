@@ -88,6 +88,10 @@ class Layout:
 				self.put_char(index, '┘', ' ', 0) # \u2518
 				return
 
+			for jndex in range(index, self.size):
+				if target.hash in self.track[jndex]:
+					self.put_char(jndex, '→', ' ', 0)
+					return
 			#self.put_char(index, '1', '1', 0)
 
 		else:
@@ -171,6 +175,11 @@ class Layout:
 			if target.hash in self.track[index]:
 				self.put_char(index, '→', ' ', 1)
 				return
+			
+			for jndex in range(index, self.size):
+				if target.hash in self.track[jndex]:
+					self.put_char(jndex, '→', ' ', 0)
+					return
 			#for name in target.parent:
 			#	if name in self.se:
 			#		self.put_char(name, '←', ' ', 1)
