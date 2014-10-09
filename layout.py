@@ -88,16 +88,19 @@ class Layout:
 				self.put_char(index, '┘', ' ', 0) # \u2518
 				return
 
-			self.put_char(index, '1', '1', 0)
+			#self.put_char(index, '1', '1', 0)
 
 		else:
 
 			#for name in target.child:
 			if target.hash in self.track[index]:
-				self.put_char(index, '├', ' ', 0) # \u251c
+				self.put_char(index, '├', '│', 0) # \u251c \u2502
 				return
 
-			self.put_char(index, '1', '1', 0)
+		if len(self.track[index]):
+			self.put_char(index, '│', '│', 0) # \u2502
+		else:
+			self.put_char(index, ' ', ' ', 0)
 
 		return
 
