@@ -1,5 +1,14 @@
 # Column module for Git-Historian
 
+class Node:
+
+	def __init__ (self, commit):
+		self.name = commit.hash
+		self.count = len(commit.parent)
+
+	def show (self):
+		return '(%s %d)' % (self.name[:7], self.count)
+
 class Column:
 
 	def __init__ (self, l, count):
