@@ -85,7 +85,10 @@ class Layout:
 
 			#for name in target.child:
 			if target.hash in self.track[index]:
-				self.put_char(index, '┘', ' ', 0) # \u2518
+				if len(self.track[index]) > 1:
+					self.put_char(index, '┤', '│', 0) # \u2524 \u2502
+				else:
+					self.put_char(index, '┘', ' ', 0) # \u2518
 				return
 
 			for jndex in range(index, self.size):
@@ -98,7 +101,10 @@ class Layout:
 
 			#for name in target.child:
 			if target.hash in self.track[index]:
-				self.put_char(index, '├', '│', 0) # \u251c \u2502
+				if len(self.track[index]) > 1:
+					self.put_char(index, '├', '│', 0) # \u251c \u2502
+				else:
+					self.put_char(index, '└', ' ', 0) # \u2514
 				return
 
 			for jndex in range(0, index):
