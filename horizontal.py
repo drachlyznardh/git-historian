@@ -26,9 +26,10 @@ class Column:
 		if len(self.content) < 2: return ''
 		return self.content[-2]
 
-	def append (self, bottom):
+	def append (self, commit):
 		self.available = 0
-		self.content.append(bottom)
+		self.content.append(commit.hash)
+		self.count = len(commit.parent)
 
 	def show (self):
 		if len(self.content) == 0:
