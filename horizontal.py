@@ -98,7 +98,8 @@ class Order:
 				missing = 1
 				break
 		if missing:
-			print "No child of %s found" % target
+			if self.debug:
+				print "No child of %s found" % target.hash[:7]
 			self.insert_from_left(target)
 		return
 
