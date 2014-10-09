@@ -115,7 +115,7 @@ class Layout:
 				self.put_char(index, '│', '│', 0)
 				return
 
-			for jndex in range(0, index):
+			for jndex in reversed(range(0, index)):
 				if target.hash in self.track[jndex]:
 					self.put_char(jndex, '←', ' ', 0) # \u2500
 					return
@@ -206,7 +206,7 @@ class Layout:
 				self.put_char(index - 1, '←', ' ', 1)
 				return
 
-			for jndex in range(0, index - 1):
+			for jndex in reversed(range(0, index - 1)):
 				if target.hash in self.track[jndex]:
 					self.put_char(jndex, '←', ' ', 0)
 					return
