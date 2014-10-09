@@ -243,8 +243,8 @@ class Historian:
 			message = check_output(cmdargs).split('\n')
 
 			print '%s\x1b[m %s' % (t.draw_transition(), message[0])
-			#for i in message[1:-1]:
-			for i in message[1:]:
+			for i in message[1:-1]:
+			#for i in message[1:]:
 				print '%s\x1b[m %s' % (t.draw_padding(), i)
 
 	def print_version(self):
