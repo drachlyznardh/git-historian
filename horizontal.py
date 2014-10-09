@@ -23,15 +23,15 @@ class Column:
 		#self.count = 0
 
 	def top (self):
-		if len(self.content) == 0: return ''
+		if len(self.content) == 0: return None
 		return self.content[0]
 	
 	def bottom (self):
-		if len(self.content) == 0: return ''
+		if len(self.content) == 0: return None
 		return self.content[-1]
 
 	def last2bottom (self):
-		if len(self.content) < 2: return ''
+		if len(self.content) < 2: return None
 		return self.content[-2]
 
 	def append (self, commit):
