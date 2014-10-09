@@ -85,17 +85,40 @@ class Layout:
 
 			#for name in target.child:
 			if target.hash in self.track[index]:
-				self.put_char(index, '┘', ' ', 0) # \u2518
+				if len(self.track[index]) > 1:
+					self.put_char(index, '┤', '│', 0) # \u2524 \u2502
+				else:
+					self.put_char(index, '┘', ' ', 0) # \u2518
 				return
 
+			if len(self.track[index]):
+				self.put_char(index, '│', '│', 0)
+				return
+
+			for jndex in range(index, self.size):
+				if target.hash in self.track[jndex]:
+					self.put_char(jndex, '→', ' ', 0)
+					return
 			#self.put_char(index, '1', '1', 0)
 
 		else:
 
 			#for name in target.child:
 			if target.hash in self.track[index]:
-				self.put_char(index, '├', '│', 0) # \u251c \u2502
+				if len(self.track[index]) > 1:
+					self.put_char(index, '├', '│', 0) # \u251c \u2502
+				else:
+					self.put_char(index, '└', ' ', 0) # \u2514
 				return
+
+			if len(self.track[index]):
+				self.put_char(index, '│', '│', 0)
+				return
+
+			for jndex in reversed(range(0, index)):
+				if target.hash in self.track[jndex]:
+					self.put_char(jndex, '←', ' ', 0) # \u2500
+					return
 
 		if len(self.track[index]):
 			self.put_char(index, '│', '│', 0) # \u2502
@@ -166,6 +189,11 @@ class Layout:
 			if target.hash in self.track[index]:
 				self.put_char(index, '→', ' ', 1)
 				return
+			
+			for jndex in range(index, self.size):
+				if target.hash in self.track[jndex]:
+					self.put_char(jndex, '→', ' ', 0)
+					return
 			#for name in target.parent:
 			#	if name in self.se:
 			#		self.put_char(name, '←', ' ', 1)
@@ -177,6 +205,11 @@ class Layout:
 			if target.hash in self.track[index - 1]:
 				self.put_char(index - 1, '←', ' ', 1)
 				return
+
+			for jndex in reversed(range(0, index - 1)):
+				if target.hash in self.track[jndex]:
+					self.put_char(jndex, '←', ' ', 0)
+					return
 			#for name in reversed(self.sw):
 			#	if name in target.parent:
 			#		self.put_char(name, '→', ' ', 1)
