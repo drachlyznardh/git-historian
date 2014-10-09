@@ -186,8 +186,15 @@ class Order:
 
 	def push_column_up_to (self, column, node):
 		
-		cindex = self.active.index(column)
-		eindex = column.content.index(node)
+		cindex = 1 + self.active.index(column)
+		eindex = 1 + column.content.index(node)
+		
+		next_column = Column(None)
+		self.active.insert(cindex, next_column)
+		self.trim_one_available(cindex)
+
+		for i in xrange(eindex, len(column.content)-1):
+			next_column.content.append(column.content.pop(i))
 
 	def insert(self, commit):
 		
