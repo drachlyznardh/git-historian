@@ -3,16 +3,18 @@ CHECKPOINT for 0.0-a
 
 This file contains a TODO list and keeps track of progress.
 
- - I witnessed some cases of arrows being completely overwritten by other
-   arrows, or commits; column inheritance has to take the number of parents into
-   consideration, and act accordingly;
  - When branches cross-merge between fixed and dynamic columns, some are never
    assigned and get lost;
- - I definitely must add at least the commit message to the output;
 
 ## FOCUS: Independent heads
 
-When multiple independet heads are present, some of them are not plotted at all;
+ - I witnessed some cases of arrows being completely overwritten by other
+   arrows, or commits; column inheritance has to take the number of parents into
+   consideration, and act accordingly;
+
+   This is due to the ordering of commits: relative position can lead to arrows
+   begin obscured by some other parts of the history. Layout of arrows must be
+   mirrored.
 
 ## Done
 
@@ -20,6 +22,9 @@ Here's the list of registered progress.
 
  - My `less` does not support the `\U2b24` character, while `more` does. I guess
    I'll change that to something less obscure (?), like the `\2022` bullet;
+ - I definitely must add at least the commit message to the output;
+ - When multiple independet heads are present, some of them are not plotted at
+   all;
 
 ### Vertical Padding
 

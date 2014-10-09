@@ -10,16 +10,22 @@ class Column:
 
 class Layout:
 
-	def __init__ (self, size, commit):
+	def __init__ (self, size, commit, debug):
 		
 		self.size = size
 		self.commit = commit
+		self.debug = debug
+
 		self.bottom = {}
 		for i in xrange(size):
 			self.bottom[i] = ''
 
 		self.layout = []
 		self.last_color = 39
+
+		self.track = {}
+		for i in xrange(size):
+			self.track[i] = set()
 
 	def swap (self):
 		self.top = self.bottom.copy()
@@ -39,6 +45,10 @@ class Layout:
 			if c: transition += " %s" % c[:7]
 			else: transition += " %s" % "XXXXXXX"
 		print "B {%s}" % transition
+
+	def plot_track (self):
+		for track in self.track.values():
+			print track
 
 	def put_char(self, name, transition, padding, save):
 		
@@ -62,7 +72,7 @@ class Layout:
 		
 		if index == target.column:
 
-			if len(self.bottom[index]): padding = '│' # \u2502
+			if len(target.parent): padding = '│' # \u2502
 			else: padding = ' '
 			
 			self.put_char(target.column, '•', padding, 0) # \u2022 \u2502
@@ -70,6 +80,29 @@ class Layout:
 
 		top = self.top[index]
 		bottom = self.bottom[index]
+
+		if index > target.column:
+
+			#for name in target.child:
+			if target.hash in self.track[index]:
+				self.put_char(index, '┘', ' ', 0) # \u2518
+				return
+
+			#self.put_char(index, '1', '1', 0)
+
+		else:
+
+			#for name in target.child:
+			if target.hash in self.track[index]:
+				self.put_char(index, '├', '│', 0) # \u251c \u2502
+				return
+
+		if len(self.track[index]):
+			self.put_char(index, '│', '│', 0) # \u2502
+		else:
+			self.put_char(index, ' ', ' ', 0)
+
+		return
 
 		if len(top) and len(bottom): # both ends are present
 
@@ -125,21 +158,29 @@ class Layout:
 
 	def compute_odd_column(self, index, target):
 
-		father = None
+		#father = None
 
 		if index > target.column:
 			
-			for name in target.parent:
-				if name in self.se:
-					self.put_char(name, '←', ' ', 1)
-					return
+			#for name in target.child:
+			if target.hash in self.track[index]:
+				self.put_char(index, '→', ' ', 1)
+				return
+			#for name in target.parent:
+			#	if name in self.se:
+			#		self.put_char(name, '←', ' ', 1)
+			#		return
 		
 		else:
 
-			for name in reversed(self.sw):
-				if name in target.parent:
-					self.put_char(name, '→', ' ', 1)
-					return
+			#for name in target.child:
+			if target.hash in self.track[index - 1]:
+				self.put_char(index - 1, '←', ' ', 1)
+				return
+			#for name in reversed(self.sw):
+			#	if name in target.parent:
+			#		self.put_char(name, '→', ' ', 1)
+			#		return
 
 		self.put_char(index, ' ', ' ', 0)
 
@@ -154,6 +195,10 @@ class Layout:
 
 		#print "North %s" % self.ne
 		#print "South %s" % self.se
+			
+		if self.debug:
+			self.plot_track()
+			print target.child
 
 		if self.size:
 			self.compute_even_column(0, target)
@@ -166,11 +211,17 @@ class Layout:
 			self.compute_even_column(i, target)
 		#return self.layout
 
+		for track in self.track.values():
+			track.discard(target.hash)
+
+		for name in target.parent:
+			self.track[target.column].add(name)
+
 	def draw_padding (self):
 
 		padding = ''
 		for i in self.layout:
-			padding += '\x1b[%d;%dm%s' % (i.color, i.padding)
+			padding += '\x1b[%dm%s' % (i.color, i.padding)
 		return padding
 
 	def draw_transition (self):

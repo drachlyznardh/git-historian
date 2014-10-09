@@ -206,7 +206,7 @@ class Historian:
 			print "Wut!"
 			return
 
-		t = layout.Layout(self.max_column, self.commit)
+		t = layout.Layout(self.max_column, self.commit, debug)
 
 		cmdargs = 'git show -s --oneline --decorate --color'.split(' ')
 		#cmdargs.append(optargs)
@@ -230,8 +230,9 @@ class Historian:
 					print "No parent with name %s" % name[:7]
 				t.bottom[parent.column] = name
 
-			if debug: t.plot_top()
-			if debug: t.plot_bottom()
+			#if debug: t.plot_top()
+			#if debug: t.plot_bottom()
+			#if debug: t.plot_track()
 			
 			t.compute_layout(commit)
 
@@ -241,7 +242,8 @@ class Historian:
 			message = check_output(cmdargs).split('\n')
 
 			print '%s\x1b[m %s' % (t.draw_transition(), message[0])
-			for i in message[1:-1]:
+			#for i in message[1:-1]:
+			for i in message[1:]:
 				print '%s\x1b[m %s' % (t.draw_padding(), i)
 
 	def print_version(self):
