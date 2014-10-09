@@ -12,7 +12,8 @@ class Node:
 class Column:
 
 	def __init__ (self, commit):
-		self.content = [Node(commit)]
+		if commit: self.content = [Node(commit)]
+		else: self.content = []
 		#self.index = -1
 		self.available = 0
 	
