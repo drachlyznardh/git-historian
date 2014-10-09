@@ -168,6 +168,7 @@ class Historian:
 					order.insert_from_left(commit)
 			# deal with parents: it this a merge?
 
+			continue
 			if parents > 1:
 				# selecting non-static parents
 				candidates = []
