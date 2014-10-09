@@ -71,8 +71,7 @@ class Order:
 			print "Insert from left (%s)" % target.hash[:7]
 		for column in self.active:
 			if column.available:
-				column.append(target.hash)
-				column.count = len(target.parent)
+				column.append(target)
 				return
 		self.active.append(Column([target.hash], len(target.parent)))
 
@@ -82,7 +81,7 @@ class Order:
 			print "Insert %s on child column %s" % (target.hash[:7], child[:7])
 		for column in self.active:
 			if column.bottom() == child:
-				column.append(target.hash)
+				column.append(target)
 				return
 		print "Child %s in nowhere to be found!" % child
 		self.insert_from_left(target)
@@ -95,7 +94,7 @@ class Order:
 		missing = 1
 		for column in self.active:
 			if column.available or column.bottom() == child:
-				column.append(target.hash)
+				column.append(target)
 				missing = 1
 				break
 		if missing:
