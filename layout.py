@@ -97,6 +97,11 @@ class Layout:
 				self.put_char(index, '├', '│', 0) # \u251c \u2502
 				return
 
+			for jndex in range(0, index):
+				if target.hash in self.track[jndex]:
+					self.put_char(jndex, '←', ' ', 0) # \u2500
+					return
+
 		if len(self.track[index]):
 			self.put_char(index, '│', '│', 0) # \u2502
 		else:
