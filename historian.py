@@ -48,58 +48,85 @@ class Historian:
 			if not self.head: self.head = current.hash
 			self.commit[current.hash] = current
 	
-	def unroll_vertically(self):
-		
-		visit = vertical.Order(self.head)
+	def vertical_unrolling(self, debug):
 
-		while 1:
+		if debug:
+			print '\n-- Vertical unrolling --'
 
-			target = visit.pop()
-			if not target:
-				if self.debug: print "No Target"
-				break
+		visit = vertical.Order()
 
-			commit = self.commit[target]
-			if not commit:
-				if self.debug: print "No Commit"
-				break
+		for name, commit in self.commit.items():
+
+			if debug: visit.show()
+
 			if commit.done:
-				if self.debug: print "%s is done, skipping" % commit.hash[:7]
+				if debug: print '%s is done, skipping' % name[:7]
 				continue
 
-			if len(commit.child) > 1:
-				skip = 0
-				for i in reversed(commit.child):
-					child = self.commit[i]
-					if child and not child.done:
-						visit.cpush(i)
-						skip = 1
-				if skip: continue
-			elif len(commit.child) > 0:
-				child = self.commit[commit.child[0]]
-				if child and not child.done:
-					visit.cpush(commit.child[0])
+			if debug: print 'pushing %s' % name[:7]
+			visit.push(name)
+
+			while 1:
+
+				if debug: visit.show()
+
+				target = visit.pop()
+				if not target:
+					if debug: print "No Target"
+					break
+
+				commit = self.commit[target]
+				if not commit:
+					if debug: print "No Commit"
+					break
+
+				if debug: print 'Unrolling %s' % target[:7]
+				if commit.done:
+					if debug: print "%s is done, skipping" % commit.hash[:7]
 					continue
-			
-			self.vertical.append(commit.hash)
 
-			if len(commit.parent) > 1:
-				for i in commit.parent:
-					parent = self.commit[i]
+				if len(commit.child) > 1:
+					skip = 0
+					for i in reversed(commit.child):
+						child = self.commit[i]
+						if child and not child.done:
+							visit.cpush(i)
+							skip = 1
+					if skip: continue
+				elif len(commit.child) > 0:
+					child = self.commit[commit.child[0]]
+					if child and not child.done:
+						visit.cpush(commit.child[0])
+						continue
+				
+				self.vertical.append(commit.hash)
+
+				if len(commit.parent) > 1:
+					for i in commit.parent:
+						parent = self.commit[i]
+						if parent and not parent.done:
+							visit.ppush(i)
+				elif len(commit.parent) > 0:
+					parent = self.commit[commit.parent[0]]
 					if parent and not parent.done:
-						visit.ppush(i)
-			elif len(commit.parent) > 0:
-				parent = self.commit[commit.parent[0]]
-				if parent and not parent.done:
-					visit.push(commit.parent[0])
-			
-			if self.debug: visit.show()
-			commit.done = 1
+						visit.push(commit.parent[0])
+				
+				if debug: visit.show()
+				commit.done = 1
 
-	def unroll_horizontally(self):
+		if debug:
+			print '  --'
+			for name in self.vertical:
+				print '%s' % name[:7]
+			print '  --'
+
+	def horizontal_unroll(self, debug):
+
+		if debug:
+			print '\n-- Horizontal unrolling --'
 
 		reserved = 2
-		order = horizontal.Order(reserved, self.debug)
+		order = horizontal.Order(self.commit, debug)
 
 		# Children must appear in their vertical order
 		for name in self.vertical:
@@ -116,60 +143,74 @@ class Historian:
 
 		for name in self.vertical:
 			
-			if self.debug: order.show()
+			if debug: order.show()
 			commit = self.commit[name]
 			if not commit:
-				if self.debug:
+				if debug:
 					print "No Commit for name %s" % name[:7]
 				break
 
-			if commit.static:
-				if self.debug:
-					print "%s has fixed column %d" % (
-					commit.hash[:7], commit .column)
-				order.static_insert(commit)
+			children = len(commit.child)
+			parents = len(commit.parent)
+			if debug:
+				print "Vertical unrolling of %s (%d, %d)" % (
+					name[:7], children, parents)
 
-			for child in commit.child[1:]:
-				if self.debug:
-					print "  Should be archiving branch for %s" % child[:7]
-				order.archive(name, child)
+			# deal with children: it this a split?
+			if children > 1:
+				for child in commit.child:
+					order.archive_commit(child)
+			# deal with self: it this static?
+			if not commit.static:
+				if children == 1:
+					order.insert_on_child_column(commit, commit.child[0])
+				else:
+					order.insert_from_left(commit)
+			# deal with parents: it this a merge?
 
-			for parent in commit.parent:
-				if self.debug:
-					print "  Inserting (%s, %s)" % (
-					name[:7], parent[:7])
-				order.insert(commit, self.commit[parent])
+			if parents > 1:
+				# selecting non-static parents
+				candidates = []
+				for name in commit.parent:
+					parent = self.commit[name]
+					if not parent.static: candidates.append(name)
 
-		for index in range(len(order.l)):
-			for name in order.l[index].l:
-				if self.debug:
-					print "Calling %s with %d from column" % (
-					name[:7], index)
-				target = self.commit[name]
-				if target and target.column == -1:
-					target.column = index
+				for name in candidates:
+					parent = self.commit[name]
+					order.insert_before_or_on_child_column(parent, commit.hash)
+				#if len(candidates):
+				#	first = self.commit[candidates[0]]
+				#	order.insert_on_child_column(first, commit.hash)
+				#for name in candidates[1:]:
+				#	parent = self.commit[name]
+				#	if not parent.static:
+				#		order.insert_from_left(parent)
 
-		for i in reversed(range(len(order.archived))):
-			column = order.archived[i]
-			index = column.index
-			for name in column.l:
-				if self.debug:
+		order.flush_active()
+
+		for index, column in order.archived.items():
+			for name in column:
+				if debug:
 					print "Calling %s with %d from archive" % (
 					name[:7], index)
 				target = self.commit[name]
 				if target and target.column == -1:
-					target.column = index
+					target.column = reserved + index
 		
-		self.max_column = len(order.l)
+		self.max_column = reserved + len(order.archived)
 
-	def print_graph (self):
+	def print_graph (self, debug):
 		
 		head = self.commit[self.head]
 		if not head:
 			print "Wut!"
 			return
 
-		t = layout.Layout(self.max_column, self.commit)
+		t = layout.Layout(self.max_column, self.commit, debug)
+
+		cmdargs = 'git show -s --oneline --decorate --color'.split(' ')
+		#cmdargs.append(optargs)
+		cmdargs.append('<commit>')
 
 		for name in self.vertical:
 
@@ -178,7 +219,7 @@ class Historian:
 				print "No Commit for name %s" % name[:7]
 				break
 
-			if self.debug: print "\nP %s" % name[:7]
+			if debug: print "\nP %s" % name[:7]
 			
 			t.swap()
 
@@ -189,13 +230,21 @@ class Historian:
 					print "No parent with name %s" % name[:7]
 				t.bottom[parent.column] = name
 
-			if self.debug: t.plot_top()
-			if self.debug: t.plot_bottom()
+			#if debug: t.plot_top()
+			#if debug: t.plot_bottom()
+			#if debug: t.plot_track()
 			
-			#print "%s %s" % (t.draw_layout(commit), commit.to_oneline())
-			print "%s" % t.draw_padding()
 			t.compute_layout(commit)
-			print "%s %s" % (t.draw_transition(), commit.to_oneline())
+
+			cmdargs.pop() # Remove previous commit from list
+			cmdargs.append(commit.hash)
+
+			message = check_output(cmdargs).split('\n')
+
+			print '%s\x1b[m %s' % (t.draw_transition(), message[0])
+			#for i in message[1:-1]:
+			for i in message[1:]:
+				print '%s\x1b[m %s' % (t.draw_padding(), i)
 
 	def print_version(self):
 		print "Git-Historian %s (C) 2014 Ivan Simonini" % VERSION
@@ -207,11 +256,16 @@ class Historian:
 
 		try:
 			optlist, args = getopt.getopt(sys.argv[1:], 'hvd',
-				['help', 'verbose', 'version', 'debug'])
+				['help', 'verbose', 'version',
+				'debug', 'vdebug', 'hdebug', 'ldebug'])
 		except getopt.GetoptError as err:
 			print str(err)
 			self.print_help()
 			sys.exit(2)
+
+		vdebug = 0
+		hdebug = 0
+		ldebug = 0
 
 		for key, value in optlist:
 			if key in ('-h', '--help'):
@@ -221,6 +275,12 @@ class Historian:
 				self.verbose = 1
 			elif key in ('-d', '--debug'):
 				self.debug = 1
+			elif key == '--vdebug':
+				vdebug = 1
+			elif key == '--hdebug':
+				hdebug = 1
+			elif key == '--ldebug':
+				ldebug = 1
 			elif key == '--version':
 				self.print_version()
 				return
@@ -230,8 +290,10 @@ class Historian:
 
 		for i in self.commit:
 			self.commit[i].know_your_parents(self.commit)
-	
-		self.unroll_vertically()
-		self.unroll_horizontally()
-		self.print_graph()
+
+		if self.debug:
+			print "%d commits in history" % len(self.commit)
+		self.vertical_unrolling(self.debug or vdebug)
+		self.horizontal_unroll(self.debug or hdebug)
+		self.print_graph(self.debug or ldebug)
 

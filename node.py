@@ -33,7 +33,7 @@ class Node:
 				line += ', ' + i
 			line += ')'
 		
-		return '\x1b[m%s%s\x1b[m' % (self.hash[:7], line)
+		return '\x1b[m%s%s\x1b[m (%d)' % (self.hash[:7], line, self.column)
 
 	def to_string(self):
 		if self.column > 0:

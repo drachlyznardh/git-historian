@@ -3,25 +3,29 @@
 
 class Column:
 
-	def __init__ (self, color, style, transition, padding):
+	def __init__ (self, color, transition, padding):
 		self.color = color
-		self.style = style
 		self.transition = transition
 		self.padding = padding
 
 class Layout:
 
-	def __init__ (self, size, commit):
+	def __init__ (self, size, commit, debug):
 		
 		self.size = size
 		self.commit = commit
+		self.debug = debug
+
 		self.bottom = {}
 		for i in xrange(size):
 			self.bottom[i] = ''
 
 		self.layout = []
 		self.last_color = 39
-		self.last_style = 22
+
+		self.track = {}
+		for i in xrange(size):
+			self.track[i] = set()
 
 	def swap (self):
 		self.top = self.bottom.copy()
@@ -42,35 +46,33 @@ class Layout:
 			else: transition += " %s" % "XXXXXXX"
 		print "B {%s}" % transition
 
+	def plot_track (self):
+		for track in self.track.values():
+			print track
+
 	def put_char(self, name, transition, padding, save):
 		
 		if name == None:
 			try:
 				color = self.last_color #39
-				style = self.last_style #22
 			except:
 				print 'Oh noes!!! [%s][%s][%s]' % (name, transition, padding)
 				raise
 		elif isinstance(name, basestring):
 			father = self.commit[name]
 			color = 31 + father.column % 6
-			if father.column / 6 % 2: style = 1
-			else: style = 22
 		elif isinstance(name, int):
-			color = 31 + name
-			if name / 6 % 2: style = 1
-			else: style = 22
+			color = 31 + name % 6
 
-		self.layout.append(Column(color, style, transition, padding))
+		self.layout.append(Column(color, transition, padding))
 		if save:
 			self.last_color = color
-			self.last_style = style
 
 	def compute_even_column(self, index, target):
 		
 		if index == target.column:
 
-			if len(self.bottom[index]): padding = '│' # \u2502
+			if len(target.parent): padding = '│' # \u2502
 			else: padding = ' '
 			
 			self.put_char(target.column, '•', padding, 0) # \u2022 \u2502
@@ -78,6 +80,52 @@ class Layout:
 
 		top = self.top[index]
 		bottom = self.bottom[index]
+
+		if index > target.column:
+
+			#for name in target.child:
+			if target.hash in self.track[index]:
+				if len(self.track[index]) > 1:
+					self.put_char(index, '┤', '│', 0) # \u2524 \u2502
+				else:
+					self.put_char(index, '┘', ' ', 0) # \u2518
+				return
+
+			if len(self.track[index]):
+				self.put_char(index, '│', '│', 0)
+				return
+
+			for jndex in range(index, self.size):
+				if target.hash in self.track[jndex]:
+					self.put_char(jndex, '→', ' ', 0)
+					return
+			#self.put_char(index, '1', '1', 0)
+
+		else:
+
+			#for name in target.child:
+			if target.hash in self.track[index]:
+				if len(self.track[index]) > 1:
+					self.put_char(index, '├', '│', 0) # \u251c \u2502
+				else:
+					self.put_char(index, '└', ' ', 0) # \u2514
+				return
+
+			if len(self.track[index]):
+				self.put_char(index, '│', '│', 0)
+				return
+
+			for jndex in reversed(range(0, index)):
+				if target.hash in self.track[jndex]:
+					self.put_char(jndex, '←', ' ', 0) # \u2500
+					return
+
+		if len(self.track[index]):
+			self.put_char(index, '│', '│', 0) # \u2502
+		else:
+			self.put_char(index, ' ', ' ', 0)
+
+		return
 
 		if len(top) and len(bottom): # both ends are present
 
@@ -133,21 +181,39 @@ class Layout:
 
 	def compute_odd_column(self, index, target):
 
-		father = None
+		#father = None
 
 		if index > target.column:
 			
-			for name in target.parent:
-				if name in self.se:
-					self.put_char(name, '←', ' ', 1)
+			#for name in target.child:
+			if target.hash in self.track[index]:
+				self.put_char(index, '→', ' ', 1)
+				return
+			
+			for jndex in range(index, self.size):
+				if target.hash in self.track[jndex]:
+					self.put_char(jndex, '→', ' ', 0)
 					return
+			#for name in target.parent:
+			#	if name in self.se:
+			#		self.put_char(name, '←', ' ', 1)
+			#		return
 		
 		else:
 
-			for name in reversed(target.parent):
-				if name in self.sw:
-					self.put_char(name, '→', ' ', 1)
+			#for name in target.child:
+			if target.hash in self.track[index - 1]:
+				self.put_char(index - 1, '←', ' ', 1)
+				return
+
+			for jndex in reversed(range(0, index - 1)):
+				if target.hash in self.track[jndex]:
+					self.put_char(jndex, '←', ' ', 0)
 					return
+			#for name in reversed(self.sw):
+			#	if name in target.parent:
+			#		self.put_char(name, '→', ' ', 1)
+			#		return
 
 		self.put_char(index, ' ', ' ', 0)
 
@@ -162,6 +228,10 @@ class Layout:
 
 		#print "North %s" % self.ne
 		#print "South %s" % self.se
+			
+		if self.debug:
+			self.plot_track()
+			print target.child
 
 		if self.size:
 			self.compute_even_column(0, target)
@@ -174,11 +244,17 @@ class Layout:
 			self.compute_even_column(i, target)
 		#return self.layout
 
+		for track in self.track.values():
+			track.discard(target.hash)
+
+		for name in target.parent:
+			self.track[target.column].add(name)
+
 	def draw_padding (self):
 
 		padding = ''
 		for i in self.layout:
-			padding += '\x1b[%d;%dm%s' % (i.color, i.style, i.padding)
+			padding += '\x1b[%dm%s' % (i.color, i.padding)
 		return padding
 
 	def draw_transition (self):
@@ -186,6 +262,6 @@ class Layout:
 		padding = ''
 		for i in self.layout:
 			if i.transition == '•': padding += '\x1b[m•'
-			else: padding += '\x1b[%d;%dm%s' % (i.color, i.style, i.transition)
+			else: padding += '\x1b[%dm%s' % (i.color, i.transition)
 		return padding
 
