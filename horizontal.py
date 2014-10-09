@@ -246,8 +246,8 @@ class Order:
 		if self.debug:
 			print "Archiving column (%d)" % index
 		for e in column.content:
-			try: self.archived[index].append(e)
-			except: self.archived[index] = [e]
+			try: self.archived[index].append(e.name)
+			except: self.archived[index] = [e.name]
 		
 		column.make_available()
 
@@ -257,21 +257,23 @@ class Order:
 			print "Archiving commit (%s)" % target[:7]
 		for column in self.active:
 			if column.available: continue
-			if column.bottom() == target:
-				if column.count == 1:
+			bottom = column.bottom()
+			if bottom and bottom.name == target:
+			#if column.bottom() == target:
+				if bottom.count == 1:
 					index = self.active.index(column)
 					self.archive_column(index, column)
 				else:
-					column.count -= 1
+					bottom.count -= 1
 
 	# When every commit has been assigned to a column, it's time to archive any
 	# current data
 	def flush_active (self):
 		
 		for index in range(len(self.active)):
-			for element in self.active[index].content:
-				try: self.archived[index].append(element)
-				except: self.archived[index] = [element]
+			for e in self.active[index].content:
+				try: self.archived[index].append(e.name)
+				except: self.archived[index] = [e.name]
 
 	def show (self):
 		print '{'
