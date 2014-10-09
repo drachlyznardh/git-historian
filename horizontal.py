@@ -175,7 +175,39 @@ class Order:
 			if not child: continue # Missing commit: skip
 			if child.static: continue # Child on static column, not eligible
 
-	def insert (self, top, bottom):
+	def search_child (self, commit):
+		
+		for column in self.active:
+			for child in commit.child:
+				for element in column.content:
+					if child == element.name:
+						return [column, element]
+		return [None, None]
+
+	def push_column_up_to (self, column, node):
+		
+		cindex = self.active.index(column)
+		eindex = column.content.index(node)
+
+	def insert(self, commit):
+		
+		if self.debug: print 'Inserting %s' % commit.hash[:7]
+
+		[column, element] = self.search_child(commit)
+		if column and element:
+			print 'Found column %d and element %s' % (
+				self.active.index(column), element.name[:7])
+			self.push_column_up_to(column, element)
+			column.append(commit)
+		else:
+			print 'Not found'
+			for column in self.active:
+				if column.available:
+					column.append(commit)
+					return
+			self.active.append(Column(commit))
+
+	def ye_old_insert (self, top, bottom):
 
 		if bottom.static:
 			self.insert_static(bottom)
