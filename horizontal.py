@@ -204,7 +204,8 @@ class Order:
 		if column and element:
 			print 'Found column %d and element %s' % (
 				self.active.index(column), element.name[:7])
-			self.push_column_up_to(column, element)
+			if column.bottom() != element:
+				self.push_column_up_to(column, element)
 			column.append(commit)
 		else:
 			print 'Not found'
