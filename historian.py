@@ -193,8 +193,8 @@ class Historian:
 			for name in column:
 				if debug:
 					print "Calling %s with %d from archive" % (
-					name[:7], index)
-				target = self.commit[name]
+					name.name[:7], index)
+				target = self.commit[name.name]
 				if target and target.column == -1:
 					target.column = reserved + index
 		

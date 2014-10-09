@@ -11,17 +11,16 @@ class Node:
 
 class Column:
 
-	def __init__ (self, l, count):
-		self.content = l
-		self.index = -1
+	def __init__ (self, commit):
+		self.content = [Node(commit)]
+		#self.index = -1
 		self.available = 0
-		self.count = count
 	
 	def make_available (self):
 		self.content = []
-		self.index = -1
+		#self.index = -1
 		self.available = 1
-		self.count = 0
+		#self.count = 0
 
 	def top (self):
 		if len(self.content) == 0: return ''
@@ -37,17 +36,17 @@ class Column:
 
 	def append (self, commit):
 		self.available = 0
-		self.content.append(commit.hash)
-		self.count = len(commit.parent)
+		self.content.append(Node(commit))
+		#self.count = len(commit.parent)
 
 	def show (self):
 		if len(self.content) == 0:
-			print '%d [Avail]' % self.count
+			print '[Avail]'
 			return
 
-		line = '%d [%s' % (self.count, self.content[0][:7])
+		line = '[%s' % (self.content[0].show())
 		for i in self.content[1:]:
-			line += ', ' + i[:7]
+			line += ', ' + i.show()
 		line += ']'
 		print "%s" % line
 
@@ -82,7 +81,7 @@ class Order:
 			if column.available:
 				column.append(target)
 				return
-		self.active.append(Column([target.hash], len(target.parent)))
+		self.active.append(Column(target))#Column([target.hash], len(target.parent)))
 
 	def insert_on_child_column (self, target, child):
 		if self.at_bottom(target.hash): return
