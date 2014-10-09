@@ -182,6 +182,11 @@ class Layout:
 			if target.hash in self.track[index - 1]:
 				self.put_char(index - 1, '←', ' ', 1)
 				return
+
+			for jndex in range(0, index - 1):
+				if target.hash in self.track[jndex]:
+					self.put_char(jndex, '←', ' ', 0)
+					return
 			#for name in reversed(self.sw):
 			#	if name in target.parent:
 			#		self.put_char(name, '→', ' ', 1)
