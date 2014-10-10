@@ -14,62 +14,32 @@ class Layout:
 
 	def bottom_insert (self, commit):
 		if self.debug: print '  bottom insert %s' % commit.hash[:7]
-		if self.check(commit): return
-
-		self.cell[commit.hash] = Cell(commit)
-		cell = self.cell[commit.hash]
 
 		# Looking for non-static children
-		candidates = []
 		for name in commit.child:
-			if self.commit[name].static: continue
 			
-			ccell = self.cell[name]
-				
+			child = self.commit[name]
+			if child.static: continue
+			
 			# Free cell under this one
-			if not ccell.bottom:
-				ccell.bottom = commit.hash
-				cell.top = ccell.name
-				commit.column = self.commit[name].column
+			if not child.bottom:
+				child.bottom = commit.hash
+				commit.top = name
+				commit.column = child.column
 				break
 
 			# Move sideways until there is an opening
-			while ccell.lower:
-				ccell = self.cell[ccell.lower]
+			while child.lower:
+				child = self.commit[child.lower]
 
 			# Free cell after this one
-			ccell.lower = commit.hash
-			cell.left = ccell.name
-			commit.column = self.commit[ccell.name].column + 1
+			child.lower = commit.hash
+			commit.left = name
+			commit.column = child.column + 1
 			break
 
 		commit.column = self.first
 
-	def top_insert (self, commit):
-		if self.debug: print '  top insert %s' % commit.hash[:7]
-		if self.check(commit): return
-
-		cell = Cell(commit)
-		
-		# Looking for non-static parents
-		candidates = []
-		for name in commit.parent:
-			if not self.commit[name].static:
-				candidates.append(name)
-		
-		if len(candidates) == 0:
-			commit.column = self.first
-			self.commit[commit.hash] = cell
-			return
-		
-		print 'This case is not yet covered!!!'
-
-		self.commit[commit.hash] = cell
-
-	def brand_new_insert (self, commit):
-		if self.debug: print '  brand new insert %s' % commit.hash[:7]
-		if self.check(commit): return
-	
 class Order:
 
 	def __init__ (self, debug):
