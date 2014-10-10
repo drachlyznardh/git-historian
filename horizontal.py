@@ -21,7 +21,7 @@ class Layout:
 			self.max_column = n
 
 	def check (self, commit):
-		if commit.hash in self.commit:
+		if commit.hash in self.cell:
 			if self.debug: print '%s already done, skipping' % commit.hash[:7]
 			return 1
 		return 0
