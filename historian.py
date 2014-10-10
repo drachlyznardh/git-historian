@@ -23,7 +23,7 @@ class Historian:
 		self.head = 0
 		self.commit = {}
 		self.vertical = []
-		self.max_column = -1
+		self.width = -1
 	
 	def get_history(self):
 		git_history_dump = check_output(["git", "log", '--pretty="%H %P%d"', "--all"])
@@ -48,7 +48,7 @@ class Historian:
 			if not self.head: self.head = current.hash
 			self.commit[current.hash] = current
 	
-	def vertical_unrolling(self, debug):
+	def unroll_graph(self, debug):
 
 		if debug:
 			print '\n-- Vertical unrolling --'
@@ -124,65 +124,9 @@ class Historian:
 				print '%s' % name[:7]
 			print '  --'
 
-	def horizontal_unroll(self, debug):
-
-		if debug:
-			print '\n-- Horizontal unrolling --'
-
-		for name in self.vertical:
-			commit = self.commit[name]
-			if commit:
-				commit.know_your_column()
-				commit.done = 0
-
-		visit = horizontal.Order(debug)
-		layout = horizontal.Layout(debug, self.commit, 2)
-
-		for name in self.vertical:
-			
-			if debug: visit.show()
-
-			commit = self.commit[name]
-			if not commit:
-				if debug:
-					print "No Commit for name %s" % name[:7]
-				break
-
-			if commit.done:
-				if debug: print '%s is done, skipping' % name[:7]
-				continue
-
-			if debug: print 'now pushing %s to visit' % name[:7]
-			visit.push_one(name)
-
-			while 1:
-
-				name = visit.pop()
-				if not name:
-					if debug: print 'No target name in visit'
-					break
-
-				commit = self.commit[name]
-				if not commit:
-					if debug: print 'Commit %s does not exist' % name[:7]
-					break
-
-				if debug: print '\nProcessing %s' % name[:7]
-				
-				layout.bottom_insert(commit)
-				#if len(commit.child): layout.bottom_insert(commit)
-				#elif len(commit.parent): layout.top_insert(commit)
-				#else: layout.brand_new_insert(commit)
-				commit.done = 1
-
-				if len(commit.parent): visit.push_many(commit.parent)
-				if debug: visit.show()
-
-		self.max_column = layout.max_column
-
 	def print_graph (self, debug):
 		
-		#t = layout.Layout(self.max_column, self.commit, debug)
+		#t = layout.Layout(self.width, self.commit, debug)
 		t = layout.Layout(10, self.commit, debug)
 
 		cmdargs = 'git show -s --oneline --decorate --color'.split(' ')
@@ -271,7 +215,6 @@ class Historian:
 
 		if self.debug:
 			print "%d commits in history" % len(self.commit)
-		self.vertical_unrolling(self.debug or vdebug)
-		#self.horizontal_unroll(self.debug or hdebug)
+		self.unroll_graph(self.debug or vdebug)
 		#self.print_graph(self.debug or ldebug)
 
