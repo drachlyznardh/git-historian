@@ -42,7 +42,7 @@ class Layout:
 			self.commit[commit.hash] = cell
 			return
 		
-
+		print 'This case is not yet covered!!!'
 
 		self.commit[commit.hash] = cell
 
