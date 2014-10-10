@@ -11,8 +11,11 @@ class Node:
 		self.column = -1
 		self.static = 0
 		self.printed = 0
-		self.done = 0
 		self.nth_child = 0
+
+		# Visit marks
+		self.vdone = 0
+		self.hdone = 0
 
 		# Layout relation
 		self.left = None   # Cell on left
