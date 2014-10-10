@@ -8,7 +8,7 @@ import getopt
 
 import node
 import vertical
-import horizontal
+#import horizontal
 
 import layout as layout
 
@@ -100,6 +100,8 @@ class Historian:
 						continue
 				
 				self.vertical.append(commit.hash)
+				if not commit.static: commit.column = 2
+				self.print_graph(0)
 
 				if len(commit.parent) > 1:
 					for i in commit.parent:
@@ -183,7 +185,8 @@ class Historian:
 			print "Wut!"
 			return
 
-		t = layout.Layout(self.max_column, self.commit, debug)
+		#t = layout.Layout(self.max_column, self.commit, debug)
+		t = layout.Layout(10, self.commit, debug)
 
 		cmdargs = 'git show -s --oneline --decorate --color'.split(' ')
 		#cmdargs.append(optargs)
@@ -267,10 +270,11 @@ class Historian:
 
 		for i in self.commit:
 			self.commit[i].know_your_parents(self.commit)
+			self.commit[i].know_your_column()
 
 		if self.debug:
 			print "%d commits in history" % len(self.commit)
 		self.vertical_unrolling(self.debug or vdebug)
-		self.horizontal_unroll(self.debug or hdebug)
-		self.print_graph(self.debug or ldebug)
+		#self.horizontal_unroll(self.debug or hdebug)
+		#self.print_graph(self.debug or ldebug)
 
