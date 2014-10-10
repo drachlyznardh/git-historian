@@ -21,6 +21,28 @@ class Node:
 		self.bottom = None # Cell on bottom
 		self.lower = None  # Cell on bottom-right
 
+	def print_cell (self):
+		
+		message = '       '
+		
+		if self.top: message += ' %s' % self.top[:7]
+		else: message += '        '
+		if self.upper: message += ' %s' % self.upper[:7]
+		
+		message += '\n'
+		
+		if self.left: message += ' %s' % self.left[:7]
+		else: message += '        '
+		if self.hash: message += ' %s' % self.hash[:7]
+		
+		message += '\n'
+		
+		if self.bottom: message += ' %s' % self.bottom[:7]
+		else: message += '        '
+		if self.lower: message += ' %s' % self.lower[:7]
+
+		print '(%s)' % message
+
 	def print_graph(self, commit_map):
 		if self.printed: return
 		self.printed = 1

@@ -71,7 +71,10 @@ class Historian:
 
 			# Move sideways until there is an opening
 			while child.lower:
+				child.print_cell()
 				child = self.commit[child.lower]
+
+			child.print_cell()
 
 			# Free cell after this one
 			child.lower = commit.hash
