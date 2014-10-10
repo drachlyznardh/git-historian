@@ -152,7 +152,7 @@ class Historian:
 				commit.done = 1
 
 				print
-				self.print_graph(0)
+				self.print_graph(1)
 
 				parents = len(commit.parent)
 
@@ -216,8 +216,8 @@ class Historian:
 			message = check_output(cmdargs).split('\n')
 
 			print '%s\x1b[m %s' % (t.draw_transition(), message[0])
-			for i in message[1:-1]:
-			#for i in message[1:]:
+			#for i in message[1:-1]:
+			for i in message[1:]:
 				print '%s\x1b[m %s' % (t.draw_padding(), i)
 
 	def print_version(self):
@@ -269,5 +269,5 @@ class Historian:
 		if self.debug:
 			print "%d commits in history" % len(self.commit)
 		self.unroll_graph(self.debug or vdebug)
-		#self.print_graph(self.debug or ldebug)
+		self.print_graph(self.debug or ldebug)
 
