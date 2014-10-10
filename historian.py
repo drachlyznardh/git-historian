@@ -198,11 +198,6 @@ class Historian:
 
 	def print_graph (self, debug):
 		
-		head = self.commit[self.head]
-		if not head:
-			print "Wut!"
-			return
-
 		t = layout.Layout(self.max_column, self.commit, debug)
 
 		cmdargs = 'git show -s --oneline --decorate --color'.split(' ')
