@@ -4,8 +4,8 @@ class Cell:
 
 	def __init__ (self, name):
 		self.name = name
-		self.left = self.top = self.bottom = ''
-		self.upper = self.lower = ''
+		self.left = self.top = self.bottom = None
+		self.upper = self.lower = None
 
 class Layout:
 
@@ -29,6 +29,32 @@ class Layout:
 	def bottom_insert (self, commit):
 		if self.debug: print '  bottom insert %s' % commit.hash[:7]
 		if self.check(commit): return
+
+		cell = Cell(commit)
+
+		# Looking for non-static children
+		candidates = []
+		for name in commit.child:
+			if self.commit[name].static: continue
+			
+			ccell = self.cell[name]
+				
+			# Free cell under this one
+			if not ccell.bottom:
+				ccell.bottom = commit.hash
+				cell.top = ccell.name
+				commit.column = self.commit[ccell.name]
+				break
+
+			# Move sideways until there is an opening
+			while ccell.lower:
+				ccell = self.cell[ccell.lower]
+
+			# Free cell after this one
+			ccell.lower = commit.hash
+			cell.left = ccell.name
+			commit.column = self.commit[ccell.name] + 1
+			break
 
 		commit.column = self.first
 
