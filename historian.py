@@ -153,8 +153,6 @@ class Historian:
 
 			while 1:
 
-				if debug: visit.show()
-
 				name = visit.pop()
 				if not name:
 					if debug: print 'No target name in visit'
@@ -172,6 +170,7 @@ class Historian:
 				commit.done = 1
 
 				if len(commit.parent): visit.push_many(commit.parent)
+				if debug: visit.show()
 
 	def print_graph (self, debug):
 		
