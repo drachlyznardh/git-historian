@@ -122,6 +122,9 @@ class Historian:
 					if debug: print "%s is done, skipping" % commit.hash[:7]
 					continue
 
+				# Horizontal order
+				self.insert(commit)
+
 				children = len(commit.child)
 
 				if children > 1:
@@ -145,9 +148,6 @@ class Historian:
 				
 				# Vertical order is now fixed
 				self.vertical.append(commit.hash)
-
-				# Horizontal order 
-				self.insert(commit)
 
 				commit.done = 1
 
