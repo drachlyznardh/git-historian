@@ -164,6 +164,7 @@ class Historian:
 					if debug: print 'Commit %s does not exist' % name[:7]
 					break
 
+				if debug: print 'Processing %s' % name[:7]
 				commit.done = 1
 
 				visit.push_many(commit.parent)
