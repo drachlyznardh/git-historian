@@ -77,6 +77,8 @@ class Historian:
 			child.lower = commit.hash
 			commit.left = name
 			commit.column = child.column + 1
+			if commit.column > self.width:
+				self.width = commit.column
 			return
 		
 		#if self.debug:
@@ -180,7 +182,7 @@ class Historian:
 	def print_graph (self, debug):
 		
 		#t = layout.Layout(self.width, self.commit, debug)
-		t = layout.Layout(10, self.commit, debug)
+		t = layout.Layout(self.width, self.commit, debug)
 
 		cmdargs = 'git show -s --oneline --decorate --color'.split(' ')
 		#cmdargs.append(optargs)
@@ -262,6 +264,8 @@ class Historian:
 		if not self.commit:
 			self.get_history()
 
+		self.width = 4 # Reserved columns
+
 		for i in self.commit:
 			self.commit[i].know_your_parents(self.commit)
 			self.commit[i].know_your_column()
@@ -271,3 +275,4 @@ class Historian:
 		self.unroll_graph(self.debug or vdebug)
 		self.print_graph(self.debug or ldebug)
 
+		print 'Width %d' % self.width
