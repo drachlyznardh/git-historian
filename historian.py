@@ -149,7 +149,6 @@ class Historian:
 				
 				# Vertical order is now fixed
 				self.vertical.append(commit.hash)
-
 				commit.vdone = 1
 
 				print
@@ -265,7 +264,7 @@ class Historian:
 		if not self.commit:
 			self.get_history()
 
-		self.width = 14 # Reserved columns
+		self.width = 4 # Reserved columns
 
 		for i in self.commit:
 			self.commit[i].know_your_parents(self.commit)

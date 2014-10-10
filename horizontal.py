@@ -49,12 +49,16 @@ class Order:
 	def show (self):
 		
 		if len(self.content) == 0:
-			print '(Empty)'
+			print '{Empty}'
 			return
 
 		print '{'
 		for l in self.content:
-			if len(l): message = l[0][:7]
+			if len(l) == 0:
+				print '(Empty)'
+				continue
+			
+			message = l[0][:7]
 			for e in l[1:]: message += ', %s' % e[:7]
 			print '  (%s)' % message
 		print '}'
