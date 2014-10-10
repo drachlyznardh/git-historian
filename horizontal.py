@@ -1,30 +1,16 @@
 # Column module for Git-Historian
 
-class Cell:
-
-	def __init__ (self, name):
-		self.name = name
-		self.left = self.top = self.bottom = None
-		self.upper = self.lower = None
-
 class Layout:
 
 	def __init__ (self, debug, commit, first):
 		self.debug = debug
 		self.commit = commit
 		self.first = first
-		self.cell = {}
 		self.max_column = first
 
 	def update(self, n):
 		if n > self.max_column:
 			self.max_column = n
-
-	def check (self, commit):
-		if commit.hash in self.cell:
-			if self.debug: print '%s already done, skipping' % commit.hash[:7]
-			return 1
-		return 0
 
 	def bottom_insert (self, commit):
 		if self.debug: print '  bottom insert %s' % commit.hash[:7]
