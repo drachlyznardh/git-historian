@@ -14,14 +14,23 @@ class Layout:
 		self.commit = {}
 		self.head = []
 
+	def check (self, commit):
+		if commit.hash in self.commit:
+			if self.debug: print '%s already done, skipping' % commit.hash[:7]
+			return 1
+		return 0
+
 	def bottom_insert (self, commit):
 		if self.debug: print '  bottom insert %s' % commit.hash[:7]
+		if self.check(commit): return
 	
 	def top_insert (self, commit):
 		if self.debug: print '  top insert %s' % commit.hash[:7]
-	
+		if self.check(commit): return
+
 	def brand_new_insert (self, commit):
 		if self.debug: print '  brand new insert %s' % commit.hash[:7]
+		if self.check(commit): return
 	
 class Order:
 
