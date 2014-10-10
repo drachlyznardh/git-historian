@@ -73,10 +73,11 @@ class Historian:
 
 		visit = vertical.Order()
 
-		for name, commit in self.commit.items():
+		for name in self.head:
 
 			if debug: visit.show()
 
+			commit = self.commit[name]
 			if commit.done:
 				if debug: print '%s is done, skipping' % name[:7]
 				continue
@@ -143,7 +144,8 @@ class Historian:
 		if debug:
 			print '\n-- Horizontal unrolling --'
 
-		for name in self.vertical:
+		for name in self.head:
+
 			commit = self.commit[name]
 			if commit:
 				commit.know_your_column()
