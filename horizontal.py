@@ -63,6 +63,9 @@ class Order:
 		try:
 			while len(self.content[0]) == 0:
 				self.content.pop(0)
-			return self.content[0].pop(0)
+			target = self.content[0].pop(0)
+			if len(self.content[0]) == 0:
+				self.content.pop(0)
+			return target
 		except:
 			return None
