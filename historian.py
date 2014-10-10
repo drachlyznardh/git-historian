@@ -125,79 +125,48 @@ class Historian:
 		if debug:
 			print '\n-- Horizontal unrolling --'
 
-		reserved = 2
-		order = horizontal.Order(self.commit, debug)
-
-		# Children must appear in their vertical order
 		for name in self.vertical:
 			commit = self.commit[name]
-			if commit: commit.child = []
+			if commit:
+				commit.know_your_column()
+				commit.done = 0
 
-		for name in self.vertical:
-			commit = self.commit[name]
-			if commit: commit.know_your_parents(self.commit)
-
-		for name in self.vertical:
-			commit = self.commit[name]
-			if commit: commit.know_your_column()
+		visit = horizontal.Order(debug)
 
 		for name in self.vertical:
 			
 			if debug: order.show()
+
 			commit = self.commit[name]
 			if not commit:
 				if debug:
 					print "No Commit for name %s" % name[:7]
 				break
 
-			children = len(commit.child)
-			parents = len(commit.parent)
-			if debug:
-				print "Vertical unrolling of %s (%d, %d)" % (
-					name[:7], children, parents)
+			if commit.done:
+				if debug: print '%s is done, skipping' % name[:7]
+				continue
 
-			# deal with children: it this a split?
-			if children > 1:
-				for child in commit.child:
-					order.archive_commit(child)
-			# deal with self: it this static?
-			if not commit.static:
-				if children == 1:
-					order.insert_on_child_column(commit, commit.child[0])
-				else:
-					order.insert_from_left(commit)
-			# deal with parents: it this a merge?
+			if debug: print 'now pushing %s to visit' % name[:7]
+			visit.push_one(name)
 
-			if parents > 1:
-				# selecting non-static parents
-				candidates = []
-				for name in commit.parent:
-					parent = self.commit[name]
-					if not parent.static: candidates.append(name)
+			while 1:
 
-				for name in candidates:
-					parent = self.commit[name]
-					order.insert_before_or_on_child_column(parent, commit.hash)
-				#if len(candidates):
-				#	first = self.commit[candidates[0]]
-				#	order.insert_on_child_column(first, commit.hash)
-				#for name in candidates[1:]:
-				#	parent = self.commit[name]
-				#	if not parent.static:
-				#		order.insert_from_left(parent)
+				if debug: visit.show()
 
-		order.flush_active()
+				name = visit.pop()
+				if not name:
+					if debug: print 'No target name in visit'
+					break
 
-		for index, column in order.archived.items():
-			for name in column:
-				if debug:
-					print "Calling %s with %d from archive" % (
-					name[:7], index)
-				target = self.commit[name]
-				if target and target.column == -1:
-					target.column = reserved + index
-		
-		self.max_column = reserved + len(order.archived)
+				commit = self.commit[name]
+				if not commit:
+					if debug: print 'Commit %s does not exist' % name[:7]
+					break
+
+				commit.done = 1
+
+				visit.push_many(commit.parent)
 
 	def print_graph (self, debug):
 		
