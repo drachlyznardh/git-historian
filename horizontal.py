@@ -215,6 +215,25 @@ class Order:
 					return
 			self.active.append(Column(commit))
 
+		self.show()
+
+		return
+		for child in reversed(commit.child):
+			self.archive_commit(child)
+
+		return
+
+		for column in self.active:
+			target = column.bottom()
+			if target and target.name in commit.child:
+				print 'Found a child %s of %s' % (
+					target.name[:7], commit.hash[:7])
+				continue
+			target = column.last2bottom()
+			if target and target.name in commit.child:
+				print 'Found a child %s of %s' % (
+					target.name[:7], commit.hash[:7])
+
 	def ye_old_insert (self, top, bottom):
 
 		if bottom.static:
@@ -293,6 +312,14 @@ class Order:
 		
 		column.make_available()
 
+	def do_archive_commit (self, column, target):
+		
+		if target.count > 1:
+			target.count -= 1
+			return
+
+
+
 	def archive_commit (self, target):
 	
 		if self.debug:
@@ -301,7 +328,13 @@ class Order:
 			if column.available: continue
 			bottom = column.bottom()
 			if bottom and bottom.name == target:
-			#if column.bottom() == target:
+				if bottom.count == 1:
+					index = self.active.index(column)
+					self.archive_column(index, column)
+				else:
+					bottom.count -= 1
+			bottom = column.last2bottom()
+			if bottom and bottom.name == target:
 				if bottom.count == 1:
 					index = self.active.index(column)
 					self.archive_column(index, column)

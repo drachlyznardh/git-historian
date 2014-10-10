@@ -164,6 +164,7 @@ class Historian:
 				#else:
 				#	order.insert_from_left(commit)
 
+			continue
 			# deal with children: it this a split?
 			if children > 1:
 				for child in commit.child:
