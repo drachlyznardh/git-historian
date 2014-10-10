@@ -164,9 +164,11 @@ class Historian:
 					break
 
 				if debug: print '\nProcessing %s' % name[:7]
-				if len(commit.child): layout.bottom_insert(commit)
-				elif len(commit.parent): layout.top_insert(commit)
-				else: layout.brand_new_insert(commit)
+				
+				layout.bottom_insert(commit)
+				#if len(commit.child): layout.bottom_insert(commit)
+				#elif len(commit.parent): layout.top_insert(commit)
+				#else: layout.brand_new_insert(commit)
 				commit.done = 1
 
 				if len(commit.parent): visit.push_many(commit.parent)
