@@ -14,7 +14,6 @@ class Layout:
 		self.debug = debug
 		self.commit = commit
 		self.cell = {}
-		self.head = []
 
 	def check (self, commit):
 		if commit.hash in self.commit:
@@ -30,7 +29,6 @@ class Layout:
 		if self.debug: print '  top insert %s' % commit.hash[:7]
 		if self.check(commit): return
 
-		#self.head.append(commit.hash)
 		cell = Cell(commit)
 		
 		# Looking for non-static parents
