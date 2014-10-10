@@ -10,9 +10,10 @@ class Cell:
 
 class Layout:
 
-	def __init__ (self, debug, commit):
+	def __init__ (self, debug, commit, first):
 		self.debug = debug
 		self.commit = commit
+		self.first = first
 		self.cell = {}
 
 	def check (self, commit):
@@ -38,7 +39,7 @@ class Layout:
 				candidates.append(name)
 		
 		if len(candidates) == 0:
-			cell.column = 0
+			cell.column = self.first
 			self.commit[commit.hash] = cell
 			return
 		
