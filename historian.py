@@ -151,8 +151,8 @@ class Historian:
 				self.vertical.append(commit.hash)
 				commit.vdone = 1
 
-				print
-				self.print_graph(1)
+				#print
+				#self.print_graph(1)
 
 				parents = len(commit.parent)
 
@@ -264,7 +264,7 @@ class Historian:
 		if not self.commit:
 			self.get_history()
 
-		self.width = 4 # Reserved columns
+		self.width = 3 # Reserved columns
 
 		for i in self.commit:
 			self.commit[i].know_your_parents(self.commit)
@@ -273,6 +273,8 @@ class Historian:
 		if self.debug:
 			print "%d commits in history" % len(self.commit)
 		self.unroll_graph(self.debug or vdebug)
-		self.print_graph(self.debug or ldebug)
+		#self.print_graph(self.debug or ldebug)
+		for name in self.vertical:
+			print self.commit[name].to_oneline()
 
 		print 'Width %d' % self.width
