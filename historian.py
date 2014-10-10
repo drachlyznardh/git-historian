@@ -122,7 +122,10 @@ class Historian:
 					if debug: print "%s is done, skipping" % commit.hash[:7]
 					continue
 
-				if len(commit.child) > 1:
+				children = len(commit.child)
+
+				if children > 1:
+					print '  Now pushing %d children' % children
 					visit.push_many(commit.child)
 					continue
 					#skip = 0
@@ -132,10 +135,11 @@ class Historian:
 					#		visit.cpush(i)
 					#		skip = 1
 					#if skip: continue
-				elif len(commit.child) > 0:
+				elif children > 0:
 					child = self.commit[commit.child[0]]
 					if child and not child.done:
 						#visit.cpush(commit.child[0])
+						print '  Now pushing single child'
 						visit.push_one(commit.child[0])
 						continue
 				
@@ -145,23 +149,27 @@ class Historian:
 				# Horizontal order 
 				self.insert(commit)
 
+				commit.done = 1
+
 				print
 				self.print_graph(0)
 
-				if len(commit.parent) > 1:
+				parents = len(commit.parent)
+
+				if parents > 1:
 					#for i in commit.parent:
 					#	parent = self.commit[i]
 					#	if parent and not parent.done:
 					#		visit.ppush(i)
+					print '  Now pushing %d parents' % parents
 					visit.push_many(commit.parent)
-				elif len(commit.parent) > 0:
+				elif parents > 0:
 					parent = self.commit[commit.parent[0]]
 					if parent and not parent.done:
 						#visit.push(commit.parent[0])
+						print '  Now pushing single parent'
 						visit.push_one(commit.parent[0])
 				
-				if debug: visit.show()
-				commit.done = 1
 
 		if debug:
 			print '  --'
