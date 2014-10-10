@@ -6,6 +6,20 @@ class Cell:
 		self.name = name
 		self.left = self.top = self.bottom = ''
 		self.upper = self.lower = ''
+
+class Layout:
+
+	def __init__ (self, debug):
+		self.debug = debug
+
+	def bottom_insert (self, commit):
+		if self.debug: print '  bottom insert %s' % commit.hash[:7]
+	
+	def top_insert (self, commit):
+		if self.debug: print '  top insert %s' % commit.hash[:7]
+	
+	def brand_new_insert (self, commit):
+		if self.debug: print '  brand new insert %s' % commit.hash[:7]
 	
 class Order:
 
