@@ -167,7 +167,7 @@ class Historian:
 				if debug: print 'Processing %s' % name[:7]
 				commit.done = 1
 
-				visit.push_many(commit.parent)
+				if len(commit.parent): visit.push_many(commit.parent)
 
 	def print_graph (self, debug):
 		
