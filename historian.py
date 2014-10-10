@@ -48,6 +48,41 @@ class Historian:
 			if not self.head: self.head = current.hash
 			self.commit[current.hash] = current
 	
+	def insert (self, commit):
+		
+		if commit.static:
+			#if self.debug:
+			print '%s is static, skipping' % commit.hash[:7]
+			return
+
+		for name in commit.child:
+			child = self.commit[name]
+			if child.static:
+				#if self.debug:
+				print 'child %s is static, skipping' % name[:7]
+				continue
+			
+			# Free cell under this one
+			if not child.bottom:
+				child.bottom = commit.hash
+				commit.top = name
+				commit.column = child.column
+				return
+
+			# Move sideways until there is an opening
+			while child.lower:
+				child = self.commit[child.lower]
+
+			# Free cell after this one
+			child.lower = commit.hash
+			commit.left = name
+			commit.column = child.column + 1
+			return
+		
+		#if self.debug:
+		print 'No valid child found for %s, defaulting' % commit.hash[:7]
+		commit.column = 2
+
 	def unroll_graph(self, debug):
 
 		if debug:
@@ -99,8 +134,11 @@ class Historian:
 						visit.cpush(commit.child[0])
 						continue
 				
+				# Vertical order is now fixed
 				self.vertical.append(commit.hash)
-				if not commit.static: commit.column = 2
+
+				# Horizontal order 
+				self.insert(commit)
 
 				print
 				self.print_graph(0)
