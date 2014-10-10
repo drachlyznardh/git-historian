@@ -135,7 +135,7 @@ class Historian:
 
 		for name in self.vertical:
 			
-			if debug: order.show()
+			if debug: visit.show()
 
 			commit = self.commit[name]
 			if not commit:
