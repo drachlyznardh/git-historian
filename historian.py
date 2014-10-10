@@ -132,6 +132,7 @@ class Historian:
 				commit.done = 0
 
 		visit = horizontal.Order(debug)
+		layout = horizontal.Layout(debug, self.commit, 2)
 
 		for name in self.vertical:
 			
@@ -152,8 +153,6 @@ class Historian:
 
 			while 1:
 
-				if debug: visit.show()
-
 				name = visit.pop()
 				if not name:
 					if debug: print 'No target name in visit'
@@ -165,9 +164,17 @@ class Historian:
 					break
 
 				if debug: print '\nProcessing %s' % name[:7]
+				
+				layout.bottom_insert(commit)
+				#if len(commit.child): layout.bottom_insert(commit)
+				#elif len(commit.parent): layout.top_insert(commit)
+				#else: layout.brand_new_insert(commit)
 				commit.done = 1
 
 				if len(commit.parent): visit.push_many(commit.parent)
+				if debug: visit.show()
+
+		self.max_column = layout.max_column
 
 	def print_graph (self, debug):
 		
