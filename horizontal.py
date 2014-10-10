@@ -47,10 +47,17 @@ class Order:
 		self.debug = debug
 
 	def show (self):
+		
+		if len(self.content) == 0:
+			print '(Empty)'
+			return
+
+		print '{'
 		for l in self.content:
 			if len(l): message = l[0][:7]
 			for e in l[1:]: message += ', %s' % e[:7]
-			print '[%s]' % message
+			print '  (%s)' % message
+		print '}'
 	
 	def push_one (self, one):
 		self.content.insert(0, [one])
