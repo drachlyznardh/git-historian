@@ -50,8 +50,10 @@ class Order:
 		self.debug = debug
 
 	def show (self):
-		for e in self.content:
-			print '%s' % e
+		for l in self.content:
+			if len(l): message = l[0][:7]
+			for e in l[1:]: message += ', %s' % e[:7]
+			print '[%s]' % message
 	
 	def push_one (self, one):
 		self.content.insert(0, [one])
@@ -63,6 +65,9 @@ class Order:
 		try:
 			while len(self.content[0]) == 0:
 				self.content.pop(0)
-			return self.content[0].pop(0)
+			target = self.content[0].pop(0)
+			if len(self.content[0]) == 0:
+				self.content.pop(0)
+			return target
 		except:
 			return None

@@ -135,7 +135,7 @@ class Historian:
 
 		for name in self.vertical:
 			
-			if debug: order.show()
+			if debug: visit.show()
 
 			commit = self.commit[name]
 			if not commit:
@@ -164,9 +164,10 @@ class Historian:
 					if debug: print 'Commit %s does not exist' % name[:7]
 					break
 
+				if debug: print '\nProcessing %s' % name[:7]
 				commit.done = 1
 
-				visit.push_many(commit.parent)
+				if len(commit.parent): visit.push_many(commit.parent)
 
 	def print_graph (self, debug):
 		
