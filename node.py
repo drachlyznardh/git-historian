@@ -14,6 +14,13 @@ class Node:
 		self.done = 0
 		self.nth_child = 0
 
+		# Layout relation
+		self.left = None   # Cell on left
+		self.top = None    # Cell on top
+		self.upper = None  # Cell on top-right
+		self.bottom = None # Cell on bottom
+		self.lower = None  # Cell on bottom-right
+
 	def print_graph(self, commit_map):
 		if self.printed: return
 		self.printed = 1
