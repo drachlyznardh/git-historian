@@ -10,9 +10,10 @@ class Cell:
 
 class Layout:
 
-	def __init__ (self, debug):
+	def __init__ (self, debug, commit):
 		self.debug = debug
-		self.commit = {}
+		self.commit = commit
+		self.cell = {}
 		self.head = []
 
 	def check (self, commit):

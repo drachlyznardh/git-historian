@@ -132,7 +132,7 @@ class Historian:
 				commit.done = 0
 
 		visit = horizontal.Order(debug)
-		layout = horizontal.Layout(debug)
+		layout = horizontal.Layout(debug, self.commit)
 
 		for name in self.vertical:
 			
