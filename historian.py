@@ -101,6 +101,8 @@ class Historian:
 				
 				self.vertical.append(commit.hash)
 				if not commit.static: commit.column = 2
+
+				print
 				self.print_graph(0)
 
 				if len(commit.parent) > 1:
@@ -180,11 +182,6 @@ class Historian:
 
 	def print_graph (self, debug):
 		
-		head = self.commit[self.head]
-		if not head:
-			print "Wut!"
-			return
-
 		#t = layout.Layout(self.max_column, self.commit, debug)
 		t = layout.Layout(10, self.commit, debug)
 
@@ -222,8 +219,8 @@ class Historian:
 			message = check_output(cmdargs).split('\n')
 
 			print '%s\x1b[m %s' % (t.draw_transition(), message[0])
-			#for i in message[1:-1]:
-			for i in message[1:]:
+			for i in message[1:-1]:
+			#for i in message[1:]:
 				print '%s\x1b[m %s' % (t.draw_padding(), i)
 
 	def print_version(self):
