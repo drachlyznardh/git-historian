@@ -26,7 +26,7 @@ class Historian:
 		self.max_column = -1
 
 	def get_heads (self):
-		
+
 		git_output = check_output(['git', 'show-ref', '--heads'])
 
 		for line in git_output.split('\n'):
@@ -40,7 +40,11 @@ class Historian:
 			self.head.append(hash_n_ref.group(1))
 
 	def get_history(self):
-		git_history_dump = check_output(['git', 'log', '--pretty="%H %P%d"', '--all'])
+
+		cmdlist = ['git', 'log', '--pretty="%H %P%d"']
+		cmdlist.extend(self.head)
+
+		git_history_dump = check_output(cmdlist)
 
 		for line in git_history_dump.split('\n'):
 			if len(line) == 0: continue
