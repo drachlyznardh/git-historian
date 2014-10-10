@@ -14,6 +14,11 @@ class Layout:
 		self.commit = commit
 		self.first = first
 		self.cell = {}
+		self.max_column = first
+
+	def update(self, n):
+		if n > self.max_column:
+			self.max_column = n
 
 	def check (self, commit):
 		if commit.hash in self.commit:
@@ -24,7 +29,9 @@ class Layout:
 	def bottom_insert (self, commit):
 		if self.debug: print '  bottom insert %s' % commit.hash[:7]
 		if self.check(commit): return
-	
+
+		commit.column = self.first
+
 	def top_insert (self, commit):
 		if self.debug: print '  top insert %s' % commit.hash[:7]
 		if self.check(commit): return

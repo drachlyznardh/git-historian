@@ -172,6 +172,8 @@ class Historian:
 				if len(commit.parent): visit.push_many(commit.parent)
 				if debug: visit.show()
 
+		self.max_column = layout.max_column
+
 	def print_graph (self, debug):
 		
 		head = self.commit[self.head]
