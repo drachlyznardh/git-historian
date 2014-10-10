@@ -6,6 +6,7 @@ class Cell:
 		self.name = name
 		self.left = self.top = self.bottom = ''
 		self.upper = self.lower = ''
+		self.column = -1
 
 class Layout:
 
@@ -27,6 +28,24 @@ class Layout:
 	def top_insert (self, commit):
 		if self.debug: print '  top insert %s' % commit.hash[:7]
 		if self.check(commit): return
+
+		#self.head.append(commit.hash)
+		cell = Cell(commit)
+		
+		# Looking for non-static parents
+		candidates = []
+		for name in commit.parent:
+			if not self.commit[name].static:
+				candidates.append(name)
+		
+		if len(candidates) == 0:
+			cell.column = 0
+			self.commit[commit.hash] = cell
+			return
+		
+
+
+		self.commit[commit.hash] = cell
 
 	def brand_new_insert (self, commit):
 		if self.debug: print '  brand new insert %s' % commit.hash[:7]
