@@ -30,7 +30,8 @@ class Layout:
 		if self.debug: print '  bottom insert %s' % commit.hash[:7]
 		if self.check(commit): return
 
-		cell = Cell(commit)
+		self.cell[commit.hash] = Cell(commit)
+		cell = self.cell[commit.hash]
 
 		# Looking for non-static children
 		candidates = []
@@ -43,7 +44,7 @@ class Layout:
 			if not ccell.bottom:
 				ccell.bottom = commit.hash
 				cell.top = ccell.name
-				commit.column = self.commit[ccell.name]
+				commit.column = self.commit[name].column
 				break
 
 			# Move sideways until there is an opening
@@ -53,7 +54,7 @@ class Layout:
 			# Free cell after this one
 			ccell.lower = commit.hash
 			cell.left = ccell.name
-			commit.column = self.commit[ccell.name] + 1
+			commit.column = self.commit[ccell.name].column + 1
 			break
 
 		commit.column = self.first
