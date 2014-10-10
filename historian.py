@@ -129,7 +129,7 @@ class Historian:
 
 				if children > 1:
 					print '  Now pushing %d children' % children
-					visit.push_many(commit.child)
+					visit.push_many(self.skip_if_done(commit.child))
 					continue
 				elif children > 0:
 					child = self.commit[commit.child[0]]
@@ -150,7 +150,7 @@ class Historian:
 
 				if parents > 1:
 					print '  Now pushing %d parents' % parents
-					visit.push_many(commit.parent)
+					visit.push_many(self.skip_if_done(commit.parent))
 				elif parents > 0:
 					parent = self.commit[commit.parent[0]]
 					if parent and not parent.done:
@@ -163,6 +163,14 @@ class Historian:
 			for name in self.vertical:
 				print '%s' % name[:7]
 			print '  --'
+
+	def skip_if_done (self, names):
+		result = []
+		for name in names:
+			target = self.commit[name]
+			if target.done: continue
+			result.append(name)
+		return result
 
 	def print_graph (self, debug):
 		
@@ -248,7 +256,7 @@ class Historian:
 		if not self.commit:
 			self.get_history()
 
-		self.width = 4 # Reserved columns
+		self.width = 14 # Reserved columns
 
 		for i in self.commit:
 			self.commit[i].know_your_parents(self.commit)
