@@ -20,13 +20,27 @@ class Historian:
 		self.verbose = 0
 		self.debug = 0
 
-		self.head = 0
+		self.head = []
 		self.commit = {}
 		self.vertical = []
 		self.max_column = -1
-	
+
+	def get_heads (self):
+		
+		git_output = check_output(['git', 'show-ref', '--heads'])
+
+		for line in git_output.split('\n'):
+			
+			if len(line) == 0: continue
+			
+			hash_n_ref = re.compile(r'''(.*) refs\/heads\/(.*)''').match(line)
+			if not hash_n_ref:
+				print 'No match for (%s)' % line
+				continue
+			self.head.append(hash_n_ref.group(1))
+
 	def get_history(self):
-		git_history_dump = check_output(["git", "log", '--pretty="%H %P%d"', "--all"])
+		git_history_dump = check_output(['git', 'log', '--pretty="%H %P%d"', '--all'])
 
 		for line in git_history_dump.split('\n'):
 			if len(line) == 0: continue
@@ -262,8 +276,8 @@ class Historian:
 				self.print_version()
 				return
 
-		if not self.commit:
-			self.get_history()
+		self.get_heads()
+		self.get_history()
 
 		for i in self.commit:
 			self.commit[i].know_your_parents(self.commit)
