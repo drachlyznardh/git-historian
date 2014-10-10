@@ -11,6 +11,8 @@ class Layout:
 
 	def __init__ (self, debug):
 		self.debug = debug
+		self.commit = {}
+		self.head = []
 
 	def bottom_insert (self, commit):
 		if self.debug: print '  bottom insert %s' % commit.hash[:7]
