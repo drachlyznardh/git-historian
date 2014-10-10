@@ -6,7 +6,6 @@ class Cell:
 		self.name = name
 		self.left = self.top = self.bottom = ''
 		self.upper = self.lower = ''
-		self.column = -1
 
 class Layout:
 
@@ -39,7 +38,7 @@ class Layout:
 				candidates.append(name)
 		
 		if len(candidates) == 0:
-			cell.column = self.first
+			commit.column = self.first
 			self.commit[commit.hash] = cell
 			return
 		
