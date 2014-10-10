@@ -49,10 +49,13 @@ class Historian:
 			self.commit[current.hash] = current
 	
 	def insert (self, commit):
-		
+
+		if commit.hdone: return
+
 		if commit.static:
 			#if self.debug:
 			print '%s is static, skipping' % commit.hash[:7]
+			commit.hdone = 1
 			return
 
 		for name in commit.child:
@@ -67,6 +70,7 @@ class Historian:
 				child.bottom = commit.hash
 				commit.top = name
 				commit.column = child.column
+				commit.hdone = 1
 				return
 
 			# Move sideways until there is an opening
@@ -80,6 +84,7 @@ class Historian:
 			child.lower = commit.hash
 			commit.left = name
 			commit.column = child.column + 1
+			commit.hdone = 1
 			if commit.column > self.width:
 				self.width = commit.column
 			return
@@ -87,6 +92,7 @@ class Historian:
 		#if self.debug:
 		print 'No valid child found for %s, defaulting' % commit.hash[:7]
 		commit.column = 2
+		commit.hdone = 1
 
 	def unroll_graph(self, debug):
 
@@ -99,8 +105,8 @@ class Historian:
 
 			if debug: visit.show()
 
-			if commit.done:
-				if debug: print '%s is done, skipping' % name[:7]
+			if commit.vdone:
+				if debug: print '%s is vdone, skipping' % name[:7]
 				continue
 
 			if debug: print 'pushing %s' % name[:7]
@@ -121,8 +127,8 @@ class Historian:
 					break
 
 				if debug: print 'Unrolling %s' % target[:7]
-				if commit.done:
-					if debug: print "%s is done, skipping" % commit.hash[:7]
+				if commit.vdone:
+					if debug: print "%s is vdone, skipping" % commit.hash[:7]
 					continue
 
 				# Horizontal order
@@ -132,11 +138,11 @@ class Historian:
 
 				if children > 1:
 					print '  Now pushing %d children' % children
-					visit.push_many(self.skip_if_done(commit.child))
+					visit.push_many(self.skip_if_vdone(commit.child))
 					continue
 				elif children > 0:
 					child = self.commit[commit.child[0]]
-					if child and not child.done:
+					if child and not child.vdone:
 						print '  Now pushing single child'
 						visit.push_one(commit.child[0])
 						continue
@@ -144,7 +150,7 @@ class Historian:
 				# Vertical order is now fixed
 				self.vertical.append(commit.hash)
 
-				commit.done = 1
+				commit.vdone = 1
 
 				print
 				self.print_graph(1)
@@ -153,10 +159,10 @@ class Historian:
 
 				if parents > 1:
 					print '  Now pushing %d parents' % parents
-					visit.push_many(self.skip_if_done(commit.parent))
+					visit.push_many(self.skip_if_vdone(commit.parent))
 				elif parents > 0:
 					parent = self.commit[commit.parent[0]]
-					if parent and not parent.done:
+					if parent and not parent.vdone:
 						print '  Now pushing single parent'
 						visit.push_one(commit.parent[0])
 				
@@ -167,11 +173,11 @@ class Historian:
 				print '%s' % name[:7]
 			print '  --'
 
-	def skip_if_done (self, names):
+	def skip_if_vdone (self, names):
 		result = []
 		for name in names:
 			target = self.commit[name]
-			if target.done: continue
+			if target.vdone: continue
 			result.append(name)
 		return result
 
