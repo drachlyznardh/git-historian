@@ -321,7 +321,7 @@ class Historian:
 	def print_help(self):
 		print "Usage: %s " % sys.argv[0]
 
-	def tell_the_story(self):
+	def get_options(self):
 
 		try:
 			optlist, args = getopt.getopt(sys.argv[1:], 'hvd',
@@ -354,8 +354,13 @@ class Historian:
 				self.print_version()
 				return
 
+	def tell_the_story(self):
+
+		self.get_options()
 		self.get_heads()
 		self.get_history()
+
+		return
 
 		self.width = 3 # Reserved columns
 
