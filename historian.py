@@ -70,28 +70,49 @@ class Historian:
 
 	def get_history(self):
 
+		# Looking for commit's and parents' hashes…
 		cmdlist = ['git', 'log', '--pretty="%H %P%d"']
+
+		# … starting from know heads only
 		cmdlist.extend(self.head)
 
+		# Invoking Git
 		git_history_dump = check_output(cmdlist)
 
+		# Parsing Git response
 		for line in git_history_dump.split('\n'):
+
+			# Skipping empty lines (the last one should be empty)
 			if len(line) == 0: continue
 
+			# Matching hashes and ref names
 			hashes_n_refs = re.compile(r'''"(.*) \((.*)\)"''').match(line)
+
+			# Match successulf, store values
 			if hashes_n_refs:
 				hashes = hashes_n_refs.group(1).split()
 				refs = hashes_n_refs.group(2).split(',')
+
+			# Match failed, no refs found, only hashes
 			else:
 				hashes = line[1:-1].split()
 				refs = ""
 
+			# New node to store info
 			current = node.Node()
+
 			if hashes:
+
+				# Store self
 				current.hash = hashes[0]
+
+				# Store parents
 				for i in hashes[1:]: current.parent.append(i)
+
+			# Store refs, if any
 			for i in refs: current.ref.append(i.strip())
 
+			# Store node in map
 			self.commit[current.hash] = current
 	
 	def insert (self, commit):
