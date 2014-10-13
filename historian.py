@@ -23,7 +23,7 @@ class Historian:
 		self.head = 0
 		self.commit = {}
 		self.vertical = []
-		self.max_column = -1
+		self.width = -1
 	
 	def get_history(self):
 		git_history_dump = check_output(["git", "log", '--pretty="%H %P%d"', "--all"])
@@ -48,23 +48,69 @@ class Historian:
 			if not self.head: self.head = current.hash
 			self.commit[current.hash] = current
 	
-	def vertical_unrolling(self, debug):
+	def insert (self, commit):
+
+		if commit.hdone: return
+
+		if commit.static:
+			#if self.debug:
+			print '%s is static, skipping' % commit.hash[:7]
+			commit.hdone = 1
+			return
+
+		for name in commit.child:
+			child = self.commit[name]
+			if child.static:
+				#if self.debug:
+				print 'child %s is static, skipping' % name[:7]
+				continue
+			
+			# Free cell under this one
+			if not child.bottom:
+				child.bottom = commit.hash
+				commit.top = name
+				commit.column = child.column
+				commit.hdone = 1
+				return
+
+			# Move sideways until there is an opening
+			while child.lower:
+				child.print_cell()
+				child = self.commit[child.lower]
+
+			child.print_cell()
+
+			# Free cell after this one
+			child.lower = commit.hash
+			commit.left = name
+			commit.column = child.column + 1
+			commit.hdone = 1
+			if commit.column > self.width:
+				self.width = commit.column
+			return
+		
+		#if self.debug:
+		print 'No valid child found for %s, defaulting' % commit.hash[:7]
+		commit.column = 2
+		commit.hdone = 1
+
+	def unroll_graph(self, debug):
 
 		if debug:
 			print '\n-- Vertical unrolling --'
 
-		visit = vertical.Order()
+		visit = horizontal.Order(0)
 
 		for name, commit in self.commit.items():
 
 			if debug: visit.show()
 
-			if commit.done:
-				if debug: print '%s is done, skipping' % name[:7]
+			if commit.vdone:
+				if debug: print '%s is vdone, skipping' % name[:7]
 				continue
 
 			if debug: print 'pushing %s' % name[:7]
-			visit.push(name)
+			visit.push_one(name)
 
 			while 1:
 
@@ -81,38 +127,44 @@ class Historian:
 					break
 
 				if debug: print 'Unrolling %s' % target[:7]
-				if commit.done:
-					if debug: print "%s is done, skipping" % commit.hash[:7]
+				if commit.vdone:
+					if debug: print "%s is vdone, skipping" % commit.hash[:7]
 					continue
 
-				if len(commit.child) > 1:
-					skip = 0
-					for i in reversed(commit.child):
-						child = self.commit[i]
-						if child and not child.done:
-							visit.cpush(i)
-							skip = 1
-					if skip: continue
-				elif len(commit.child) > 0:
+				# Horizontal order
+				self.insert(commit)
+
+				children = len(commit.child)
+
+				if children > 1:
+					print '  Now pushing %d children' % children
+					visit.push_many(self.skip_if_vdone(commit.child))
+					continue
+				elif children > 0:
 					child = self.commit[commit.child[0]]
-					if child and not child.done:
-						visit.cpush(commit.child[0])
+					if child and not child.vdone:
+						print '  Now pushing single child'
+						visit.push_one(commit.child[0])
 						continue
 				
+				# Vertical order is now fixed
 				self.vertical.append(commit.hash)
+				commit.vdone = 1
 
-				if len(commit.parent) > 1:
-					for i in commit.parent:
-						parent = self.commit[i]
-						if parent and not parent.done:
-							visit.ppush(i)
-				elif len(commit.parent) > 0:
+				#print
+				#self.print_graph(1)
+
+				parents = len(commit.parent)
+
+				if parents > 1:
+					print '  Now pushing %d parents' % parents
+					visit.push_many(self.skip_if_vdone(commit.parent))
+				elif parents > 0:
 					parent = self.commit[commit.parent[0]]
-					if parent and not parent.done:
-						visit.push(commit.parent[0])
+					if parent and not parent.vdone:
+						print '  Now pushing single parent'
+						visit.push_one(commit.parent[0])
 				
-				if debug: visit.show()
-				commit.done = 1
 
 		if debug:
 			print '  --'
@@ -205,12 +257,7 @@ class Historian:
 
 	def print_graph (self, debug):
 		
-		head = self.commit[self.head]
-		if not head:
-			print "Wut!"
-			return
-
-		t = layout.Layout(self.max_column, self.commit, debug)
+		t = layout.Layout(self.width, self.commit, debug)
 
 		cmdargs = 'git show -s --oneline --decorate --color'.split(' ')
 		#cmdargs.append(optargs)
@@ -292,12 +339,17 @@ class Historian:
 		if not self.commit:
 			self.get_history()
 
+		self.width = 3 # Reserved columns
+
 		for i in self.commit:
 			self.commit[i].know_your_parents(self.commit)
+			self.commit[i].know_your_column()
 
 		if self.debug:
 			print "%d commits in history" % len(self.commit)
-		self.vertical_unrolling(self.debug or vdebug)
-		self.horizontal_unroll(self.debug or hdebug)
-		self.print_graph(self.debug or ldebug)
+		self.unroll_graph(self.debug or vdebug)
+		#self.print_graph(self.debug or ldebug)
+		for name in self.vertical:
+			print self.commit[name].to_oneline()
 
+		print 'Width %d' % self.width
