@@ -21,6 +21,7 @@ class Historian:
 		self.debug = 0
 
 		self.head = []
+		self.head_by_name = {}
 		self.commit = {}
 		self.vertical = []
 		
@@ -49,8 +50,10 @@ class Historian:
 				print 'No match for (%s)' % line
 				continue
 			self.head.append(hash_n_ref.group(1))
+			self.head_by_name[hash_n_ref.group(2)] = hash_n_ref.group(1)
 
 		print self.head
+		print self.head_by_name
 
 	def get_history(self):
 
