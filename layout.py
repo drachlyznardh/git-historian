@@ -78,9 +78,6 @@ class Layout:
 			self.put_char(target.column, '•', padding, 0) # \u2022 \u2502
 			return
 
-		top = self.top[index]
-		bottom = self.bottom[index]
-
 		if index > target.column:
 
 			#for name in target.child:
