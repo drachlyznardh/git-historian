@@ -20,13 +20,34 @@ class Historian:
 		self.verbose = 0
 		self.debug = 0
 
-		self.head = 0
+		self.head = []
 		self.commit = {}
 		self.vertical = []
+		
 		self.width = -1
 	
+		self.max_column = -1
+
+	def get_heads (self):
+
+		git_output = check_output(['git', 'show-ref', '--heads'])
+
+		for line in git_output.split('\n'):
+			
+			if len(line) == 0: continue
+			
+			hash_n_ref = re.compile(r'''(.*) refs\/heads\/(.*)''').match(line)
+			if not hash_n_ref:
+				print 'No match for (%s)' % line
+				continue
+			self.head.append(hash_n_ref.group(1))
+
 	def get_history(self):
-		git_history_dump = check_output(["git", "log", '--pretty="%H %P%d"', "--all"])
+
+		cmdlist = ['git', 'log', '--pretty="%H %P%d"']
+		cmdlist.extend(self.head)
+
+		git_history_dump = check_output(cmdlist)
 
 		for line in git_history_dump.split('\n'):
 			if len(line) == 0: continue
@@ -101,12 +122,13 @@ class Historian:
 
 		visit = horizontal.Order(0)
 
-		for name, commit in self.commit.items():
+		for name in self.head:
 
 			if debug: visit.show()
 
-			if commit.vdone:
-				if debug: print '%s is vdone, skipping' % name[:7]
+			commit = self.commit[name]
+			if commit.done:
+				if debug: print '%s is done, skipping' % name[:7]
 				continue
 
 			if debug: print 'pushing %s' % name[:7]
@@ -177,11 +199,7 @@ class Historian:
 		if debug:
 			print '\n-- Horizontal unrolling --'
 
-		reserved = 2
-		order = horizontal.Order(self.commit, debug)
-
-		# Children must appear in their vertical order
-		for name in self.vertical:
+		for name in self.head:
 			commit = self.commit[name]
 			if commit: commit.child = []
 
@@ -336,8 +354,8 @@ class Historian:
 				self.print_version()
 				return
 
-		if not self.commit:
-			self.get_history()
+		self.get_heads()
+		self.get_history()
 
 		self.width = 3 # Reserved columns
 
