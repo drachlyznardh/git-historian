@@ -92,7 +92,6 @@ class Historian:
 				for i in hashes[1:]: current.parent.append(i)
 			for i in refs: current.ref.append(i.strip())
 
-			if not self.head: self.head = current.hash
 			self.commit[current.hash] = current
 	
 	def insert (self, commit):
