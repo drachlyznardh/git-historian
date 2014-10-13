@@ -156,18 +156,22 @@ class Historian:
 				print "Vertical unrolling of %s (%d, %d)" % (
 					name[:7], children, parents)
 
+			# deal with self: it this static?
+			if not commit.static:
+				order.insert(commit)
+				#if children == 1:
+				#	order.insert_on_child_column(commit, commit.child[0])
+				#else:
+				#	order.insert_from_left(commit)
+
+			continue
 			# deal with children: it this a split?
 			if children > 1:
 				for child in commit.child:
 					order.archive_commit(child)
-			# deal with self: it this static?
-			if not commit.static:
-				if children == 1:
-					order.insert_on_child_column(commit, commit.child[0])
-				else:
-					order.insert_from_left(commit)
-			# deal with parents: it this a merge?
 
+			# deal with parents: it this a merge?
+			continue
 			if parents > 1:
 				# selecting non-static parents
 				candidates = []
@@ -242,8 +246,8 @@ class Historian:
 			message = check_output(cmdargs).split('\n')
 
 			print '%s\x1b[m %s' % (t.draw_transition(), message[0])
-			#for i in message[1:-1]:
-			for i in message[1:]:
+			for i in message[1:-1]:
+			#for i in message[1:]:
 				print '%s\x1b[m %s' % (t.draw_padding(), i)
 
 	def print_version(self):

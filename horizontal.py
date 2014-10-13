@@ -1,44 +1,53 @@
 # Column module for Git-Historian
 
+class Node:
+
+	def __init__ (self, commit):
+		self.name = commit.hash
+		self.count = len(commit.parent)
+
+	def show (self):
+		return '(%s %d)' % (self.name[:7], self.count)
+
 class Column:
 
-	def __init__ (self, l, count):
-		self.content = l
-		self.index = -1
+	def __init__ (self, commit):
+		if commit: self.content = [Node(commit)]
+		else: self.content = []
+		#self.index = -1
 		self.available = 0
-		self.count = count
 	
 	def make_available (self):
 		self.content = []
-		self.index = -1
+		#self.index = -1
 		self.available = 1
-		self.count = 0
+		#self.count = 0
 
 	def top (self):
-		if len(self.content) == 0: return ''
+		if len(self.content) == 0: return None
 		return self.content[0]
 	
 	def bottom (self):
-		if len(self.content) == 0: return ''
+		if len(self.content) == 0: return None
 		return self.content[-1]
 
 	def last2bottom (self):
-		if len(self.content) < 2: return ''
+		if len(self.content) < 2: return None
 		return self.content[-2]
 
 	def append (self, commit):
 		self.available = 0
-		self.content.append(commit.hash)
-		self.count = len(commit.parent)
+		self.content.append(Node(commit))
+		#self.count = len(commit.parent)
 
 	def show (self):
 		if len(self.content) == 0:
-			print '%d [Avail]' % self.count
+			print '[Avail]'
 			return
 
-		line = '%d [%s' % (self.count, self.content[0][:7])
+		line = '[%s' % (self.content[0].show())
 		for i in self.content[1:]:
-			line += ', ' + i[:7]
+			line += ', ' + i.show()
 		line += ']'
 		print "%s" % line
 
@@ -73,14 +82,15 @@ class Order:
 			if column.available:
 				column.append(target)
 				return
-		self.active.append(Column([target.hash], len(target.parent)))
+		self.active.append(Column(target))#Column([target.hash], len(target.parent)))
 
 	def insert_on_child_column (self, target, child):
 		if self.at_bottom(target.hash): return
 		if self.debug:
 			print "Insert %s on child column %s" % (target.hash[:7], child[:7])
 		for column in self.active:
-			if column.bottom() == child:
+			bottom = column.bottom()
+			if bottom and bottom.name == child:
 				column.append(target)
 				return
 		print "Child %s in nowhere to be found!" % child
@@ -165,7 +175,66 @@ class Order:
 			if not child: continue # Missing commit: skip
 			if child.static: continue # Child on static column, not eligible
 
-	def insert (self, top, bottom):
+	def search_child (self, commit):
+		
+		for column in self.active:
+			for child in commit.child:
+				for element in column.content:
+					if child == element.name:
+						return [column, element]
+		return [None, None]
+
+	def push_column_up_to (self, column, node):
+		
+		cindex = 1 + self.active.index(column)
+		eindex = 1 + column.content.index(node)
+		
+		next_column = Column(None)
+		self.active.insert(cindex, next_column)
+		self.trim_one_available(cindex)
+
+		while len(column.content) > eindex:
+			next_column.content.append(column.content.pop(eindex))
+
+	def insert(self, commit):
+		
+		if self.debug: print 'Inserting %s' % commit.hash[:7]
+
+		[column, element] = self.search_child(commit)
+		if column and element:
+			print 'Found column %d and element %s' % (
+				self.active.index(column), element.name[:7])
+			if column.bottom() != element:
+				self.push_column_up_to(column, element)
+			column.append(commit)
+		else:
+			print 'Not found'
+			for column in self.active:
+				if column.available:
+					column.append(commit)
+					return
+			self.active.append(Column(commit))
+
+		self.show()
+
+		return
+		for child in reversed(commit.child):
+			self.archive_commit(child)
+
+		return
+
+		for column in self.active:
+			target = column.bottom()
+			if target and target.name in commit.child:
+				print 'Found a child %s of %s' % (
+					target.name[:7], commit.hash[:7])
+				continue
+			target = column.last2bottom()
+			if target and target.name in commit.child:
+				print 'Found a child %s of %s' % (
+					target.name[:7], commit.hash[:7])
+
+	def ye_old_insert (self, top, bottom):
 
 		if bottom.static:
 			self.insert_static(bottom)
@@ -238,10 +307,18 @@ class Order:
 		if self.debug:
 			print "Archiving column (%d)" % index
 		for e in column.content:
-			try: self.archived[index].append(e)
-			except: self.archived[index] = [e]
+			try: self.archived[index].append(e.name)
+			except: self.archived[index] = [e.name]
 		
 		column.make_available()
+
+	def do_archive_commit (self, column, target):
+		
+		if target.count > 1:
+			target.count -= 1
+			return
+
+
 
 	def archive_commit (self, target):
 	
@@ -249,21 +326,29 @@ class Order:
 			print "Archiving commit (%s)" % target[:7]
 		for column in self.active:
 			if column.available: continue
-			if column.bottom() == target:
-				if column.count == 1:
+			bottom = column.bottom()
+			if bottom and bottom.name == target:
+				if bottom.count == 1:
 					index = self.active.index(column)
 					self.archive_column(index, column)
 				else:
-					column.count -= 1
+					bottom.count -= 1
+			bottom = column.last2bottom()
+			if bottom and bottom.name == target:
+				if bottom.count == 1:
+					index = self.active.index(column)
+					self.archive_column(index, column)
+				else:
+					bottom.count -= 1
 
 	# When every commit has been assigned to a column, it's time to archive any
 	# current data
 	def flush_active (self):
 		
 		for index in range(len(self.active)):
-			for element in self.active[index].content:
-				try: self.archived[index].append(element)
-				except: self.archived[index] = [element]
+			for e in self.active[index].content:
+				try: self.archived[index].append(e.name)
+				except: self.archived[index] = [e.name]
 
 	def show (self):
 		print '{'
