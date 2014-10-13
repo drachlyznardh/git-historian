@@ -30,17 +30,27 @@ class Historian:
 
 	def get_heads (self):
 
-		git_output = check_output(['git', 'show-ref', '--heads'])
+		# Looking for heads, i.e. active branches
+		cmdlist = ['git', 'show-ref', '--heads']
+
+		# If names are specified, we look for them
+		if len(self.args): cmdlist.extend(self.args)
+
+		print cmdlist
+		git_output = check_output(cmdlist)
+		print git_output
 
 		for line in git_output.split('\n'):
 			
 			if len(line) == 0: continue
 			
-			hash_n_ref = re.compile(r'''(.*) refs\/heads\/(.*)''').match(line)
+			hash_n_ref = re.compile(r'''(.*) refs\/.*\/(.*)''').match(line)
 			if not hash_n_ref:
 				print 'No match for (%s)' % line
 				continue
 			self.head.append(hash_n_ref.group(1))
+
+		print self.head
 
 	def get_history(self):
 
@@ -353,6 +363,8 @@ class Historian:
 			elif key == '--version':
 				self.print_version()
 				return
+
+		self.args = args
 
 	def tell_the_story(self):
 
