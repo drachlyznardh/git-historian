@@ -68,7 +68,7 @@ class Historian:
 		if debug: print self.head
 		if debug: print self.head_by_name
 
-	def get_history(self):
+	def get_history(self, debug):
 
 		# Looking for commit's and parents' hashes…
 		cmdlist = ['git', 'log', '--pretty="%H %P%d"']
@@ -76,8 +76,14 @@ class Historian:
 		# … starting from know heads only
 		cmdlist.extend(self.head)
 
+		# Print the request
+		if debug: print cmdlist
+
 		# Invoking Git
 		git_history_dump = check_output(cmdlist)
+
+		# Print the output
+		if debug: print git_history_dump
 
 		# Parsing Git response
 		for line in git_history_dump.split('\n'):
@@ -114,7 +120,10 @@ class Historian:
 
 			# Store node in map
 			self.commit[current.hash] = current
-	
+
+		# Showing results
+		if debug: print self.commit
+
 	def insert (self, commit):
 
 		if commit.hdone: return
@@ -406,7 +415,7 @@ class Historian:
 
 		self.get_options()
 		self.get_heads(1)
-		self.get_history()
+		self.get_history(1)
 
 		return
 
