@@ -37,21 +37,34 @@ class Historian:
 		# If names are specified, we look for them
 		if len(self.args): cmdlist.extend(self.args)
 
+		# Print the command line request
 		if debug: print cmdlist
+
+		# Invoke Git
 		git_output = check_output(cmdlist)
+
+		# Print the output
 		if debug: print git_output
 
+		# Parsing Git response
 		for line in git_output.split('\n'):
 			
+			# Skipping empty lines (the last one should be empty)
 			if len(line) == 0: continue
 			
+			# Matching hash and name
 			hash_n_ref = re.compile(r'''(.*) refs\/.*\/(.*)''').match(line)
+
+			# Broken ref: display message and skip line
 			if not hash_n_ref:
 				print 'No match for (%s)' % line
 				continue
+
+			# Save result in order and by name
 			self.head.append(hash_n_ref.group(1))
 			self.head_by_name[hash_n_ref.group(2)] = hash_n_ref.group(1)
 
+		# Showing results
 		if debug: print self.head
 		if debug: print self.head_by_name
 
