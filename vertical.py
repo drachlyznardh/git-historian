@@ -1,8 +1,8 @@
 # Vertical Order module for Git-Historian
 
 class Order:
-	def __init__ (self, first):
-		self.stack = [[first]]
+	def __init__ (self):
+		self.stack = [[]]
 
 	def trim(self):
 		while len(self.stack) > 0 and len(self.stack[0]) == 0:
