@@ -207,6 +207,14 @@ class Historian:
 
 				commit.done = 1
 
+	def column_unroll (self, debug):
+
+		for name in self.vertical:
+
+			print '--'
+			for i in self.vertical:
+				print self.commit[i].to_oneline()
+
 	def insert (self, commit):
 
 		if commit.hdone: return
@@ -503,9 +511,7 @@ class Historian:
 		self.bind_children(0)
 		self.clear()
 		self.row_unroll(0)
-
-		for e in self.vertical:
-			print e[:7]
+		self.column_unroll(1)
 
 		return
 
