@@ -136,7 +136,7 @@ class Historian:
 
 			if debug: print '  Head %s' % head[:7]
 
-			visit.push([head])
+			visit.push(head)
 
 			while 1:
 
