@@ -126,6 +126,16 @@ class Historian:
 		# Showing results
 		if debug: print self.commit
 
+	def skip_if_done (self, names):
+
+		result = []
+
+		for name in names:
+			if not self.commit[name].done:
+				result.append(name)
+
+		return result
+
 	def bind_children (self, debug):
 
 		if debug: print '  -- Binding Children --'
