@@ -150,7 +150,12 @@ class Historian:
 				if commit.done:
 					if debug: print '  %s is done, skipping…' % name[:7]
 
-				visit.push(commit.parent)
+				valid = []
+				for i in commit.parent:
+					if not self.commit[i].done:
+						valid.append(i)
+				visit.push(valid)
+
 				commit.done = 1
 
 	def insert (self, commit):
