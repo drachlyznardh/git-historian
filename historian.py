@@ -414,8 +414,12 @@ class Historian:
 	def tell_the_story(self):
 
 		self.get_options()
-		self.get_heads(1)
-		self.get_history(1)
+		self.get_heads(0)
+		self.get_history(0)
+
+		l = self.commit.keys()
+		l.sort()
+		for e in l: print e[:7]
 
 		return
 
