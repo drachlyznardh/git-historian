@@ -143,7 +143,7 @@ class Historian:
 
 	def bind_children (self, debug):
 
-		if debug: print '  -- Binding Children --'
+		if debug: print '-- Binding Children --'
 
 		visit = order.LeftmostFirst()
 
@@ -172,6 +172,10 @@ class Historian:
 				visit.push(self.skip_if_done(commit.parent))
 
 				commit.done = 1
+
+	def row_unroll (self, debug):
+
+		if debug: print '-- Row Unroll --'
 
 	def insert (self, commit):
 
@@ -472,6 +476,7 @@ class Historian:
 
 		self.bind_children(1)
 		self.clear()
+		self.row_unroll(1)
 
 		return
 
