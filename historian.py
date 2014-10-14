@@ -130,6 +130,12 @@ class Historian:
 
 		if debug: print '  -- Binding Children --'
 
+		visit = order.LeftmostFirst()
+
+		for head in self.head:
+
+			if debug: print '  Head %s' % head[:7]
+
 	def insert (self, commit):
 
 		if commit.hdone: return
