@@ -167,7 +167,7 @@ class Historian:
 					continue
 
 				for i in commit.parent:
-					self.commit[i].child.append(name)
+					self.commit[i].add_child(name)
 
 				visit.push(self.skip_if_done(commit.parent))
 
