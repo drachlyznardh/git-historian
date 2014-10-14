@@ -7,6 +7,8 @@ import sys
 import getopt
 
 import node
+import order
+
 import vertical
 import horizontal
 
@@ -123,6 +125,10 @@ class Historian:
 
 		# Showing results
 		if debug: print self.commit
+
+	def bind_children (self, debug):
+
+		if debug: print '  -- Binding Children --'
 
 	def insert (self, commit):
 
@@ -420,6 +426,8 @@ class Historian:
 		l = self.commit.keys()
 		l.sort()
 		for e in l: print e[:7]
+
+		self.bind_children(1)
 
 		return
 
