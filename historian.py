@@ -177,6 +177,25 @@ class Historian:
 
 		if debug: print '-- Row Unroll --'
 
+		visit = order.UppermostFirst()
+
+		for head in self.head:
+
+			if debug: print '  Head %s' % head[:7]
+
+			visit.push(head)
+
+			while visit.has_more():
+				
+				name = visit.pop()
+				commit = self.commit[name]
+
+				if debug: print '  Visiting %s' % name[:7]
+
+				if commit.done:
+					if debug: print '  %s is done, skipping…' % name[:7]
+					continue
+
 	def insert (self, commit):
 
 		if commit.hdone: return
