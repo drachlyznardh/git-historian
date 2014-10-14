@@ -147,7 +147,7 @@ class Historian:
 
 				if debug: print '  Visiting %s' % name[:7]
 
-
+				visit.push(commit.parent)
 
 	def insert (self, commit):
 
