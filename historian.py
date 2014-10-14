@@ -196,6 +196,10 @@ class Historian:
 					if debug: print '  %s is done, skipping…' % name[:7]
 					continue
 
+				visit.push(self.skip_if_done(commit.parent))
+
+				commit.done = 1
+
 	def insert (self, commit):
 
 		if commit.hdone: return
