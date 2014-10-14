@@ -136,6 +136,19 @@ class Historian:
 
 			if debug: print '  Head %s' % head[:7]
 
+			visit.push([head])
+
+			while 1:
+
+				if visit.is_empty(): break
+
+				name = visit.pop()
+				commit = self.commit[name]
+
+				if debug: print '  Visiting %s' % name[:7]
+
+
+
 	def insert (self, commit):
 
 		if commit.hdone: return
