@@ -118,6 +118,8 @@ class Historian:
 				# Store parents
 				for i in hashes[1:]: current.parent.append(i)
 
+			current.missing = len(current.parent)
+
 			# Store refs, if any
 			for i in refs: current.ref.append(i.strip())
 
@@ -221,12 +223,12 @@ class Historian:
 			for i in xrange(self.width):
 				if self.horizon[i] in commit.child:
 					current = self.commit[self.horizon[i]]
-					if current.seen == 1:
+					if current.missing == 1:
 						commit.column = i
 						assigned = 1
 						self.horizon[i] = name
 						break
-					current.seen -= 1
+					current.missing -= 1
 
 			if assigned: continue
 
@@ -237,7 +239,8 @@ class Historian:
 			print '--'
 			message = ''
 			for i in xrange(self.width):
-				message += '%s, ' % self.horizon[i][:7]
+				target = self.horizon[i]
+				message += '%s (%d), ' % (target[:7], self.commit[target].missing)
 			print message
 			print '--'
 			for i in self.vertical:
