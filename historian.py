@@ -207,10 +207,6 @@ class Historian:
 
 				commit.done = 1
 
-		print '--'
-		for e in self.vertical:
-			print e[:7]
-
 	def insert (self, commit):
 
 		if commit.hdone: return
@@ -504,13 +500,12 @@ class Historian:
 		self.get_heads(0)
 		self.get_history(0)
 
-		l = self.commit.keys()
-		l.sort()
-		for e in l: print e[:7]
-
-		self.bind_children(1)
+		self.bind_children(0)
 		self.clear()
-		self.row_unroll(1)
+		self.row_unroll(0)
+
+		for e in self.vertical:
+			print e[:7]
 
 		return
 
