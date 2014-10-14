@@ -231,6 +231,11 @@ class Historian:
 			commit.column = self.width
 
 			print '--'
+			message = ''
+			for i in xrange(self.width):
+				message += '%s, ' % self.horizon[i][:7]
+			print message
+			print '--'
 			for i in self.vertical:
 				print self.commit[i].to_oneline()
 
