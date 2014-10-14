@@ -136,6 +136,11 @@ class Historian:
 
 		return result
 
+	def clear (self):
+
+		for commit in self.commit.values():
+			commit.done = 0
+
 	def bind_children (self, debug):
 
 		if debug: print '  -- Binding Children --'
@@ -466,6 +471,7 @@ class Historian:
 		for e in l: print e[:7]
 
 		self.bind_children(1)
+		self.clear()
 
 		return
 
