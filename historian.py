@@ -161,11 +161,7 @@ class Historian:
 					if debug: print '  %s is done, skipping…' % name[:7]
 					continue
 
-				valid = []
-				for i in commit.parent:
-					if not self.commit[i].done:
-						valid.append(i)
-				visit.push(valid)
+				visit.push(self.skip_if_done(commit.parent))
 
 				commit.done = 1
 
