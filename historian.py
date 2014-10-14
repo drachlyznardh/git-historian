@@ -161,6 +161,9 @@ class Historian:
 					if debug: print '  %s is done, skipping…' % name[:7]
 					continue
 
+				for i in commit.parent:
+					self.commit[i].child.append(name)
+
 				visit.push(self.skip_if_done(commit.parent))
 
 				commit.done = 1
