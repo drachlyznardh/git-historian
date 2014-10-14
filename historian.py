@@ -196,9 +196,15 @@ class Historian:
 					if debug: print '  %s is done, skipping…' % name[:7]
 					continue
 
+				self.vertical.append(name)
+
 				visit.push(self.skip_if_done(commit.parent))
 
 				commit.done = 1
+
+		print '--'
+		for e in self.vertical:
+			print e[:7]
 
 	def insert (self, commit):
 
