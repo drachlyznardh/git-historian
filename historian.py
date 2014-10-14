@@ -159,6 +159,7 @@ class Historian:
 
 				if commit.done:
 					if debug: print '  %s is done, skipping…' % name[:7]
+					continue
 
 				valid = []
 				for i in commit.parent:
