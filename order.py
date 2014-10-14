@@ -35,7 +35,7 @@ class UppermostFirst:
 
 		self.content = []
 
-	def push (self, arg):
+	def push_children (self, arg):
 
 		if isinstance(arg, basestring):
 			self.content.insert(0, arg)
@@ -48,6 +48,19 @@ class UppermostFirst:
 
 		for e in reversed(arg):
 			self.content.insert(0, e)
+
+	def push_parents (self, arg):
+
+		if isinstance(arg, basestring):
+			self.content.append(arg)
+			return
+
+		if not isinstance(arg, list):
+			print 'WTF is %s?' % arg
+
+		if len(arg) == 0: return
+
+		self.content.extend(arg)
 
 	def has_more (self):
 

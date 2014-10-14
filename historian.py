@@ -183,7 +183,7 @@ class Historian:
 
 			if debug: print '  Head %s' % head[:7]
 
-			visit.push(head)
+			visit.push_children(head)
 
 			while visit.has_more():
 				
@@ -198,12 +198,12 @@ class Historian:
 
 				children = self.skip_if_done(commit.child)
 				if len(children):
-					visit.push(children)
+					visit.push_children(children)
 					continue
 
 				self.vertical.append(name)
 
-				visit.push(self.skip_if_done(commit.parent))
+				visit.push_parents(self.skip_if_done(commit.parent))
 
 				commit.done = 1
 
