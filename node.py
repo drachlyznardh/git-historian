@@ -14,6 +14,7 @@ class Node:
 		self.nth_child = 0
 
 		# Visit marks
+		self.done = 0
 		self.vdone = 0
 		self.hdone = 0
 
