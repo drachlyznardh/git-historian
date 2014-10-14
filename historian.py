@@ -220,9 +220,13 @@ class Historian:
 
 			for i in xrange(self.width):
 				if self.horizon[i] in commit.child:
-					commit.column = i
-					assigned = 1
-					break
+					current = self.commit[self.horizon[i]]
+					if current.seen == 1:
+						commit.column = i
+						assigned = 1
+						self.horizon[i] = name
+						break
+					current.seen -= 1
 
 			if assigned: continue
 
