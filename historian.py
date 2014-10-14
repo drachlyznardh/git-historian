@@ -26,6 +26,7 @@ class Historian:
 		self.head_by_name = {}
 		self.commit = {}
 		self.vertical = []
+		self.horizonal = {}
 		
 		self.width = -1
 	
@@ -209,7 +210,25 @@ class Historian:
 
 	def column_unroll (self, debug):
 
+		self.horizon = {}
+		self.width = -1
+
 		for name in self.vertical:
+
+			assigned = 0
+			commit = self.commit[name]
+
+			for i in xrange(self.width):
+				if self.horizon[i] in commit.child:
+					commit.column = i
+					assigned = 1
+					break
+
+			if assigned: continue
+
+			self.width += 1
+			self.horizon[self.width] = name
+			commit.column = self.width
 
 			print '--'
 			for i in self.vertical:
