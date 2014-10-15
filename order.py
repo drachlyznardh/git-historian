@@ -87,6 +87,21 @@ class DirectedFIFO:
 
 		return len(self.content)
 
+	def push_children (self, arg, direction):
+
+		if isinstance(arg, basestring):
+			self.content.append((arg, direction))
+			return
+
+		if not isinstance(arg, list):
+			print 'WTF is %s?' % arg
+			return
+
+		if len(arg) == 0: return
+
+		for e in arg:
+			self.content.append((e, direction))
+
 	def push_parents (self, arg, direction):
 
 		if isinstance(arg, basestring):
