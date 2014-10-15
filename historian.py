@@ -255,16 +255,6 @@ class Historian:
 			previous = current
 			commit.done = 1
 
-			#print '--'
-			#message = ''
-			#for i in xrange(self.width):
-			#	target = self.horizon[i]
-			#	message += '%s (%d), ' % (target[:7], self.commit[target].missing)
-			#print message
-			#print '--'
-			#for i in self.vertical:
-			#	print self.commit[i].to_oneline()
-
 	def insert (self, commit):
 
 		if commit.hdone: return
