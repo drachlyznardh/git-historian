@@ -215,10 +215,37 @@ class Historian:
 		self.horizon = {}
 		self.width = -1
 
+		upper = order.LeftmostFirst()
+		lower = order.LeftmostFirst()
+
+		# The first target head will take the first column
+		upper.push(self.head[0])
+		lower.push(self.head[0])
+
 		# Vertical order is not good
 		# Need a visit
 		# Heads in order ???
 		# Parents, in order, once each
+
+		while upper.has_more() or lower.has_more():
+
+			if upper.has_more():
+				name = upper.pop()
+				commit = self.commit[name]
+
+				print '  U Visiting %s' % name[:7]
+				upper.push(self.skip_if_done(commit.parent))
+				commit.done = 1
+
+			if lower.has_more():
+				name = lower.pop()
+				commit = self.commit[name]
+
+				print '  L Visiting %s' % name[:7]
+				lower.push(self.skip_if_done(commit.child))
+				commit.done = 1
+
+		return
 
 		for name in self.vertical:
 

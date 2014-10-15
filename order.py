@@ -24,6 +24,10 @@ class LeftmostFirst:
 
 		return len(self.content) == 0
 
+	def has_more (self):
+
+		return len(self.content)
+
 	def pop (self):
 
 		try: return self.content.pop(0)
