@@ -574,6 +574,7 @@ class Historian:
 		self.bind_children(0)
 		self.clear()
 		self.row_unroll(0)
+		self.clear()
 		self.column_unroll(1)
 
 		return
