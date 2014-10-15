@@ -230,6 +230,13 @@ class Historian:
 		# Heads in order ???
 		# Parents, in order, once each
 
+		# I need to try the bouncing visit, as I did in ye old days…
+
+		# Start from head[0], explore down with depth-first visit
+		# Whenever a non-done child is found, pause visit and jump up following
+		# the leftmost children until an head is found, then restart as
+		# previously, descending…
+
 		previous = len(self.vertical)
 		current = -1
 
