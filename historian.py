@@ -230,67 +230,40 @@ class Historian:
 		# Heads in order ???
 		# Parents, in order, once each
 
+		previous = len(self.vertical)
+		current = -1
+
 		while visit.has_more():
 
 			[name, direction] = visit.pop()
 			commit = self.commit[name]
 
-			print '  Visiting %s' % name[:7]
+			if commit.done: continue
 
-		return
+			print '  Visiting %s, %d' % (name[:7], direction)
 
-		while upper.has_more() or lower.has_more():
+			visit.push(self.skip_if_done(commit.child), 1)
+			visit.push(self.skip_if_done(commit.parent), 0)
 
-			if upper.has_more():
-				name = upper.pop()
-				commit = self.commit[name]
+			current = self.vertical.index(name)
+			print 'Current %d, previous %d' % (current, previous)
+			if previous > current:
+				self.width += 1
 
-				print '  U Visiting %s' % name[:7]
-				upper.push(self.skip_if_done(commit.child))
-				lower.push(self.skip_if_done(commit.parent))
-				commit.done = 1
-
-			if lower.has_more():
-				name = lower.pop()
-				commit = self.commit[name]
-
-				print '  L Visiting %s' % name[:7]
-				upper.push(self.skip_if_done(commit.child))
-				lower.push(self.skip_if_done(commit.parent))
-				commit.done = 1
-
-		return
-
-		for name in self.vertical:
-
-			assigned = 0
-			commit = self.commit[name]
-
-			for i in xrange(self.width):
-				if self.horizon[i] in commit.child:
-					current = self.commit[self.horizon[i]]
-					if current.missing == 1:
-						commit.column = i
-						assigned = 1
-						self.horizon[i] = name
-						break
-					current.missing -= 1
-
-			if assigned: continue
-
-			self.width += 1
-			self.horizon[self.width] = name
 			commit.column = self.width
+			print 'commit %s in column %d' % (name[:7], commit.column)
+			previous = current
+			commit.done = 1
 
-			print '--'
-			message = ''
-			for i in xrange(self.width):
-				target = self.horizon[i]
-				message += '%s (%d), ' % (target[:7], self.commit[target].missing)
-			print message
-			print '--'
-			for i in self.vertical:
-				print self.commit[i].to_oneline()
+			#print '--'
+			#message = ''
+			#for i in xrange(self.width):
+			#	target = self.horizon[i]
+			#	message += '%s (%d), ' % (target[:7], self.commit[target].missing)
+			#print message
+			#print '--'
+			#for i in self.vertical:
+			#	print self.commit[i].to_oneline()
 
 	def insert (self, commit):
 
@@ -590,6 +563,10 @@ class Historian:
 		self.row_unroll(0)
 		self.clear()
 		self.column_unroll(1)
+
+		print '--'
+		for i in self.vertical:
+			print self.commit[i].to_oneline()
 
 		return
 
