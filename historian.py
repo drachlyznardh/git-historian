@@ -215,6 +215,9 @@ class Historian:
 		self.horizon = {}
 		self.width = -1
 
+		visit = order.DirectedFIFO()
+		visit.push(self.head[0], 0)
+
 		upper = order.LeftmostFirst()
 		lower = order.LeftmostFirst()
 
@@ -226,6 +229,15 @@ class Historian:
 		# Need a visit
 		# Heads in order ???
 		# Parents, in order, once each
+
+		while visit.has_more():
+
+			[name, direction] = visit.pop()
+			commit = self.commit[name]
+
+			print '  Visiting %s' % name[:7]
+
+		return
 
 		while upper.has_more() or lower.has_more():
 
