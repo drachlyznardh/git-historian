@@ -234,7 +234,8 @@ class Historian:
 				commit = self.commit[name]
 
 				print '  U Visiting %s' % name[:7]
-				upper.push(self.skip_if_done(commit.parent))
+				upper.push(self.skip_if_done(commit.child))
+				lower.push(self.skip_if_done(commit.parent))
 				commit.done = 1
 
 			if lower.has_more():
@@ -242,7 +243,8 @@ class Historian:
 				commit = self.commit[name]
 
 				print '  L Visiting %s' % name[:7]
-				lower.push(self.skip_if_done(commit.child))
+				upper.push(self.skip_if_done(commit.child))
+				lower.push(self.skip_if_done(commit.parent))
 				commit.done = 1
 
 		return
