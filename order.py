@@ -87,7 +87,7 @@ class DirectedFIFO:
 
 		return len(self.content)
 
-	def push (self, arg, direction):
+	def push_parents (self, arg, direction):
 
 		if isinstance(arg, basestring):
 			self.content.append((arg, direction))

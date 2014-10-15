@@ -216,7 +216,7 @@ class Historian:
 		self.width = -1
 
 		visit = order.DirectedFIFO()
-		visit.push(self.head[0], 0)
+		visit.push_parents(self.head[0], 0)
 
 		upper = order.LeftmostFirst()
 		lower = order.LeftmostFirst()
@@ -242,8 +242,8 @@ class Historian:
 
 			print '  Visiting %s, %d' % (name[:7], direction)
 
-			visit.push(self.skip_if_done(commit.child), 1)
-			visit.push(self.skip_if_done(commit.parent), 0)
+			visit.push_parents(self.skip_if_done(commit.parent), 0)
+			visit.push_parents(self.skip_if_done(commit.child), 1)
 
 			current = self.vertical.index(name)
 			print 'Current %d, previous %d' % (current, previous)
