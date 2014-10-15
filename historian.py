@@ -246,12 +246,12 @@ class Historian:
 			visit.push_parents(self.skip_if_done(commit.child), 1)
 
 			current = self.vertical.index(name)
-			print 'Current %d, previous %d' % (current, previous)
+			#print 'Current %d, previous %d' % (current, previous)
 			if previous > current:
 				self.width += 1
 
 			commit.column = self.width
-			print 'commit %s in column %d' % (name[:7], commit.column)
+			#print 'commit %s in column %d' % (name[:7], commit.column)
 			previous = current
 			commit.done = 1
 
