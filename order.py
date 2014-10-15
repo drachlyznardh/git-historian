@@ -14,6 +14,7 @@ class LeftmostFirst:
 
 		if not isinstance(arg, list):
 			print 'WTF is %s?' % arg
+			return
 
 		if len(arg) == 0: return
 
@@ -47,6 +48,7 @@ class UppermostFirst:
 
 		if not isinstance(arg, list):
 			print 'WTF is %s?' % arg
+			return
 
 		if len(arg) == 0: return
 
