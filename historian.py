@@ -215,6 +215,11 @@ class Historian:
 		self.horizon = {}
 		self.width = -1
 
+		# Vertical order is not good
+		# Need a visit
+		# Heads in order ???
+		# Parents, in order, once each
+
 		for name in self.vertical:
 
 			assigned = 0
