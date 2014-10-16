@@ -2,6 +2,7 @@
 # -*- encoding: utf-8 -*-
 
 from subprocess import check_output
+from subprocess import CalledProcessError
 import re
 import sys
 import getopt
@@ -44,7 +45,11 @@ class Historian:
 		if debug: print cmdlist
 
 		# Invoke Git
-		git_output = check_output(cmdlist)
+		try: git_output = check_output(cmdlist)
+		except CalledProcessError as error:
+			print 'Command `%s` returned %d' % (' '.join(cmdlist), error.returncode)
+			sys.exit(1)
+			return
 
 		# Print the output
 		if debug: print git_output
@@ -583,7 +588,7 @@ class Historian:
 	def tell_the_story(self):
 
 		self.get_options()
-		self.get_heads(1)
+		self.get_heads(0)
 		self.get_history(0)
 
 		self.bind_children(0)
