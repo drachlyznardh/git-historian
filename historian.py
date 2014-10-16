@@ -161,9 +161,10 @@ class Historian:
 			result = max(result, target.column)
 			name = target.top
 
-	def jump_to_head (self, names):
+	def jump_to_head (self, arg):
 
 		result = []
+		names = list(arg)
 
 		while len(names):
 			name = names.pop(0)
