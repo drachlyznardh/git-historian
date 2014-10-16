@@ -146,8 +146,15 @@ class Historian:
 	def select_column (self, commit):
 
 		print 'Selecting column for %s' % commit.hash[:7]
+		print 'Looking for any of [%s]' % ', '.join(commit.child)
+		print commit.child
 
 		if not commit.top:
+			return self.width
+
+		if len(commit.child) == 0:
+			print 'No children to look for'
+			self.width += 1
 			return self.width
 
 		result = -2
@@ -155,10 +162,15 @@ class Historian:
 		while name:
 
 			print '  Rising to %s' % name[:7]
-			if name in commit.child: return result
+			if name in commit.child:
+				print result
+				print name
+				return result
 
 			target = self.commit[name]
+			print '%d, %d' % (result, target.column)
 			result = max(result, target.column)
+			print '%d' % result
 			name = target.top
 
 	def jump_to_head (self, arg):
@@ -265,14 +277,14 @@ class Historian:
 
 	def column_unroll (self, debug):
 
-		self.horizon = {}
+		#self.horizon = {}
 		self.width = -1
 
 		visit = order.LeftmostFirst()
 		visit.push(self.head[0])
 
-		previous = len(self.vertical)
-		current = -1
+		#previous = len(self.vertical)
+		#current = -1
 
 		while visit.has_more():
 
@@ -282,18 +294,27 @@ class Historian:
 			if commit.done: continue
 
 			print '  Visiting %s' % name[:7]
+			print commit.child
 
 			visit.push(self.jump_to_head(commit.child))
 			visit.push(self.skip_if_done(commit.parent))
 
+			print commit.child
+			print self.commit[name].child
+			'''
 			current = self.vertical.index(name)
 			#print 'Current %d, previous %d' % (current, previous)
 			if previous > current:
 				self.width += 1
 
-			commit.column = self.width
-			#print 'commit %s in column %d' % (name[:7], commit.column)
-			previous = current
+			if len(commit.
+			'''
+
+			commit.column = self.select_column(commit)
+			print '--'
+			print commit.column
+			print name
+			print '  %s in column (%d)' % (name[:7], commit.column)
 			commit.done = 1
 
 	def insert (self, commit):
