@@ -230,6 +230,7 @@ class Historian:
 		if debug: print '-- Row Unroll --'
 
 		visit = order.UppermostFirst()
+		current = None
 
 		for head in self.head:
 
@@ -253,6 +254,8 @@ class Historian:
 					visit.push_children(children)
 					continue
 
+				if current: commit.top = current
+				current = name
 				self.vertical.append(name)
 
 				visit.push_parents(self.skip_if_done(commit.parent))
