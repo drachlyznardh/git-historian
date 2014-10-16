@@ -256,8 +256,8 @@ class Historian:
 			#print '  Visiting %s, %d' % (name[:7], direction)
 			print '  Visiting %s' % name[:7]
 
-			visit.push(self.skip_if_done(commit.parent))#, 0)
 			visit.push(self.skip_if_done(commit.child))#, 1)
+			visit.push(self.skip_if_done(commit.parent))#, 0)
 
 			current = self.vertical.index(name)
 			#print 'Current %d, previous %d' % (current, previous)
