@@ -15,6 +15,7 @@ class Node:
 
 		# Visit marks
 		self.done = 0
+		self.mark = 0
 		self.missing = 0
 		self.vdone = 0
 		self.hdone = 0
