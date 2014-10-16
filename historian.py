@@ -215,8 +215,9 @@ class Historian:
 		self.horizon = {}
 		self.width = -1
 
-		visit = order.DirectedFIFO()
-		visit.push_parents(self.head[0], 0)
+		visit = order.LeftmostFirst()#DirectedFIFO()
+		#visit.push_parents(self.head[0], 0)
+		visit.push(self.head[0])
 
 		upper = order.LeftmostFirst()
 		lower = order.LeftmostFirst()
@@ -246,15 +247,17 @@ class Historian:
 
 		while visit.has_more():
 
-			[name, direction] = visit.pop()
+			#[name, direction] = visit.pop()
+			name = visit.pop()
 			commit = self.commit[name]
 
 			if commit.done: continue
 
-			print '  Visiting %s, %d' % (name[:7], direction)
+			#print '  Visiting %s, %d' % (name[:7], direction)
+			print '  Visiting %s' % name[:7]
 
-			visit.push_parents(self.skip_if_done(commit.parent), 0)
-			visit.push_parents(self.skip_if_done(commit.child), 1)
+			visit.push(self.skip_if_done(commit.parent))#, 0)
+			visit.push(self.skip_if_done(commit.child))#, 1)
 
 			current = self.vertical.index(name)
 			#print 'Current %d, previous %d' % (current, previous)
