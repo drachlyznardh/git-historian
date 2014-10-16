@@ -143,6 +143,24 @@ class Historian:
 		# Showing results
 		if debug: print self.commit
 
+	def select_column (self, commit):
+
+		print 'Selecting column for %s' % commit.hash[:7]
+
+		if not commit.top:
+			return self.width
+
+		result = -2
+		name = commit.top
+		while name:
+
+			print '  Rising to %s' % name[:7]
+			if name in commit.child: return result
+
+			target = self.commit[name]
+			result = max(result, target.column)
+			name = target.top
+
 	def jump_to_head (self, names):
 
 		result = []
