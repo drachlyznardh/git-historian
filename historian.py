@@ -237,6 +237,10 @@ class Historian:
 		# the leftmost children until an head is found, then restart as
 		# previously, descending…
 
+		# Added heads must be marked, in order to be added just once (at their
+		# top call), but they are pushed as normal.
+		# for e in child, parent => prepend to visit
+
 		previous = len(self.vertical)
 		current = -1
 
