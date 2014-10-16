@@ -129,6 +129,20 @@ class Historian:
 		# Showing results
 		if debug: print self.commit
 
+	def jump_to_head (self, names):
+
+		while len(names):
+			name = names.pop(0)
+			commit = self.commit[name]
+			if commit.done: continue
+			if commit.mark: continue
+			if len(commit.child) == 0:
+				commit.mark = 1
+				return name
+			names = commit.child
+
+		return []
+
 	def skip_if_done (self, names):
 
 		result = []
@@ -256,7 +270,8 @@ class Historian:
 			#print '  Visiting %s, %d' % (name[:7], direction)
 			print '  Visiting %s' % name[:7]
 
-			visit.push(self.skip_if_done(commit.child))#, 1)
+			#visit.push(self.skip_if_done(commit.child))#, 1)
+			visit.push(self.jump_to_head(commit.child))
 			visit.push(self.skip_if_done(commit.parent))#, 0)
 
 			current = self.vertical.index(name)
