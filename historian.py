@@ -2,11 +2,14 @@
 # -*- encoding: utf-8 -*-
 
 from subprocess import check_output
+from subprocess import CalledProcessError
 import re
 import sys
 import getopt
 
 import node
+import order
+
 import vertical
 import horizontal
 
@@ -21,54 +24,280 @@ class Historian:
 		self.debug = 0
 
 		self.head = []
+		self.head_by_name = {}
 		self.commit = {}
 		self.vertical = []
+		self.horizonal = {}
 		
 		self.width = -1
 	
 		self.max_column = -1
 
-	def get_heads (self):
+	def get_heads_by_name (self, name, debug):
 
-		git_output = check_output(['git', 'show-ref', '--heads'])
+		# Looking for heads, i.e. active branches
+		cmdlist = ['git', 'show-ref', '--heads']
 
+		# If names are specified, we look for them
+		if name: cmdlist.append(name)
+
+		# Print the command line request
+		if debug: print cmdlist
+
+		# Invoke Git
+		try: git_output = check_output(cmdlist)
+		except CalledProcessError as error:
+			print 'Command `%s` returned %d' % (' '.join(cmdlist), error.returncode)
+			sys.exit(1)
+			return
+
+		# Print the output
+		if debug: print git_output
+
+		# Parsing Git response
 		for line in git_output.split('\n'):
 			
+			# Skipping empty lines (the last one should be empty)
 			if len(line) == 0: continue
 			
-			hash_n_ref = re.compile(r'''(.*) refs\/heads\/(.*)''').match(line)
+			# Matching hash and name
+			hash_n_ref = re.compile(r'''(.*) refs\/.*\/(.*)''').match(line)
+
+			# Broken ref: display message and skip line
 			if not hash_n_ref:
 				print 'No match for (%s)' % line
 				continue
+
+			# Save result in order and by name
 			self.head.append(hash_n_ref.group(1))
+			self.head_by_name[hash_n_ref.group(2)] = hash_n_ref.group(1)
 
-	def get_history(self):
+		# Showing results
+		if debug: print self.head
+		if debug: print self.head_by_name
 
+	def get_heads (self, debug):
+
+		if len(self.args) == 0:
+			self.get_heads_by_name(None, debug)
+			return
+
+		for name in self.args:
+			self.get_heads_by_name(name, debug)
+
+	def get_history(self, debug):
+
+		# Looking for commit's and parents' hashes…
 		cmdlist = ['git', 'log', '--pretty="%H %P%d"']
+
+		# … starting from know heads only
 		cmdlist.extend(self.head)
 
+		# Print the request
+		if debug: print cmdlist
+
+		# Invoking Git
 		git_history_dump = check_output(cmdlist)
 
+		# Print the output
+		if debug: print git_history_dump
+
+		# Parsing Git response
 		for line in git_history_dump.split('\n'):
+
+			# Skipping empty lines (the last one should be empty)
 			if len(line) == 0: continue
 
+			# Matching hashes and ref names
 			hashes_n_refs = re.compile(r'''"(.*) \((.*)\)"''').match(line)
+
+			# Match successulf, store values
 			if hashes_n_refs:
 				hashes = hashes_n_refs.group(1).split()
 				refs = hashes_n_refs.group(2).split(',')
+
+			# Match failed, no refs found, only hashes
 			else:
 				hashes = line[1:-1].split()
 				refs = ""
 
+			# New node to store info
 			current = node.Node()
+
 			if hashes:
+
+				# Store self
 				current.hash = hashes[0]
+
+				# Store parents
 				for i in hashes[1:]: current.parent.append(i)
+
+			current.missing = len(current.parent)
+
+			# Store refs, if any
 			for i in refs: current.ref.append(i.strip())
 
-			if not self.head: self.head = current.hash
+			# Store node in map
 			self.commit[current.hash] = current
-	
+
+		# Showing results
+		if debug: print self.commit
+
+	def jump_to_head (self, names):
+
+		while len(names):
+			name = names.pop(0)
+			commit = self.commit[name]
+			if commit.done: continue
+			if commit.mark: continue
+			if len(commit.child) == 0:
+				commit.mark = 1
+				return name
+			names = commit.child
+
+		return []
+
+	def skip_if_done (self, names):
+
+		result = []
+
+		for name in names:
+			if not self.commit[name].done:
+				result.append(name)
+
+		return result
+
+	def clear (self):
+
+		for commit in self.commit.values():
+			commit.done = 0
+
+	def bind_children (self, debug):
+
+		if debug: print '-- Binding Children --'
+
+		visit = order.LeftmostFirst()
+
+		for head in self.head:
+
+			if debug: print '  Head %s' % head[:7]
+
+			visit.push(head)
+
+			while 1:
+
+				if visit.is_empty(): break
+
+				name = visit.pop()
+				commit = self.commit[name]
+
+				if debug: print '  Visiting %s' % name[:7]
+
+				if commit.done:
+					if debug: print '  %s is done, skipping…' % name[:7]
+					continue
+
+				for i in commit.parent:
+					self.commit[i].add_child(name)
+
+				visit.push(self.skip_if_done(commit.parent))
+
+				commit.done = 1
+
+	def row_unroll (self, debug):
+
+		if debug: print '-- Row Unroll --'
+
+		visit = order.UppermostFirst()
+
+		for head in self.head:
+
+			if debug: print '  Head %s' % head[:7]
+
+			visit.push_children(head)
+
+			while visit.has_more():
+				
+				name = visit.pop()
+				commit = self.commit[name]
+
+				if debug: print '  Visiting %s' % name[:7]
+
+				if commit.done:
+					if debug: print '  %s is done, skipping…' % name[:7]
+					continue
+
+				children = self.skip_if_done(commit.child)
+				if len(children):
+					visit.push_children(children)
+					continue
+
+				self.vertical.append(name)
+
+				visit.push_parents(self.skip_if_done(commit.parent))
+
+				commit.done = 1
+
+	def column_unroll (self, debug):
+
+		self.horizon = {}
+		self.width = -1
+
+		visit = order.LeftmostFirst()#DirectedFIFO()
+		#visit.push_parents(self.head[0], 0)
+		visit.push(self.head[0])
+
+		upper = order.LeftmostFirst()
+		lower = order.LeftmostFirst()
+
+		# The first target head will take the first column
+		upper.push(self.head[0])
+		lower.push(self.head[0])
+
+		# Vertical order is not good
+		# Need a visit
+		# Heads in order ???
+		# Parents, in order, once each
+
+		# I need to try the bouncing visit, as I did in ye old days…
+
+		# Start from head[0], explore down with depth-first visit
+		# Whenever a non-done child is found, pause visit and jump up following
+		# the leftmost children until an head is found, then restart as
+		# previously, descending…
+
+		# Added heads must be marked, in order to be added just once (at their
+		# top call), but they are pushed as normal.
+		# for e in child, parent => prepend to visit
+
+		previous = len(self.vertical)
+		current = -1
+
+		while visit.has_more():
+
+			#[name, direction] = visit.pop()
+			name = visit.pop()
+			commit = self.commit[name]
+
+			if commit.done: continue
+
+			#print '  Visiting %s, %d' % (name[:7], direction)
+			print '  Visiting %s' % name[:7]
+
+			#visit.push(self.skip_if_done(commit.child))#, 1)
+			visit.push(self.jump_to_head(commit.child))
+			visit.push(self.skip_if_done(commit.parent))#, 0)
+
+			current = self.vertical.index(name)
+			#print 'Current %d, previous %d' % (current, previous)
+			if previous > current:
+				self.width += 1
+
+			commit.column = self.width
+			#print 'commit %s in column %d' % (name[:7], commit.column)
+			previous = current
+			commit.done = 1
+
 	def insert (self, commit):
 
 		if commit.hdone: return
@@ -321,7 +550,7 @@ class Historian:
 	def print_help(self):
 		print "Usage: %s " % sys.argv[0]
 
-	def tell_the_story(self):
+	def get_options(self):
 
 		try:
 			optlist, args = getopt.getopt(sys.argv[1:], 'hvd',
@@ -354,8 +583,25 @@ class Historian:
 				self.print_version()
 				return
 
-		self.get_heads()
-		self.get_history()
+		self.args = args
+
+	def tell_the_story(self):
+
+		self.get_options()
+		self.get_heads(0)
+		self.get_history(0)
+
+		self.bind_children(0)
+		self.clear()
+		self.row_unroll(0)
+		self.clear()
+		self.column_unroll(1)
+
+		print '--'
+		for i in self.vertical:
+			print self.commit[i].to_oneline()
+
+		return
 
 		self.width = 3 # Reserved columns
 

@@ -14,6 +14,9 @@ class Node:
 		self.nth_child = 0
 
 		# Visit marks
+		self.done = 0
+		self.mark = 0
+		self.missing = 0
 		self.vdone = 0
 		self.hdone = 0
 
@@ -23,6 +26,10 @@ class Node:
 		self.upper = None  # Cell on top-right
 		self.bottom = None # Cell on bottom
 		self.lower = None  # Cell on bottom-right
+
+	def add_child (self, name):
+
+		self.child.append(name)
 
 	def print_cell (self):
 		
@@ -68,7 +75,9 @@ class Node:
 				line += ', ' + i
 			line += ')'
 		
-		return '\x1b[m%s%s\x1b[m (%d)' % (self.hash[:7], line, self.column)
+		return '(%d) \x1b[m%s%s\x1b[m (%d) (%d)' % (self.column,
+			self.hash[:7],
+			line, self.column, self.missing)
 
 	def to_string(self):
 		if self.column > 0:
