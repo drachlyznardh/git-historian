@@ -145,17 +145,20 @@ class Historian:
 
 	def jump_to_head (self, names):
 
+		result = []
+
 		while len(names):
 			name = names.pop(0)
 			commit = self.commit[name]
 			if commit.done: continue
 			if commit.mark: continue
-			if len(commit.child) == 0:
+			children = self.skip_if_done(commit.child)
+			if len(children) == 0:
 				commit.mark = 1
-				return name
-			names = commit.child
+				result.append(name)
+			else: names.extend(children)
 
-		return []
+		return result
 
 	def skip_if_done (self, names):
 
