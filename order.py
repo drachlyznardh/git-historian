@@ -66,7 +66,7 @@ class UppermostFirst:
 
 		if len(arg) == 0: return
 
-		self.content.extend(arg)
+		self.content.extend(reversed(arg))
 
 	def has_more (self):
 
