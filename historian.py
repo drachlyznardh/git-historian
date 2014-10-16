@@ -243,50 +243,23 @@ class Historian:
 		self.horizon = {}
 		self.width = -1
 
-		visit = order.LeftmostFirst()#DirectedFIFO()
-		#visit.push_parents(self.head[0], 0)
+		visit = order.LeftmostFirst()
 		visit.push(self.head[0])
-
-		upper = order.LeftmostFirst()
-		lower = order.LeftmostFirst()
-
-		# The first target head will take the first column
-		upper.push(self.head[0])
-		lower.push(self.head[0])
-
-		# Vertical order is not good
-		# Need a visit
-		# Heads in order ???
-		# Parents, in order, once each
-
-		# I need to try the bouncing visit, as I did in ye old days…
-
-		# Start from head[0], explore down with depth-first visit
-		# Whenever a non-done child is found, pause visit and jump up following
-		# the leftmost children until an head is found, then restart as
-		# previously, descending…
-
-		# Added heads must be marked, in order to be added just once (at their
-		# top call), but they are pushed as normal.
-		# for e in child, parent => prepend to visit
 
 		previous = len(self.vertical)
 		current = -1
 
 		while visit.has_more():
 
-			#[name, direction] = visit.pop()
 			name = visit.pop()
 			commit = self.commit[name]
 
 			if commit.done: continue
 
-			#print '  Visiting %s, %d' % (name[:7], direction)
 			print '  Visiting %s' % name[:7]
 
-			#visit.push(self.skip_if_done(commit.child))#, 1)
 			visit.push(self.jump_to_head(commit.child))
-			visit.push(self.skip_if_done(commit.parent))#, 0)
+			visit.push(self.skip_if_done(commit.parent))
 
 			current = self.vertical.index(name)
 			#print 'Current %d, previous %d' % (current, previous)
