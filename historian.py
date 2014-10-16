@@ -32,13 +32,13 @@ class Historian:
 	
 		self.max_column = -1
 
-	def get_heads (self, debug):
+	def get_heads_by_name (self, name, debug):
 
 		# Looking for heads, i.e. active branches
 		cmdlist = ['git', 'show-ref', '--heads']
 
 		# If names are specified, we look for them
-		if len(self.args): cmdlist.extend(self.args)
+		if name: cmdlist.append(name)
 
 		# Print the command line request
 		if debug: print cmdlist
@@ -70,6 +70,15 @@ class Historian:
 		# Showing results
 		if debug: print self.head
 		if debug: print self.head_by_name
+
+	def get_heads (self, debug):
+
+		if len(self.args) == 0:
+			self.get_heads_by_name(None, debug)
+			return
+
+		for name in self.args:
+			self.get_heads_by_name(name, debug)
 
 	def get_history(self, debug):
 
@@ -574,7 +583,7 @@ class Historian:
 	def tell_the_story(self):
 
 		self.get_options()
-		self.get_heads(0)
+		self.get_heads(1)
 		self.get_history(0)
 
 		self.bind_children(0)
