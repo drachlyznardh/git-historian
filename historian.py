@@ -27,13 +27,10 @@ class Historian:
 		self.head_by_name = {}
 		self.commit = {}
 		self.vertical = []
-		self.horizonal = {}
 		
 		self.width = -1
 		self.max_width = 0
 	
-		self.max_column = -1
-
 	def get_heads_by_name (self, name, debug):
 
 		# Looking for heads, i.e. active branches
