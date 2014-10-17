@@ -170,7 +170,7 @@ class Historian:
 
 				booked = 1 + max([self.commit[j].column for j in target.parent])
 				print booked
-				return max(result, booked)
+				return max(result, target.column, booked)
 
 			print '  Matching %s against %s' % (
 				commit.hash[:7], name[:7])
