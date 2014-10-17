@@ -208,8 +208,8 @@ class Layout:
 		self.se = self.bottom.values()
 		self.sw = []
 
-		#print "North %s" % self.ne
-		#print "South %s" % self.se
+		if self.debug: print "North %s" % self.ne
+		if self.debug: print "South %s" % self.se
 			
 		if self.debug:
 			self.plot_track()
@@ -220,8 +220,8 @@ class Layout:
 		for i in xrange(1, self.size):
 			self.nw.append(self.ne.pop(0))
 			self.sw.append(self.se.pop(0))
-			#print "N (%s) (%s)" % (self.nw, self.ne)
-			#print "S (%s) (%s)" % (self.sw, self.se)
+			if self.debug: print "N (%s) (%s)" % (self.nw, self.ne)
+			if self.debug: print "S (%s) (%s)" % (self.sw, self.se)
 			self.compute_odd_column(i, target)
 			self.compute_even_column(i, target)
 
