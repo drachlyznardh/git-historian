@@ -23,6 +23,8 @@ class Historian:
 		self.head = []
 		self.head_by_name = {}
 		self.commit = {}
+
+		self.first = None
 		self.vertical = []
 		
 		self.width = -1
@@ -273,6 +275,7 @@ class Historian:
 					continue
 
 				if current: commit.top = current
+				else: self.first = name
 				current = name
 				self.vertical.append(name)
 
