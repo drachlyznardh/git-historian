@@ -17,9 +17,7 @@ class Layout:
 
 		self.layout = []
 
-		self.track = {}
-		for i in xrange(size):
-			self.track[i] = set()
+		self.track = {i:set() for i in xrange(size)}
 
 	def plot_track (self):
 		for track in self.track.values():
