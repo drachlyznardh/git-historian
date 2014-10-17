@@ -342,7 +342,7 @@ class Historian:
 		for key, value in optlist:
 			if key in ('-h', '--help'):
 				self.print_help()
-				return
+				sys.exit(0)
 			elif key in ('-v', '--verbose'):
 				self.verbose = 1
 			elif key in ('-d', '--debug'):
@@ -355,7 +355,7 @@ class Historian:
 				ldebug = 1
 			elif key == '--version':
 				self.print_version()
-				return
+				sys.exit(0)
 
 		self.args = args
 
