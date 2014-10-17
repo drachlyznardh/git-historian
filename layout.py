@@ -80,7 +80,6 @@ class Layout:
 
 		if index > target.column:
 
-			#for name in target.child:
 			if target.hash in self.track[index]:
 				if len(self.track[index]) > 1:
 					self.put_char(index, '┤', '│', 0) # \u2524 \u2502
@@ -96,11 +95,9 @@ class Layout:
 				if target.hash in self.track[jndex]:
 					self.put_char(jndex, '→', ' ', 0)
 					return
-			#self.put_char(index, '1', '1', 0)
 
 		else:
 
-			#for name in target.child:
 			if target.hash in self.track[index]:
 				if len(self.track[index]) > 1:
 					self.put_char(index, '├', '│', 0) # \u251c \u2502
@@ -178,11 +175,8 @@ class Layout:
 
 	def compute_odd_column(self, index, target):
 
-		#father = None
-
 		if index > target.column:
 			
-			#for name in target.child:
 			if target.hash in self.track[index]:
 				self.put_char(index, '→', ' ', 1)
 				return
@@ -191,14 +185,9 @@ class Layout:
 				if target.hash in self.track[jndex]:
 					self.put_char(jndex, '→', ' ', 0)
 					return
-			#for name in target.parent:
-			#	if name in self.se:
-			#		self.put_char(name, '←', ' ', 1)
-			#		return
 		
 		else:
 
-			#for name in target.child:
 			if target.hash in self.track[index - 1]:
 				self.put_char(index - 1, '←', ' ', 1)
 				return
@@ -207,10 +196,6 @@ class Layout:
 				if target.hash in self.track[jndex]:
 					self.put_char(jndex, '←', ' ', 0)
 					return
-			#for name in reversed(self.sw):
-			#	if name in target.parent:
-			#		self.put_char(name, '→', ' ', 1)
-			#		return
 
 		self.put_char(index, ' ', ' ', 0)
 
@@ -239,7 +224,6 @@ class Layout:
 			#print "S (%s) (%s)" % (self.sw, self.se)
 			self.compute_odd_column(i, target)
 			self.compute_even_column(i, target)
-		#return self.layout
 
 		for track in self.track.values():
 			track.discard(target.hash)
