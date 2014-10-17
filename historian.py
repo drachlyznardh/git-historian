@@ -605,12 +605,10 @@ class Historian:
 		self.bind_children(0)
 		self.clear()
 		self.row_unroll(0)
-		print '--'
-		for i in self.vertical:
-			print self.commit[i].to_oneline()
-
 		self.clear()
 		self.column_unroll(1)
+
+		self.print_graph(1)
 
 		print '--'
 		for i in self.vertical:
