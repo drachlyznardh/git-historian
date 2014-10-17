@@ -317,7 +317,10 @@ class Historian:
 		#cmdargs.append(optargs)
 		cmdargs.append('<commit>')
 
-		for name in self.vertical:
+		name = self.first
+
+		while name:
+		#for name in self.vertical:
 
 			commit = self.commit[name]
 			if not commit:
@@ -337,6 +340,8 @@ class Historian:
 			for i in message[1:-1]:
 			#for i in message[1:]:
 				print '%s\x1b[m %s' % (t.draw_padding(), i)
+
+			name = commit.bottom
 
 	def print_version(self):
 		print "Git-Historian %s (C) 2014 Ivan Simonini" % VERSION
