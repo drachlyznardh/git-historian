@@ -40,51 +40,42 @@ child(ren), and no commit can displayed after its parent(s); commit with no
 relation at all (heads with completely independent history) should appear in
 order.
 
-This is computed by walking the graph iteratively. Each commit holds until all
-its children are in order, and then it calls its parents.
-
 ### Horizontal spread
 
 Branches should occupy the same column, as long as they are but a sequence of
-commits. Plus, tagged commits which matches the criteria are moved to a specific
-column.
+commits. Heads should appear in order, as specified by cmdline args or
+alphabetically, unless they are related.
 
 As rules of thumb, it should work more or less like this:
 
- - commits with matching tags go to assigned column;
  - lone parents belong to the same line as their child;
  - parents of a same commit, as also children of a same commit, must belong each
    to a different column;
  - no commit can belong to the column of another active branch
 
-This is computed in order, top-to-bottom, by tracking active branches and
-available columns. Merge commits spread their parents on available columns, if
-any; more columns are added whenever necessary. Commit with multiple children
-collect the branches they close, which columns become available. Columns may
-remain available indefinitely, but are never destroyed.
-
-Many different small tweaks (and bugs, most probably) affect this behaviour and
-the final layout. This is mostly due to personal taste, instead to rules; I did
-what I did out of hope, to enhance readability.
+This is computed while walking the graph, starting from the first head and
+moving down or up following a commit's parents and children, in a sort of
+leftmost-first visit. Each visited commit takes the first available column,
+which could contain one of the commit's parents or children, but no arrows.
 
 ### Display
 
-Each commit is displayed as a white, very big bullet character '⬤' (\U2b24) is
-its assigned column. Fork and merge relations are displayed with arrows, which
-move on vertical straight lines until they reach the target row, then bend by 90
-degrees and move horizontally until they touch the target commit. Each arrow
-gets it color from its source's column and keeps it until the end.
+Each commit is displayed as a bullet character '⬤' (\u2022).
+
+Fork and merge relations are displayed with arrows, which move on horizontal
+straight lines until they reach the target column, then bend by 90 degrees and
+move straight up until they touch the target commit. Each arrow gets it color
+from its destination column and keeps it until the end.
 
 All arrows start from the father and point towards the child. The parent order
 is not preserved, so you cannot longer assume that the leftmost arrows comes
 from the first parent, as you can do with the usual `git log --graph` layout.
 
 Closer arrows (those with less horizontal gap from the respective target) take
-precedence over other arrows.
+precedence over other arrows. This affects the color, not the direction.
 
-At the end of its row, each commit is marked by its short hash (7 characters) in
-white, padded by the whole graph's width, and by its refs, if any, in bold
-green.
+At the end of its row, each commit is resented with its `git show --pretty`
+output.
 
 Testing
 -------
