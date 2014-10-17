@@ -13,7 +13,6 @@ class Layout:
 	def __init__ (self, size, commit, debug):
 		
 		self.size = size
-		self.commit = commit
 		self.debug = debug
 
 		self.layout = []
@@ -22,22 +21,6 @@ class Layout:
 		self.track = {}
 		for i in xrange(size):
 			self.track[i] = set()
-
-	def plot_top (self):
-		transition = ''
-		for i in self.top:
-			c = self.top[i]
-			if c: transition += " %s" % c[:7]
-			else: transition += " %s" % "XXXXXXX"
-		print "T {%s}" % transition
-
-	def plot_bottom (self):
-		transition = ''
-		for i in self.bottom:
-			c = self.bottom[i]
-			if c: transition += " %s" % c[:7]
-			else: transition += " %s" % "XXXXXXX"
-		print "B {%s}" % transition
 
 	def plot_track (self):
 		for track in self.track.values():
