@@ -176,6 +176,8 @@ class Historian:
 			result = max(result, target.column)
 			name = target.top
 
+		return self.width
+
 	def jump_to_head (self, arg):
 
 		result = []
