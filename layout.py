@@ -16,19 +16,12 @@ class Layout:
 		self.commit = commit
 		self.debug = debug
 
-		self.bottom = {}
-		for i in xrange(size):
-			self.bottom[i] = ''
-
 		self.layout = []
 		self.last_color = 39
 
 		self.track = {}
 		for i in xrange(size):
 			self.track[i] = set()
-
-	def swap (self):
-		self.top = self.bottom.copy()
 
 	def plot_top (self):
 		transition = ''
@@ -203,14 +196,6 @@ class Layout:
 
 		self.layout = []
 
-		self.ne = self.top.values()
-		self.nw = []
-		self.se = self.bottom.values()
-		self.sw = []
-
-		if self.debug: print "North %s" % self.ne
-		if self.debug: print "South %s" % self.se
-			
 		if self.debug:
 			self.plot_track()
 			print target.child
@@ -218,10 +203,6 @@ class Layout:
 		if self.size:
 			self.compute_even_column(0, target)
 		for i in xrange(1, self.size):
-			self.nw.append(self.ne.pop(0))
-			self.sw.append(self.se.pop(0))
-			if self.debug: print "N (%s) (%s)" % (self.nw, self.ne)
-			if self.debug: print "S (%s) (%s)" % (self.sw, self.se)
 			self.compute_odd_column(i, target)
 			self.compute_even_column(i, target)
 

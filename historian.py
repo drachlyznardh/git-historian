@@ -533,19 +533,6 @@ class Historian:
 
 			if debug: print "\nP %s" % name[:7]
 			
-			t.swap()
-
-			t.bottom[commit.column] = ''
-			for name in commit.parent:
-				parent = self.commit[name]
-				if not parent:
-					print "No parent with name %s" % name[:7]
-				t.bottom[parent.column] = name
-
-			#if debug: t.plot_top()
-			#if debug: t.plot_bottom()
-			#if debug: t.plot_track()
-			
 			t.compute_layout(commit)
 
 			cmdargs.pop() # Remove previous commit from list
