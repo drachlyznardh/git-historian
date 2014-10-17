@@ -91,58 +91,6 @@ class Layout:
 
 		return
 
-		if len(top) and len(bottom): # both ends are present
-
-			if top == bottom:
-
-				if bottom in target.parent:
-
-					if target.hash in self.ne:
-						
-						self.put_char(bottom, '├', '│', 1) # \u251c
-					elif target.hash in self.nw:
-						
-						self.put_char(top, '┤', '│', 1) # \u2524
-					elif target.hash in self.commit[bottom].child:
-
-						self.put_char(bottom, '├', '│', 1) # \u251c
-					else: #self.layout += '^'
-						self.put_char(None, '^', '^', 0)
-
-				else: 
-					self.put_char(top, '│', '│', 0) # \u2502
-
-			else: #self.layout += '@'
-				self.put_char(None, '@', '@', 0)
-
-			return
-
-		if len(bottom): # only lower end is present
-
-			if bottom == target.hash:
-				#self.layout += '┐' # \u2510
-				self.put_char(None, '┐', '│', 1) # \u2510 \u2502
-				return
-
-			if index > target.column:
-				self.put_char(index, '┐', '│', 1) # \u2510 \u2502
-				return
-			else:
-				self.put_char(index, '┌', '│', 1) # \u250c \u2502
-				return
-				
-		if len(top): # only upper end is present
-
-			self.put_char(None, '_', '_', 0)
-			return
-
-		transition = ' '
-		if len(self.layout):
-			last = self.layout[-1]
-			if last.transition == '←' or last.transition == '→':
-				transition = '─' # \u2500
-		self.put_char(None, transition, ' ', 0)
-
 	def compute_odd_column(self, index, target):
 
 		if index > target.column:
