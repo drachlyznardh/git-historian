@@ -148,6 +148,7 @@ class Historian:
 		print
 		if not commit.top:
 			print '  %s is the topmost' % commit.hash[:7]
+			self.width += 1
 			return self.width
 
 		if len(commit.child) == 0:
@@ -171,11 +172,14 @@ class Historian:
 				print booked
 				return max(result, booked)
 
-			print '  Matching %s against %s %d' % (
-				commit.hash[:7], name[:7], target.column)
+			print '  Matching %s against %s' % (
+				commit.hash[:7], name[:7])
+			print target.column
 			result = max(result, target.column)
 			name = target.top
 
+		print 'Oh shi-'
+		self.width += 1
 		return self.width
 
 	def jump_to_head (self, arg):
@@ -283,7 +287,7 @@ class Historian:
 	def column_unroll (self, debug):
 
 		#self.horizon = {}
-		self.width = 0
+		self.width = -1#0
 
 		visit = order.LeftmostFirst()
 		visit.push(self.head[0])
@@ -600,6 +604,10 @@ class Historian:
 		self.bind_children(0)
 		self.clear()
 		self.row_unroll(0)
+		print '--'
+		for i in self.vertical:
+			print self.commit[i].to_oneline()
+
 		self.clear()
 		self.column_unroll(1)
 

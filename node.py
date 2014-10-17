@@ -83,11 +83,11 @@ class Node:
 				line += ', ' + i
 			line += ')'
 		
-		return '%s(%d) \x1b[m%s%s\x1b[m (%d) (%d)' % (
+		return '%s(%s) \x1b[m%s%s\x1b[m' % (
 			self.get_indent(),
 			self.column,
 			self.hash[:7],
-			line, self.column, self.missing)
+			line)
 
 	def to_string(self):
 		if self.column > 0:
