@@ -189,10 +189,8 @@ class Historian:
 			name = names.pop(0)
 			commit = self.commit[name]
 			if commit.done: continue
-			if commit.mark: continue
 			children = self.skip_if_done(commit.child)
 			if len(children) == 0:
-				commit.mark = 1
 				result.append(name)
 			else: names.extend(children)
 
