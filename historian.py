@@ -145,40 +145,41 @@ class Historian:
 
 	def select_column (self, commit):
 
-		print
+		debug = 0
+
+		if debug: print
 		if not commit.top:
-			print '  %s is the topmost' % commit.hash[:7]
+			if debug: print '  %s is the topmost' % commit.hash[:7]
 			self.width += 1
 			return self.width
 
 		if len(commit.child) == 0:
-			print '  %s has no children' % commit.hash[:7]
+			if debug: print '  %s has no children' % commit.hash[:7]
 			self.width += 1
 			return self.width
 
 		result = self.width
 		name = commit.top
-		print '  Processing %s' % commit.hash[:7]
+		if debug: print '  Processing %s' % commit.hash[:7]
 		while name:
 
 			target = self.commit[name]
 
 			if name in commit.child and target.has_column():
-				print '  %s is a child of %s (%d), halting' % (
+				if debug: print '  %s is a child of %s (%d), halting' % (
 					name[:7], commit.hash[:7],
 					self.commit[name].column)
 
 				booked = 1 + max([self.commit[j].column for j in target.parent])
-				print booked
+				if debug: print booked
 				return max(result, target.column, booked)
 
-			print '  Matching %s against %s' % (
-				commit.hash[:7], name[:7])
-			print target.column
+			if debug: print '  Matching %s against %s (%d)' % (
+				commit.hash[:7], name[:7], target.column)
 			result = max(result, target.column)
 			name = target.top
 
-		print 'Oh shi-'
+		if debug: print 'No assigned children found. Defaulting'
 		self.width += 1
 		return self.width
 
