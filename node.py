@@ -31,6 +31,9 @@ class Node:
 
 		self.child.append(name)
 
+	def has_column (self):
+		return self.column >= 0
+
 	def print_cell (self):
 		
 		message = '       '

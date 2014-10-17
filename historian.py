@@ -162,7 +162,7 @@ class Historian:
 
 			target = self.commit[name]
 
-			if name in commit.child and target.column > -1:
+			if name in commit.child and target.has_column():
 				print '  %s is a child of %s (%d), halting' % (
 					name[:7], commit.hash[:7],
 					self.commit[name].column)
