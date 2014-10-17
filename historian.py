@@ -10,10 +10,7 @@ import getopt
 import node
 import order
 
-import vertical
-import horizontal
-
-import layout as layout
+import layout
 
 VERSION="0.0-a"
 
