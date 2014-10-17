@@ -30,6 +30,7 @@ class Historian:
 		self.horizonal = {}
 		
 		self.width = -1
+		self.max_width = 0
 	
 		self.max_column = -1
 
@@ -145,40 +146,43 @@ class Historian:
 
 	def select_column (self, commit):
 
-		print
+		debug = 0
+
+		if debug: print
 		if not commit.top:
-			print '  %s is the topmost' % commit.hash[:7]
+			if debug: print '  %s is the topmost' % commit.hash[:7]
 			self.width += 1
 			return self.width
 
 		if len(commit.child) == 0:
-			print '  %s has no children' % commit.hash[:7]
+			if debug: print '  %s has no children' % commit.hash[:7]
 			self.width += 1
 			return self.width
 
 		result = self.width
 		name = commit.top
-		print '  Processing %s' % commit.hash[:7]
+		if debug: print '  Processing %s' % commit.hash[:7]
 		while name:
 
 			target = self.commit[name]
 
 			if name in commit.child and target.has_column():
-				print '  %s is a child of %s (%d), halting' % (
+				if debug: print '  %s is a child of %s (%d), halting' % (
 					name[:7], commit.hash[:7],
 					self.commit[name].column)
 
 				booked = 1 + max([self.commit[j].column for j in target.parent])
-				print booked
-				return max(result, target.column, booked)
+				if debug: print booked
+				column = max(result, target.column, booked)
+				self.max_width = max(self.max_width, column)
+				return column
 
-			print '  Matching %s against %s' % (
-				commit.hash[:7], name[:7])
-			print target.column
+			if debug: print '  Matching %s against %s (%d)' % (
+				commit.hash[:7], name[:7], target.column)
 			result = max(result, target.column)
 			name = target.top
 
-		print 'Oh shi-'
+		if debug: print 'No assigned children found. Defaulting'
 		self.width += 1
 		return self.width
 
@@ -514,7 +518,7 @@ class Historian:
 
 	def print_graph (self, debug):
 		
-		t = layout.Layout(self.width, self.commit, debug)
+		t = layout.Layout(self.max_width + 1, self.commit, debug)
 
 		cmdargs = 'git show -s --oneline --decorate --color'.split(' ')
 		#cmdargs.append(optargs)
@@ -604,16 +608,10 @@ class Historian:
 		self.bind_children(0)
 		self.clear()
 		self.row_unroll(0)
-		print '--'
-		for i in self.vertical:
-			print self.commit[i].to_oneline()
-
 		self.clear()
 		self.column_unroll(1)
 
-		print '--'
-		for i in self.vertical:
-			print self.commit[i].to_oneline()
+		self.print_graph(0)
 
 		return
 

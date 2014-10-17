@@ -76,18 +76,11 @@ class Node:
 
 	def to_oneline(self):
 	
-		line = ''
-		if len(self.ref):
-			line += ' \x1b[32;1m(' + self.ref[0]
-			for i in self.ref[1:]:
-				line += ', ' + i
-			line += ')'
-		
+		if len(self.ref): refs = ' \x1b[32;1m(%s)' % ', '.join(self.ref)
+		else: refs = ''
+
 		return '%s(%s) \x1b[m%s%s\x1b[m' % (
-			self.get_indent(),
-			self.column,
-			self.hash[:7],
-			line)
+			self.get_indent(), self.column, self.hash[:7], refs)
 
 	def to_string(self):
 		if self.column > 0:
