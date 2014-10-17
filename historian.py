@@ -267,7 +267,7 @@ class Historian:
 	def column_unroll (self, debug):
 
 		#self.horizon = {}
-		self.width = -1
+		self.width = 0
 
 		visit = order.LeftmostFirst()
 		visit.push(self.head[0])
