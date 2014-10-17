@@ -69,6 +69,11 @@ class Node:
 		for i in reversed(self.parent):
 			commit_map[i].print_graph(commit_map)
 
+	def get_indent (self):
+		if self.column > 0:
+			return ('%%%ds' % (3 * self.column)) % (' ')
+		return ''
+
 	def to_oneline(self):
 	
 		line = ''
@@ -78,7 +83,9 @@ class Node:
 				line += ', ' + i
 			line += ')'
 		
-		return '(%d) \x1b[m%s%s\x1b[m (%d) (%d)' % (self.column,
+		return '%s(%d) \x1b[m%s%s\x1b[m (%d) (%d)' % (
+			self.get_indent(),
+			self.column,
 			self.hash[:7],
 			line, self.column, self.missing)
 
