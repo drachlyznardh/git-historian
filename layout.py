@@ -16,7 +16,6 @@ class Layout:
 		self.debug = debug
 
 		self.layout = []
-		self.last_color = 39
 
 		self.track = {}
 		for i in xrange(size):
@@ -26,23 +25,18 @@ class Layout:
 		for track in self.track.values():
 			print track
 
-	def put_char(self, name, transition, padding, save):
+	def put_char(self, name, transition, padding):
 		
-		if name == None:
-			try:
-				color = self.last_color #39
-			except:
-				print 'Oh noes!!! [%s][%s][%s]' % (name, transition, padding)
-				raise
-		elif isinstance(name, basestring):
+		if isinstance(name, basestring):
 			father = self.commit[name]
 			color = 31 + father.column % 6
 		elif isinstance(name, int):
 			color = 31 + name % 6
+		else:
+			print 'WTF is %s' % name
+			color = 39
 
 		self.layout.append(Column(color, transition, padding))
-		if save:
-			self.last_color = color
 
 	def compute_even_column(self, index, target):
 		
@@ -51,49 +45,49 @@ class Layout:
 			if len(target.parent): padding = '│' # \u2502
 			else: padding = ' '
 			
-			self.put_char(target.column, '•', padding, 0) # \u2022 \u2502
+			self.put_char(target.column, '•', padding) # \u2022 \u2502
 			return
 
 		if index > target.column:
 
 			if target.hash in self.track[index]:
 				if len(self.track[index]) > 1:
-					self.put_char(index, '┤', '│', 0) # \u2524 \u2502
+					self.put_char(index, '┤', '│') # \u2524 \u2502
 				else:
-					self.put_char(index, '┘', ' ', 0) # \u2518
+					self.put_char(index, '┘', ' ') # \u2518
 				return
 
 			if len(self.track[index]):
-				self.put_char(index, '│', '│', 0)
+				self.put_char(index, '│', '│')
 				return
 
 			for jndex in range(index, self.size):
 				if target.hash in self.track[jndex]:
-					self.put_char(jndex, '→', ' ', 0)
+					self.put_char(jndex, '→', ' ')
 					return
 
 		else:
 
 			if target.hash in self.track[index]:
 				if len(self.track[index]) > 1:
-					self.put_char(index, '├', '│', 0) # \u251c \u2502
+					self.put_char(index, '├', '│') # \u251c \u2502
 				else:
-					self.put_char(index, '└', ' ', 0) # \u2514
+					self.put_char(index, '└', ' ') # \u2514
 				return
 
 			if len(self.track[index]):
-				self.put_char(index, '│', '│', 0)
+				self.put_char(index, '│', '│')
 				return
 
 			for jndex in reversed(range(0, index)):
 				if target.hash in self.track[jndex]:
-					self.put_char(jndex, '←', ' ', 0) # \u2500
+					self.put_char(jndex, '←', ' ') # \u2500
 					return
 
 		if len(self.track[index]):
-			self.put_char(index, '│', '│', 0) # \u2502
+			self.put_char(index, '│', '│') # \u2502
 		else:
-			self.put_char(index, ' ', ' ', 0)
+			self.put_char(index, ' ', ' ')
 
 		return
 
@@ -154,26 +148,26 @@ class Layout:
 		if index > target.column:
 			
 			if target.hash in self.track[index]:
-				self.put_char(index, '→', ' ', 1)
+				self.put_char(index, '→', ' ')
 				return
 			
 			for jndex in range(index, self.size):
 				if target.hash in self.track[jndex]:
-					self.put_char(jndex, '→', ' ', 0)
+					self.put_char(jndex, '→', ' ')
 					return
 		
 		else:
 
 			if target.hash in self.track[index - 1]:
-				self.put_char(index - 1, '←', ' ', 1)
+				self.put_char(index - 1, '←', ' ')
 				return
 
 			for jndex in reversed(range(0, index - 1)):
 				if target.hash in self.track[jndex]:
-					self.put_char(jndex, '←', ' ', 0)
+					self.put_char(jndex, '←', ' ')
 					return
 
-		self.put_char(index, ' ', ' ', 0)
+		self.put_char(index, ' ', ' ')
 
 	def compute_layout (self, target):
 
