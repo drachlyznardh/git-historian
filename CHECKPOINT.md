@@ -5,6 +5,13 @@ Obstacles were met. The design was revised. Now collecting a bunch of failed
 attempts, since most of them contain improvements in debug messages, option
 parsing and stuff.
 
+--------------------------------------------------------------------------------
+
+Trying to display heads in a given order, provided by user by cmdline args.
+Using branch names instead of tags, now.
+
+--------------------------------------------------------------------------------
+
 # Including from branch:extreme
 
 This file contains a TODO list and keeps track of progress.
