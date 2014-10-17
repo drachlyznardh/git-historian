@@ -25,8 +25,6 @@ class Historian:
 		self.commit = {}
 
 		self.first = None
-		#self.vertical = []
-		
 		self.width = -1
 		self.max_width = 0
 	
@@ -279,7 +277,6 @@ class Historian:
 					self.commit[current].bottom = name
 				else: self.first = name
 				current = name
-				#self.vertical.append(name)
 
 				visit.push_parents(self.skip_if_done(commit.parent))
 
@@ -287,14 +284,10 @@ class Historian:
 
 	def column_unroll (self, debug):
 
-		#self.horizon = {}
-		self.width = -1#0
+		self.width = -1
 
 		visit = order.LeftmostFirst()
 		visit.push(self.head[0])
-
-		#previous = len(self.vertical)
-		#current = -1
 
 		while visit.has_more():
 
@@ -320,7 +313,6 @@ class Historian:
 		name = self.first
 
 		while name:
-		#for name in self.vertical:
 
 			commit = self.commit[name]
 			if not commit:
