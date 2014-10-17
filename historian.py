@@ -166,7 +166,10 @@ class Historian:
 				print '  %s is a child of %s (%d), halting' % (
 					name[:7], commit.hash[:7],
 					self.commit[name].column)
-				return result
+
+				booked = 1 + max([self.commit[j].column for j in target.parent])
+				print booked
+				return max(result, booked)
 
 			print '  Matching %s against %s %d' % (
 				commit.hash[:7], name[:7], target.column)
