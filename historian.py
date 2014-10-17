@@ -152,7 +152,7 @@ class Historian:
 			self.width += 1
 			return self.width
 
-		result = -2
+		result = self.width
 		name = commit.top
 		while name:
 
