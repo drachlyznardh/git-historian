@@ -274,7 +274,9 @@ class Historian:
 					visit.push_children(children)
 					continue
 
-				if current: commit.top = current
+				if current:
+					commit.top = current
+					self.commit[current].bottom = name
 				else: self.first = name
 				current = name
 				self.vertical.append(name)
