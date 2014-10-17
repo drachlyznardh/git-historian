@@ -30,6 +30,7 @@ class Historian:
 		self.horizonal = {}
 		
 		self.width = -1
+		self.max_width = 0
 	
 		self.max_column = -1
 
@@ -172,7 +173,9 @@ class Historian:
 
 				booked = 1 + max([self.commit[j].column for j in target.parent])
 				if debug: print booked
-				return max(result, target.column, booked)
+				column = max(result, target.column, booked)
+				self.max_width = max(self.max_width, column)
+				return column
 
 			if debug: print '  Matching %s against %s (%d)' % (
 				commit.hash[:7], name[:7], target.column)
@@ -515,7 +518,7 @@ class Historian:
 
 	def print_graph (self, debug):
 		
-		t = layout.Layout(self.width + 1, self.commit, debug)
+		t = layout.Layout(self.max_width + 1, self.commit, debug)
 
 		cmdargs = 'git show -s --oneline --decorate --color'.split(' ')
 		#cmdargs.append(optargs)
