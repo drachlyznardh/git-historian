@@ -308,7 +308,6 @@ class Historian:
 
 		cmdargs = 'git show -s --oneline --decorate --color'.split(' ')
 		#cmdargs.append(optargs)
-		cmdargs.append('<commit>')
 
 		name = self.first
 
@@ -323,7 +322,6 @@ class Historian:
 			
 			t.compute_layout(commit)
 
-			cmdargs.pop() # Remove previous commit from list
 			cmdargs.append(commit.hash)
 
 			message = check_output(cmdargs).split('\n')
@@ -333,6 +331,7 @@ class Historian:
 			#for i in message[1:]:
 				print '%s\x1b[m %s' % (t.draw_padding(), i)
 
+			cmdargs.pop() # Remove current commit name from arg list
 			name = commit.bottom
 
 	def print_version(self):
