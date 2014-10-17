@@ -7,7 +7,6 @@ class Node:
 		self.hash = None
 		self.parent = []
 		self.child = []
-		self.ref = []
 		self.column = -1
 
 		self.done = 0
@@ -28,11 +27,8 @@ class Node:
 
 	def to_oneline(self):
 	
-		if len(self.ref): refs = ' \x1b[32;1m(%s)' % ', '.join(self.ref)
-		else: refs = ''
-
 		return '%s(%s) \x1b[m%s%s\x1b[m' % (
-			self.get_indent(), self.column, self.hash[:7], refs)
+			self.get_indent(), self.column, self.hash[:7])
 
 	def to_string(self):
 		if self.column > 0:
@@ -41,6 +37,5 @@ class Node:
 		str = "%s  Hash {%s}" % (indent, self.hash)
 		for i in self.parent: str += "\n%sParent {%s}" % (indent, i)
 		for i in self.child:  str += "\n%s Child {%s}" % (indent, i)
-		for i in self.ref:    str += "\n%s   Ref {%s}" % (indent, i)
 		return str
 
