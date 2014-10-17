@@ -143,19 +143,62 @@ class Historian:
 		# Showing results
 		if debug: print self.commit
 
-	def jump_to_head (self, names):
+	def select_column (self, commit):
+
+		print
+		if not commit.top:
+			print '  %s is the topmost' % commit.hash[:7]
+			self.width += 1
+			return self.width
+
+		if len(commit.child) == 0:
+			print '  %s has no children' % commit.hash[:7]
+			self.width += 1
+			return self.width
+
+		result = self.width
+		name = commit.top
+		print '  Processing %s' % commit.hash[:7]
+		while name:
+
+			target = self.commit[name]
+
+			if name in commit.child and target.has_column():
+				print '  %s is a child of %s (%d), halting' % (
+					name[:7], commit.hash[:7],
+					self.commit[name].column)
+
+				booked = 1 + max([self.commit[j].column for j in target.parent])
+				print booked
+				return max(result, target.column, booked)
+
+			print '  Matching %s against %s' % (
+				commit.hash[:7], name[:7])
+			print target.column
+			result = max(result, target.column)
+			name = target.top
+
+		print 'Oh shi-'
+		self.width += 1
+		return self.width
+
+	def jump_to_head (self, arg):
+
+		result = []
+		names = list(arg)
 
 		while len(names):
 			name = names.pop(0)
 			commit = self.commit[name]
 			if commit.done: continue
 			if commit.mark: continue
-			if len(commit.child) == 0:
+			children = self.skip_if_done(commit.child)
+			if len(children) == 0:
 				commit.mark = 1
-				return name
-			names = commit.child
+				result.append(name)
+			else: names.extend(children)
 
-		return []
+		return result
 
 	def skip_if_done (self, names):
 
@@ -209,6 +252,7 @@ class Historian:
 		if debug: print '-- Row Unroll --'
 
 		visit = order.UppermostFirst()
+		current = None
 
 		for head in self.head:
 
@@ -232,6 +276,8 @@ class Historian:
 					visit.push_children(children)
 					continue
 
+				if current: commit.top = current
+				current = name
 				self.vertical.append(name)
 
 				visit.push_parents(self.skip_if_done(commit.parent))
@@ -240,14 +286,14 @@ class Historian:
 
 	def column_unroll (self, debug):
 
-		self.horizon = {}
-		self.width = -1
+		#self.horizon = {}
+		self.width = -1#0
 
 		visit = order.LeftmostFirst()
 		visit.push(self.head[0])
 
-		previous = len(self.vertical)
-		current = -1
+		#previous = len(self.vertical)
+		#current = -1
 
 		while visit.has_more():
 
@@ -256,19 +302,10 @@ class Historian:
 
 			if commit.done: continue
 
-			print '  Visiting %s' % name[:7]
-
 			visit.push(self.jump_to_head(commit.child))
 			visit.push(self.skip_if_done(commit.parent))
 
-			current = self.vertical.index(name)
-			#print 'Current %d, previous %d' % (current, previous)
-			if previous > current:
-				self.width += 1
-
-			commit.column = self.width
-			#print 'commit %s in column %d' % (name[:7], commit.column)
-			previous = current
+			commit.column = self.select_column(commit)
 			commit.done = 1
 
 	def insert (self, commit):
@@ -567,6 +604,10 @@ class Historian:
 		self.bind_children(0)
 		self.clear()
 		self.row_unroll(0)
+		print '--'
+		for i in self.vertical:
+			print self.commit[i].to_oneline()
+
 		self.clear()
 		self.column_unroll(1)
 
