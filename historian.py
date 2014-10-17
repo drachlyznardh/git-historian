@@ -156,9 +156,11 @@ class Historian:
 		name = commit.top
 		while name:
 
-			if name in commit.child: return result
-
 			target = self.commit[name]
+
+			if name in commit.child and target.column > -1:
+				return result
+
 			result = max(result, target.column)
 			name = target.top
 
