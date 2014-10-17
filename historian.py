@@ -25,7 +25,7 @@ class Historian:
 		self.commit = {}
 
 		self.first = None
-		self.vertical = []
+		#self.vertical = []
 		
 		self.width = -1
 		self.max_width = 0
@@ -279,7 +279,7 @@ class Historian:
 					self.commit[current].bottom = name
 				else: self.first = name
 				current = name
-				self.vertical.append(name)
+				#self.vertical.append(name)
 
 				visit.push_parents(self.skip_if_done(commit.parent))
 
