@@ -515,7 +515,7 @@ class Historian:
 
 	def print_graph (self, debug):
 		
-		t = layout.Layout(self.width, self.commit, debug)
+		t = layout.Layout(self.width + 1, self.commit, debug)
 
 		cmdargs = 'git show -s --oneline --decorate --color'.split(' ')
 		#cmdargs.append(optargs)
