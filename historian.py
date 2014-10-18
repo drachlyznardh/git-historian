@@ -183,6 +183,9 @@ class Historian:
 
 		if debug: print 'Result (%s)' % ', '.join(result)
 
+		print 'Result (%s)' % ', '.join([e[:7] for e in result])
+		print ' Heads (%s)' % ', '.join([e[:7] for e in self.head])
+
 		return result
 
 	def skip_if_marked_or_mark (self, names):
