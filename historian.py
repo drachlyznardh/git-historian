@@ -327,7 +327,7 @@ class Historian:
 	def get_options(self):
 
 		try:
-			optlist, args = getopt.getopt(sys.argv[1:], 'hvd',
+			optlist, args = getopt.gnu_getopt(sys.argv[1:], 'hvd',
 				['help', 'verbose', 'version',
 				'debug', 'vdebug', 'hdebug', 'ldebug'])
 		except getopt.GetoptError as err:
