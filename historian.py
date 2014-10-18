@@ -181,7 +181,7 @@ class Historian:
 				#commit.mark = 1
 				continue
 
-			if commit.mark: continue
+			#if commit.mark: continue
 			for child in children:
 				#if child in names:
 				target = self.commit[child]
