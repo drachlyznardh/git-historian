@@ -16,7 +16,8 @@ class Node:
 
 	def add_child (self, name):
 
-		self.child.append(name)
+		if name not in self.child:
+			self.child.append(name)
 
 	def has_column (self):
 		return self.column >= 0
