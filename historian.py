@@ -355,15 +355,15 @@ class Historian:
 	def tell_the_story(self):
 
 		self.get_options()
-		self.get_heads(0)
-		self.get_history(0)
+		self.get_heads(self.all_debug or self.debug % 2)
+		self.get_history(self.all_debug or self.debug / 2 % 2)
 
-		self.bind_children(0)
+		self.bind_children(self.all_debug or self.debug / 4 % 2)
 		self.clear()
-		self.row_unroll(0)
+		self.row_unroll(self.all_debug or self.debug / 8 % 2)
 		self.clear()
-		self.column_unroll(1)
+		self.column_unroll(self.all_debug or self.debug / 16 % 2)
 
-		self.print_graph(0)
+		self.print_graph(self.all_debug or self.debug / 32 % 2)
 
 		return
