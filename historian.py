@@ -125,7 +125,7 @@ class Historian:
 
 	def select_column (self, commit):
 
-		debug = 0
+		debug = 1
 
 		if debug: print
 		if not commit.top:
@@ -173,9 +173,11 @@ class Historian:
 		while len(names):
 			name = names.pop(0)
 			commit = self.commit[name]
-			print '  Jumping to head of %s (%d)' % (name[:7], len(names))
+			print '  Jumping to head %s (%d) (%d)' % (name[:7],
+				len(names), len(result))
 			if commit.done: continue
 			children = self.skip_if_done(commit.child)
+			print '\t%s has %d undone children' % (name[:7], len(children))
 			if len(children) == 0:
 				result.append(name)
 				#commit.mark = 1
@@ -191,8 +193,11 @@ class Historian:
 					continue
 				target.mark = 1
 				names.append(child)
+				print '\t%s appendend to names' % child[:7]
 
 			#else: names.extend(children)
+
+		print 'Result (%s)' % ', '.join(result)
 
 		return result
 
