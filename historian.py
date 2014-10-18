@@ -183,6 +183,9 @@ class Historian:
 				#commit.mark = 1
 				continue
 
+			names.extend(self.skip_if_marked_or_mark(children))
+			continue
+
 			#if commit.mark: continue
 			for child in children:
 				#if child in names:
@@ -198,6 +201,18 @@ class Historian:
 			#else: names.extend(children)
 
 		print 'Result (%s)' % ', '.join(result)
+
+		return result
+
+	def skip_if_marked_or_mark (self, names):
+
+		result = []
+
+		for name in names:
+			target = self.commit[name]
+			if not target.mark:
+				target.mark = 1
+				result.append(name)
 
 		return result
 
