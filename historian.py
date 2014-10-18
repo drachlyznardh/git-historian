@@ -19,6 +19,7 @@ class Historian:
 
 		self.verbose = 0
 		self.debug = 0
+		self.all_debug = 0
 
 		self.head = []
 		self.head_by_name = {}
@@ -327,17 +328,13 @@ class Historian:
 	def get_options(self):
 
 		try:
-			optlist, args = getopt.gnu_getopt(sys.argv[1:], 'hvd',
+			optlist, args = getopt.gnu_getopt(sys.argv[1:], 'hvDd:',
 				['help', 'verbose', 'version',
-				'debug', 'vdebug', 'hdebug', 'ldebug'])
+				'debug', 'all-debug'])
 		except getopt.GetoptError as err:
 			print str(err)
 			self.print_help()
 			sys.exit(2)
-
-		vdebug = 0
-		hdebug = 0
-		ldebug = 0
 
 		for key, value in optlist:
 			if key in ('-h', '--help'):
@@ -345,14 +342,10 @@ class Historian:
 				sys.exit(0)
 			elif key in ('-v', '--verbose'):
 				self.verbose = 1
+			elif key in ('-D', '--all-debug'):
+				self.all_debug = 1
 			elif key in ('-d', '--debug'):
-				self.debug = 1
-			elif key == '--vdebug':
-				vdebug = 1
-			elif key == '--hdebug':
-				hdebug = 1
-			elif key == '--ldebug':
-				ldebug = 1
+				self.debug += int(value)
 			elif key == '--version':
 				self.print_version()
 				sys.exit(0)
