@@ -115,8 +115,6 @@ class Historian:
 			# Store parents
 			for i in hashes[1:]: current.parent.append(i)
 
-			current.missing = len(current.parent)
-
 			# Store node in map
 			self.commit[current.hash] = current
 
