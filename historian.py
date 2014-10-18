@@ -301,6 +301,8 @@ class Historian:
 
 	def print_graph (self, debug):
 		
+		if debug: print '-- Print Graph --'
+
 		t = layout.Layout(self.max_width + 1, self.commit, debug)
 
 		cmdargs = 'git show -s --oneline --decorate --color'.split(' ')
