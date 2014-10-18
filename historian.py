@@ -178,12 +178,18 @@ class Historian:
 			children = self.skip_if_done(commit.child)
 			if len(children) == 0:
 				result.append(name)
+				#commit.mark = 1
 				continue
 
+			if commit.mark: continue
 			for child in children:
-				if child in names:
-					print '%s was already inserted!' % child[:7]
+				#if child in names:
+				target = self.commit[child]
+				if target.mark:
+					#print '%s was already inserted!' % child[:7]
+					print '%s is marked!' % child[:7]
 					continue
+				target.mark = 1
 				names.append(child)
 
 			#else: names.extend(children)

@@ -10,6 +10,7 @@ class Node:
 		self.column = -1
 
 		self.done = 0
+		self.mark = 0
 		self.top = None    # Previous commit
 		self.bottom = None # Next commit
 
