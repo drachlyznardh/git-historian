@@ -173,6 +173,7 @@ class Historian:
 		while len(names):
 			name = names.pop(0)
 			commit = self.commit[name]
+			print '  Jumping to head of %s (%d)' % (name[:7], len(names))
 			if commit.done: continue
 			children = self.skip_if_done(commit.child)
 			if len(children) == 0:
