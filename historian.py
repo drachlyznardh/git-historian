@@ -269,6 +269,8 @@ class Historian:
 
 	def column_unroll (self, debug):
 
+		if debug: print '-- Column Unroll --'
+
 		self.width = -1
 
 		visit = order.LeftmostFirst()
@@ -278,11 +280,12 @@ class Historian:
 
 			name = visit.pop()
 			commit = self.commit[name]
+			if debug: print '  Visiting %s' % name[:7]
 
 			if commit.done: continue
 
-			visit.push(self.jump_to_head(commit.child))
 			visit.push(self.skip_if_done(commit.parent))
+			visit.push(self.jump_to_head(commit.child))
 
 			commit.column = self.select_column(commit)
 			commit.done = 1
