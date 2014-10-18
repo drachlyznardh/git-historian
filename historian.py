@@ -123,9 +123,7 @@ class Historian:
 		# Showing results
 		if debug: print self.commit
 
-	def select_column (self, commit):
-
-		debug = 1
+	def select_column (self, commit, debug):
 
 		if debug: print
 		if not commit.top:
@@ -165,7 +163,7 @@ class Historian:
 		self.width += 1
 		return self.width
 
-	def jump_to_head (self, arg):
+	def jump_to_head (self, arg, debug):
 
 		result = []
 		names = list(arg)
@@ -173,11 +171,11 @@ class Historian:
 		while len(names):
 			name = names.pop(0)
 			commit = self.commit[name]
-			print '  Jumping to head %s (%d) (%d)' % (name[:7],
+			if debug: print '  Jumping to head %s (%d) (%d)' % (name[:7],
 				len(names), len(result))
 			if commit.done: continue
 			children = self.skip_if_done(commit.child)
-			print '\t%s has %d undone children' % (name[:7], len(children))
+			if debug: print '\t%s has %d undone children' % (name[:7], len(children))
 			if len(children) == 0:
 				result.append(name)
 				continue
@@ -185,7 +183,7 @@ class Historian:
 			names.extend(self.skip_if_marked_or_mark(children))
 			continue
 
-		print 'Result (%s)' % ', '.join(result)
+		if debug: print 'Result (%s)' % ', '.join(result)
 
 		return result
 
@@ -305,9 +303,9 @@ class Historian:
 			if commit.done: continue
 
 			visit.push(self.skip_if_done(commit.parent))
-			visit.push(self.jump_to_head(commit.child))
+			visit.push(self.jump_to_head(commit.child, debug))
 
-			commit.column = self.select_column(commit)
+			commit.column = self.select_column(commit, debug)
 			commit.done = 1
 
 	def print_graph (self, debug):
