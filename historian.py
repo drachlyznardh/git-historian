@@ -181,12 +181,19 @@ class Historian:
 			names.extend(self.skip_if_marked_or_mark(children))
 			continue
 
-		if debug: print 'Result (%s)' % ', '.join(result)
+		if debug: print ' Result (%s)' % ', '.join([e[:7] for e in result])
 
-		print 'Result (%s)' % ', '.join([e[:7] for e in result])
-		print ' Heads (%s)' % ', '.join([e[:7] for e in self.head])
+		ordered = []
+		for head in self.head:
+			if head in result:
+				ordered.append(head)
+				result.remove(head)
 
-		return result
+		ordered.extend(result)
+
+		if debug: print 'Ordered (%s)' % ', '.join([e[:7] for e in ordered])
+
+		return ordered
 
 	def skip_if_marked_or_mark (self, names):
 
