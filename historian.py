@@ -132,6 +132,8 @@ class Historian:
 		if len(commit.child) == 0:
 			if debug: print '  %s has no children' % commit.hash[:7]
 			self.width += 1
+			#if len(self.skip_if_done(commit.parent)):
+			#	self.width += 1
 			return self.width
 
 		result = self.width
@@ -293,9 +295,9 @@ class Historian:
 
 				commit.done = 1
 
-	def column_unroll (self, debug):
+	def column_unroll (self, d1, d2):
 
-		if debug: print '-- Column Unroll --'
+		if d1 or d2: print '-- Column Unroll --'
 
 		self.width = -1
 
@@ -306,14 +308,14 @@ class Historian:
 
 			name = visit.pop()
 			commit = self.commit[name]
-			if debug: print '  Visiting %s' % name[:7]
+			if d1 or d2: print '  Visiting %s' % name[:7]
 
 			if commit.done: continue
 
+			visit.push(self.jump_to_head(commit.child, d1))
 			visit.push(self.skip_if_done(commit.parent))
-			visit.push(self.jump_to_head(commit.child, debug))
 
-			commit.column = self.select_column(commit, debug)
+			commit.column = self.select_column(commit, d2)
 			commit.done = 1
 
 	def print_graph (self, debug):
@@ -393,8 +395,9 @@ class Historian:
 		self.clear()
 		self.row_unroll(self.all_debug or self.debug / 8 % 2)
 		self.clear()
-		self.column_unroll(self.all_debug or self.debug / 16 % 2)
+		self.column_unroll(self.all_debug or self.debug / 16 % 2,
+			self.all_debug or self.debug / 32 % 2)
 
-		self.print_graph(self.all_debug or self.debug / 32 % 2)
+		self.print_graph(self.all_debug or self.debug / 64 % 2)
 
 		return
