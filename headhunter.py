@@ -15,7 +15,9 @@ class HeadHunter:
 		self.debug = debug
 
 		self.name = []
-		self.cname= []
+		self.cname = []
+
+		self.cmdargs = 'git show -s --oneline --decorate --color'.split(' ')
 
 	def hunt (self, all_heads, args):
 
@@ -95,3 +97,10 @@ class HeadHunter:
 		if not all_heads: return
 
 		self.ohead.extend([e[0] for e in self.head])
+
+	def describe_node (self, target):
+
+		self.cmdargs.append(target.hash)
+		message = check_output(self.cmdargs).split('\n')
+		self.cmdargs.pop()
+		return message
