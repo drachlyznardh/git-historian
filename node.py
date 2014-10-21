@@ -12,7 +12,6 @@ class Node:
 		self.real = real
 
 		self.done = 0
-		self.mark = 0
 		self.top = None    # Previous commit
 		self.bottom = None # Next commit
 

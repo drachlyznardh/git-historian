@@ -113,52 +113,6 @@ class Historian:
 		self.width += 1
 		return self.width
 
-	def jump_to_head (self, arg, debug):
-
-		result = []
-		names = list(arg)
-
-		while len(names):
-			name = names.pop(0)
-			commit = self.commit[name]
-			if debug: print '  Jumping to head %s (%d) (%d)' % (name[:7],
-				len(names), len(result))
-			if commit.done: continue
-			children = self.skip_if_done(commit.child)
-			if debug: print '\t%s has %d undone children' % (name[:7], len(children))
-			if len(children) == 0:
-				result.append(name)
-				continue
-
-			names.extend(self.skip_if_marked_or_mark(children))
-			continue
-
-		if debug: print ' Result (%s)' % ', '.join([e[:7] for e in result])
-
-		ordered = []
-		for head in self.head:
-			if head in result:
-				ordered.append(head)
-				result.remove(head)
-
-		ordered.extend(result)
-
-		if debug: print 'Ordered (%s)' % ', '.join([e[:7] for e in ordered])
-
-		return ordered
-
-	def skip_if_marked_or_mark (self, names):
-
-		result = []
-
-		for name in names:
-			target = self.commit[name]
-			if not target.mark:
-				target.mark = 1
-				result.append(name)
-
-		return result
-
 	def skip_if_done (self, names):
 
 		result = []
@@ -245,7 +199,7 @@ class Historian:
 		self.width = -1
 
 		visit = order.LeftmostFirst()
-		visit.push(self.head[0])
+		visit.push(self.head)
 
 		while visit.has_more():
 
@@ -255,7 +209,6 @@ class Historian:
 
 			if commit.done: continue
 
-			visit.push(self.jump_to_head(commit.child, d1))
 			visit.push(self.skip_if_done(commit.parent))
 
 			commit.column = self.select_column(commit, d2)
