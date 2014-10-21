@@ -98,9 +98,9 @@ class HeadHunter:
 
 		self.ohead.extend([e[0] for e in self.head])
 
-	def describe_node (self, target):
+	def describe (self, name):
 
-		self.cmdargs.append(target.hash)
+		self.cmdargs.append(name)
 		message = check_output(self.cmdargs).split('\n')
 		self.cmdargs.pop()
 		return message

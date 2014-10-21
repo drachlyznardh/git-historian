@@ -220,9 +220,6 @@ class Historian:
 
 		t = layout.Layout(self.max_width + 1, self.commit, debug)
 
-		cmdargs = 'git show -s --oneline --decorate --color'.split(' ')
-		#cmdargs.append(optargs)
-
 		name = self.first
 
 		while name:
@@ -236,16 +233,13 @@ class Historian:
 			
 			t.compute_layout(commit)
 
-			cmdargs.append(commit.hash)
-
-			message = check_output(cmdargs).split('\n')
+			message = self.hunter.describe(name)
 
 			print '%s\x1b[m %s' % (t.draw_transition(), message[0])
 			for i in message[1:-1]:
 			#for i in message[1:]:
 				print '%s\x1b[m %s' % (t.draw_padding(), i)
 
-			cmdargs.pop() # Remove current commit name from arg list
 			name = commit.bottom
 
 	def print_version(self):
