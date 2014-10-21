@@ -31,58 +31,6 @@ class Historian:
 		self.width = -1
 		self.max_width = 0
 	
-	def get_heads_by_name (self, name, debug):
-
-		# Looking for heads, i.e. active branches
-		cmdlist = ['git', 'show-ref', '--heads']
-
-		# If names are specified, we look for them
-		if name: cmdlist.append(name)
-
-		# Print the command line request
-		if debug: print cmdlist
-
-		# Invoke Git
-		try: git_output = check_output(cmdlist)
-		except CalledProcessError as error:
-			print 'Command `%s` returned %d' % (' '.join(cmdlist), error.returncode)
-			sys.exit(1)
-			return
-
-		# Print the output
-		if debug: print git_output
-
-		# Parsing Git response
-		for line in git_output.split('\n'):
-			
-			# Skipping empty lines (the last one should be empty)
-			if len(line) == 0: continue
-			
-			# Matching hash and name
-			hash_n_ref = re.compile(r'''(.*) refs\/.*\/(.*)''').match(line)
-
-			# Broken ref: display message and skip line
-			if not hash_n_ref:
-				print 'No match for (%s)' % line
-				continue
-
-			# Save result in order and by name
-			self.head.append(hash_n_ref.group(1))
-			self.head_by_name[hash_n_ref.group(2)] = hash_n_ref.group(1)
-
-		# Showing results
-		if debug: print self.head
-		if debug: print self.head_by_name
-
-	def get_heads (self, debug):
-
-		if len(self.args) == 0:
-			self.get_heads_by_name(None, debug)
-			return
-
-		for name in self.args:
-			self.get_heads_by_name(name, debug)
-
 	def get_history(self, debug):
 
 		# Looking for commit's and parents' hashes…
@@ -401,7 +349,6 @@ class Historian:
 		hunter = headhunter.HeadHunter(self.all_debug or self.debug % 2)
 		self.head = hunter.hunt(self.all_heads, self.args)
 
-		#self.get_heads(self.all_debug or self.debug % 2)
 		self.get_history(self.all_debug or self.debug / 2 % 2)
 
 		self.bind_children(self.all_debug or self.debug / 4 % 2)
