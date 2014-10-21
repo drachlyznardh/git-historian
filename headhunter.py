@@ -32,7 +32,7 @@ class HeadHunter:
 
 		print '  HeadHunter.Head(%s)' % ', '.join([e[:7] for e in self.ohead])
 
-		return self.head
+		return self.ohead
 
 	def load_configfile (self, target_file):
 
