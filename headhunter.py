@@ -21,7 +21,11 @@ class HeadHunter:
 		self.load_configfile('.git-historian')
 		self.load_args(args)
 
-		print '(%s)' % ', '.join(self.name)
+		print '  HeadHunter.Name (%s)' % ', '.join(self.name)
+
+		self.load_heads()
+
+		print '  HeadHunter.Head(%s)' % ', '.join(self.head)
 
 		return self.head
 
@@ -39,3 +43,19 @@ class HeadHunter:
 			return
 
 		self.name.extend(args)
+
+	def load_heads (self):
+
+		# Looking for heads, i.e. active branches
+		cmdlist = ['git', 'show-ref', '--heads']
+
+		# Print the command line request
+		if self.debug: print '  Now invoking %s' % cmdlist
+
+		# Invoke Git
+		try: git_output = check_output(cmdlist)
+		except CalledProcessError as error:
+			print 'Command `%s` returned %d' % (' '.join(cmdlist), error.returncode)
+			sys.exit(1)
+			return
+
