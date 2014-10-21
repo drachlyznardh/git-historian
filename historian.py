@@ -4,7 +4,7 @@
 import sys
 import getopt
 
-import headhunter
+import hunter
 import order
 
 import layout
@@ -250,7 +250,7 @@ class Historian:
 
 		self.get_options()
 
-		self.hunter = headhunter.HeadHunter(self.all_debug or self.debug % 2)
+		self.hunter = hunter.HeadHunter(self.all_debug or self.debug % 2)
 		self.head = self.hunter.hunt(self.all_heads, self.args)
 
 		self.node = self.hunter.get_history(self.all_debug or self.debug / 2 % 2)
