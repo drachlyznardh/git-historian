@@ -176,6 +176,7 @@ class Historian:
 		if debug: print '-- Print Graph --'
 
 		t = layout.Layout(self.max_width + 1, self.node, debug)
+		h = hunter.MessageHunter()
 
 		name = self.first
 
@@ -190,7 +191,7 @@ class Historian:
 			
 			t.compute_layout(commit)
 
-			message = self.hunter.describe(name)
+			message = h.describe(name)
 
 			print '%s\x1b[m %s' % (t.draw_transition(), message[0])
 			for i in message[1:-1]:

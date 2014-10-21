@@ -20,8 +20,6 @@ class HeadHunter:
 		self.name = []
 		self.cname = []
 
-		self.cmdargs = 'git show -s --oneline --decorate --color'.split(' ')
-
 	def hunt (self, all_heads, args):
 
 		self.load_configfile('.git-historian')
@@ -146,6 +144,12 @@ class HeadHunter:
 		# Showing results
 		if debug: print nodes
 		return nodes
+
+class MessageHunter:
+
+	def __init__ (self):
+
+		self.cmdargs = 'git show -s --oneline --decorate --color'.split(' ')
 
 	def describe (self, name):
 
