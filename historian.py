@@ -229,32 +229,25 @@ class Historian:
 		if debug: print '-- Binding Children --'
 
 		visit = order.LeftmostFirst()
+		visit.push(self.head)
 
-		for head in self.head:
+		while visit.has_more():
 
-			if debug: print '  Head %s' % head[:7]
+			name = visit.pop()
+			commit = self.commit[name]
 
-			visit.push(head)
+			if debug: print '  Visiting %s' % name[:7]
 
-			while 1:
+			if commit.done:
+				if debug: print '  %s is done, skipping…' % name[:7]
+				continue
 
-				if visit.is_empty(): break
+			for i in commit.parent:
+				self.commit[i].add_child(name)
 
-				name = visit.pop()
-				commit = self.commit[name]
+			visit.push(self.skip_if_done(commit.parent))
 
-				if debug: print '  Visiting %s' % name[:7]
-
-				if commit.done:
-					if debug: print '  %s is done, skipping…' % name[:7]
-					continue
-
-				for i in commit.parent:
-					self.commit[i].add_child(name)
-
-				visit.push(self.skip_if_done(commit.parent))
-
-				commit.done = 1
+			commit.done = 1
 
 	def row_unroll (self, debug):
 
