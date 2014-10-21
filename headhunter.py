@@ -7,9 +7,10 @@ import sys
 
 class HeadHunter:
 
-	def __init__ (self):
+	def __init__ (self, debug):
 
 		self.head = []
+		self.debug = debug
 
 	def hunt (self, args):
 
