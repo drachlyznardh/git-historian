@@ -1,5 +1,6 @@
 # TODO
 
+- a configuration file, to store head priority;
 - *Headhunter*: there must be a --all option to get all the heads, which then
   can be ordered as specified; maybe it should a whole new class, since
   Historian is getting fat…
