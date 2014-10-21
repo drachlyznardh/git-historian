@@ -1,151 +1,152 @@
 # Layout module for Git-Historian
 # -*- encoding: utf-8 -*-
 
+class Column:
+
+	def __init__ (self, color, transition, padding):
+		self.color = color
+		self.transition = transition
+		self.padding = padding
+
 class Layout:
-	def __init__ (self, size, commit):
+
+	def __init__ (self, size, commit, debug):
 		
 		self.size = size
-		self.commit = commit
-		self.bottom = {}
-		for i in xrange(size):
-			self.bottom[i] = ''
-		self.last = ''
+		self.debug = debug
 
-	def swap (self):
-		self.top = self.bottom.copy()
+		self.layout = []
 
-	def plot_top (self):
-		transition = ''
-		for i in self.top:
-			c = self.top[i]
-			if c: transition += " %s" % c[:7]
-			else: transition += " %s" % "XXXXXXX"
-		print "T {%s}" % transition
+		self.track = {i:set() for i in xrange(size)}
 
-	def plot_bottom (self):
-		transition = ''
-		for i in self.bottom:
-			c = self.bottom[i]
-			if c: transition += " %s" % c[:7]
-			else: transition += " %s" % "XXXXXXX"
-		print "B {%s}" % transition
+	def plot_track (self):
+		for track in self.track.values():
+			print track
 
-	def put_char(self, name, symbol):
+	def put_char(self, name, transition, padding):
 		
-		if name == None:
-			color = 9
-		elif isinstance(name, basestring):
+		if isinstance(name, basestring):
 			father = self.commit[name]
-			color = 1 + father.column % 7
+			color = 31 + father.column % 6
 		elif isinstance(name, int):
-			color = 1 + name
+			color = 31 + name % 6
+		else:
+			print 'WTF is %s' % name
+			color = 39
 
-		self.last = symbol
-		self.layout += '\x1b[3%dm%s' % (color, symbol)
+		self.layout.append(Column(color, transition, padding))
 
-	def draw_even_column(self, index, target):
+	def compute_even_column(self, index, target):
 		
 		if index == target.column:
-			self.put_char(None, '⬤') # \u2b24
+
+			if len(target.parent): padding = '│' # \u2502
+			else: padding = ' '
+			
+			self.put_char(target.column, '•', padding) # \u2022 \u2502
 			return
 
-		top = self.top[index]
-		bottom = self.bottom[index]
+		if index > target.column:
 
-		if len(top) and len(bottom): # both ends are present
-
-			if top == bottom:
-
-				if bottom in target.parent:
-
-					if target.hash in self.ne:
-						
-						self.put_char(bottom, '├') # \u251c
-					elif target.hash in self.nw:
-						
-						self.put_char(top, '┤') # \u2524
-					elif target.hash in self.commit[bottom].child:
-
-						self.put_char(bottom, '├') # \u251c
-					else: self.layout += '^'
-
-				else: 
-					self.put_char(top, '│') # \u2502
-
-			else: self.layout += '@'
-
-			return
-
-		if len(bottom): # only lower end is present
-
-			if bottom == target.hash:
-				self.layout += '┐' # \u2510
+			if target.hash in self.track[index]:
+				if len(self.track[index]) > 1:
+					self.put_char(index, '┤', '│') # \u2524 \u2502
+				else:
+					self.put_char(index, '┘', ' ') # \u2518
 				return
 
-			if index > target.column:
-				self.put_char(index, '┐') # \u2510
+			if len(self.track[index]):
+				self.put_char(index, '│', '│')
 				return
-			else:
-				self.put_char(index, '┌') # \u250c
+
+			for jndex in range(index, self.size):
+				if target.hash in self.track[jndex]:
+					self.put_char(jndex, '→', ' ')
+					return
+
+		else:
+
+			if target.hash in self.track[index]:
+				if len(self.track[index]) > 1:
+					self.put_char(index, '├', '│') # \u251c \u2502
+				else:
+					self.put_char(index, '└', ' ') # \u2514
 				return
-				
-		if len(top): # only upper end is present
 
-			self.put_char(None, '_')
-			return
+			if len(self.track[index]):
+				self.put_char(index, '│', '│')
+				return
 
-		if self.last == '←' or self.last == '→':
-			self.layout += '─' # \u2500
-		else: self.layout += ' '
+			for jndex in reversed(range(0, index)):
+				if target.hash in self.track[jndex]:
+					self.put_char(jndex, '←', ' ') # \u2500
+					return
 
-	def draw_odd_column(self, index, target):
+		if len(self.track[index]):
+			self.put_char(index, '│', '│') # \u2502
+		else:
+			self.put_char(index, ' ', ' ')
 
-		father = None
+		return
+
+	def compute_odd_column(self, index, target):
 
 		if index > target.column:
 			
-			for name in target.parent:
-				if name in self.se:
-					self.put_char(name, '←')
+			if target.hash in self.track[index]:
+				self.put_char(index, '→', ' ')
+				return
+			
+			for jndex in range(index, self.size):
+				if target.hash in self.track[jndex]:
+					self.put_char(jndex, '→', ' ')
 					return
 		
 		else:
 
-			for name in reversed(target.parent):
-				if name in self.sw:
-					self.put_char(name, '→')
+			if target.hash in self.track[index - 1]:
+				self.put_char(index - 1, '←', ' ')
+				return
+
+			for jndex in reversed(range(0, index - 1)):
+				if target.hash in self.track[jndex]:
+					self.put_char(jndex, '←', ' ')
 					return
 
-		self.put_char(None, ' ')
+		self.put_char(index, ' ', ' ')
 
-	def draw_layout (self, target, padding = 0):
-		
-		self.layout = ''
+	def compute_layout (self, target):
 
-		self.ne = self.top.values()
-		self.nw = []
-		self.se = self.bottom.values()
-		self.sw = []
+		self.layout = []
 
-		#print "North %s" % self.ne
-		#print "South %s" % self.se
-
-		if padding:
-			if self.ne[0]: self.layout += '│' # \u2502
-			else: self.layout += ' '
-			for i in self.ne[1:]:
-				if i: self.layout += ' │'
-				else: self.layout += '  '
-			self.layout += '\n'
+		if self.debug:
+			self.plot_track()
+			print target.child
 
 		if self.size:
-			self.draw_even_column(0, target)
+			self.compute_even_column(0, target)
 		for i in xrange(1, self.size):
-			self.nw.append(self.ne.pop(0))
-			self.sw.append(self.se.pop(0))
-			#print "N (%s) (%s)" % (self.nw, self.ne)
-			#print "S (%s) (%s)" % (self.sw, self.se)
-			self.draw_odd_column(i, target)
-			self.draw_even_column(i, target)
-		return self.layout
+			self.compute_odd_column(i, target)
+			self.compute_even_column(i, target)
+
+		for track in self.track.values():
+			track.discard(target.hash)
+
+		for name in target.parent:
+			self.track[target.column].add(name)
+
+	def draw_padding (self):
+
+		padding = ''
+		for i in self.layout:
+			padding += '\x1b[%dm%s' % (i.color, i.padding)
+		return padding
+
+	def draw_transition (self):
+		
+		padding = ''
+		for i in self.layout:
+			if i.transition == '•': padding += '\x1b[m•'
+			else: padding += '\x1b[%dm%s' % (i.color, i.transition)
+		return padding
 
