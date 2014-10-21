@@ -251,12 +251,11 @@ class Historian:
 
 		self.get_options()
 
-		hd = self.all_debug or self.debug / 2 % 2
+		hed = self.all_debug or self.debug % 2
+		hid = self.all_debug or self.debug / 2 % 2
 
-		self.hunter = hunter.HeadHunter(self.all_debug or self.debug % 2)
-		self.head = self.hunter.hunt(self.all_heads, self.args)
-
-		self.node = hunter.HistoryHunter(self.head, hd).hunt()
+		self.head = hunter.HeadHunter(self.all_heads, self.args, hed).hunt()
+		self.node = hunter.HistoryHunter(self.head, hid).hunt()
 
 		self.bind_children(self.all_debug or self.debug / 4 % 2)
 		self.clear()

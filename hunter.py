@@ -11,7 +11,7 @@ import node
 
 class HeadHunter:
 
-	def __init__ (self, debug):
+	def __init__ (self, all_heads, args, debug = 0):
 
 		self.head = []
 		self.ohead = []
@@ -20,10 +20,13 @@ class HeadHunter:
 		self.name = []
 		self.cname = []
 
-	def hunt (self, all_heads, args):
+		self.all_heads = all_heads
+		self.args = args
+
+	def hunt (self):
 
 		self.load_configfile('.git-historian')
-		self.load_args(args)
+		self.load_args()
 
 		if self.debug:
 			print '  HeadHunter.Name (%s)' % ', '.join(self.name)
@@ -33,7 +36,7 @@ class HeadHunter:
 		if self.debug:
 			print '  HeadHunter.Head(%s)' % ', '.join([e[0][:7] for e in self.head])
 
-		self.order_heads(all_heads)
+		self.order_heads()
 
 		if self.debug:
 			print '  HeadHunter.Head(%s)' % ', '.join([e[:7] for e in self.ohead])
@@ -47,13 +50,13 @@ class HeadHunter:
 
 		self.cname = json.load(f)
 
-	def load_args (self, args):
+	def load_args (self):
 
-		if len(args) == 0:
+		if len(self.args) == 0:
 			self.name.extend(self.cname)
 			return
 
-		self.name.extend(args)
+		self.name.extend(self.args)
 
 	def load_heads (self):
 
@@ -90,7 +93,7 @@ class HeadHunter:
 			# Save result in order and by name
 			self.head.append((hash_n_ref.group(1), hash_n_ref.group(2)))
 
-	def order_heads (self, all_heads):
+	def order_heads (self):
 
 		for name in self.name:
 			for e in self.head:
@@ -98,7 +101,7 @@ class HeadHunter:
 					self.head.remove(e)
 					self.ohead.append(e[0])
 
-		if not all_heads: return
+		if not self.all_heads: return
 
 		self.ohead.extend([e[0] for e in self.head])
 
