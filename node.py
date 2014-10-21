@@ -10,12 +10,14 @@ class Node:
 		self.column = -1
 
 		self.done = 0
+		self.mark = 0
 		self.top = None    # Previous commit
 		self.bottom = None # Next commit
 
 	def add_child (self, name):
 
-		self.child.append(name)
+		if name not in self.child:
+			self.child.append(name)
 
 	def has_column (self):
 		return self.column >= 0

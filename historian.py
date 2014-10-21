@@ -115,17 +115,13 @@ class Historian:
 			# Store parents
 			for i in hashes[1:]: current.parent.append(i)
 
-			current.missing = len(current.parent)
-
 			# Store node in map
 			self.commit[current.hash] = current
 
 		# Showing results
 		if debug: print self.commit
 
-	def select_column (self, commit):
-
-		debug = 0
+	def select_column (self, commit, debug):
 
 		if debug: print
 		if not commit.top:
@@ -136,6 +132,8 @@ class Historian:
 		if len(commit.child) == 0:
 			if debug: print '  %s has no children' % commit.hash[:7]
 			self.width += 1
+			#if len(self.skip_if_done(commit.parent)):
+			#	self.width += 1
 			return self.width
 
 		result = self.width
@@ -165,7 +163,7 @@ class Historian:
 		self.width += 1
 		return self.width
 
-	def jump_to_head (self, arg):
+	def jump_to_head (self, arg, debug):
 
 		result = []
 		names = list(arg)
@@ -173,11 +171,41 @@ class Historian:
 		while len(names):
 			name = names.pop(0)
 			commit = self.commit[name]
+			if debug: print '  Jumping to head %s (%d) (%d)' % (name[:7],
+				len(names), len(result))
 			if commit.done: continue
 			children = self.skip_if_done(commit.child)
+			if debug: print '\t%s has %d undone children' % (name[:7], len(children))
 			if len(children) == 0:
 				result.append(name)
-			else: names.extend(children)
+				continue
+
+			names.extend(self.skip_if_marked_or_mark(children))
+			continue
+
+		if debug: print ' Result (%s)' % ', '.join([e[:7] for e in result])
+
+		ordered = []
+		for head in self.head:
+			if head in result:
+				ordered.append(head)
+				result.remove(head)
+
+		ordered.extend(result)
+
+		if debug: print 'Ordered (%s)' % ', '.join([e[:7] for e in ordered])
+
+		return ordered
+
+	def skip_if_marked_or_mark (self, names):
+
+		result = []
+
+		for name in names:
+			target = self.commit[name]
+			if not target.mark:
+				target.mark = 1
+				result.append(name)
 
 		return result
 
@@ -267,9 +295,9 @@ class Historian:
 
 				commit.done = 1
 
-	def column_unroll (self, debug):
+	def column_unroll (self, d1, d2):
 
-		if debug: print '-- Column Unroll --'
+		if d1 or d2: print '-- Column Unroll --'
 
 		self.width = -1
 
@@ -280,18 +308,20 @@ class Historian:
 
 			name = visit.pop()
 			commit = self.commit[name]
-			if debug: print '  Visiting %s' % name[:7]
+			if d1 or d2: print '  Visiting %s' % name[:7]
 
 			if commit.done: continue
 
+			visit.push(self.jump_to_head(commit.child, d1))
 			visit.push(self.skip_if_done(commit.parent))
-			visit.push(self.jump_to_head(commit.child))
 
-			commit.column = self.select_column(commit)
+			commit.column = self.select_column(commit, d2)
 			commit.done = 1
 
 	def print_graph (self, debug):
 		
+		if debug: print '-- Print Graph --'
+
 		t = layout.Layout(self.max_width + 1, self.commit, debug)
 
 		cmdargs = 'git show -s --oneline --decorate --color'.split(' ')
@@ -365,8 +395,9 @@ class Historian:
 		self.clear()
 		self.row_unroll(self.all_debug or self.debug / 8 % 2)
 		self.clear()
-		self.column_unroll(self.all_debug or self.debug / 16 % 2)
+		self.column_unroll(self.all_debug or self.debug / 16 % 2,
+			self.all_debug or self.debug / 32 % 2)
 
-		self.print_graph(self.all_debug or self.debug / 32 % 2)
+		self.print_graph(self.all_debug or self.debug / 64 % 2)
 
 		return
