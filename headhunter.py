@@ -1,10 +1,13 @@
 # Headhunter module for Git-Historian
+# -*- encoding: utf-8 -*-
 
 from subprocess import check_output
 from subprocess import CalledProcessError
 import re
 import sys
 import json
+
+import node
 
 class HeadHunter:
 
@@ -97,6 +100,49 @@ class HeadHunter:
 		if not all_heads: return
 
 		self.ohead.extend([e[0] for e in self.head])
+
+	def get_history(self, debug):
+
+		nodes = {}
+
+		# Looking for commit's and parents' hashes…
+		cmdlist = ['git', 'log', '--pretty="%H %P"']
+
+		# … starting from know heads only
+		cmdlist.extend(self.ohead)
+
+		# Print the request
+		if debug: print cmdlist
+
+		# Invoking Git
+		git_history_dump = check_output(cmdlist)
+
+		# Print the output
+		if debug: print git_history_dump
+
+		# Parsing Git response
+		for line in git_history_dump.split('\n'):
+
+			# Skipping empty lines (the last one should be empty)
+			if len(line) == 0: continue
+
+			# New node to store info
+			current = node.Node(1)
+
+			hashes = line[1:-1].split()
+
+			# Store self
+			current.hash = hashes[0]
+
+			# Store parents
+			for i in hashes[1:]: current.parent.append(i)
+
+			# Store node in map
+			nodes[current.hash] = current
+
+		# Showing results
+		if debug: print nodes
+		return nodes
 
 	def describe (self, name):
 

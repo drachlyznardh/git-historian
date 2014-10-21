@@ -31,46 +31,6 @@ class Historian:
 		self.width = -1
 		self.max_width = 0
 	
-	def get_history(self, debug):
-
-		# Looking for commit's and parents' hashes…
-		cmdlist = ['git', 'log', '--pretty="%H %P"']
-
-		# … starting from know heads only
-		cmdlist.extend(self.head)
-
-		# Print the request
-		if debug: print cmdlist
-
-		# Invoking Git
-		git_history_dump = check_output(cmdlist)
-
-		# Print the output
-		if debug: print git_history_dump
-
-		# Parsing Git response
-		for line in git_history_dump.split('\n'):
-
-			# Skipping empty lines (the last one should be empty)
-			if len(line) == 0: continue
-
-			# New node to store info
-			current = node.Node(1)
-
-			hashes = line[1:-1].split()
-
-			# Store self
-			current.hash = hashes[0]
-
-			# Store parents
-			for i in hashes[1:]: current.parent.append(i)
-
-			# Store node in map
-			self.commit[current.hash] = current
-
-		# Showing results
-		if debug: print self.commit
-
 	def select_column (self, commit, debug):
 
 		if debug: print
@@ -296,8 +256,7 @@ class Historian:
 		self.hunter = headhunter.HeadHunter(self.all_debug or self.debug % 2)
 		self.head = self.hunter.hunt(self.all_heads, self.args)
 
-		self.get_history(self.all_debug or self.debug / 2 % 2)
-
+		self.commit = self.hunter.get_history(self.all_debug or self.debug / 2 % 2)
 		self.bind_children(self.all_debug or self.debug / 4 % 2)
 		self.clear()
 		self.row_unroll(self.all_debug or self.debug / 8 % 2)
