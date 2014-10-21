@@ -12,7 +12,7 @@ import order
 
 import layout
 
-VERSION="0.0-a"
+VERSION="0.0-b"
 
 class Historian:
 	def __init__ (self):
