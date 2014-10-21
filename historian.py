@@ -1,14 +1,10 @@
 # Main module for Git-Historian
 # -*- encoding: utf-8 -*-
 
-from subprocess import check_output
-from subprocess import CalledProcessError
-import re
 import sys
 import getopt
 
 import headhunter
-import node
 import order
 
 import layout
