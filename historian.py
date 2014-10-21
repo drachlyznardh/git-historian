@@ -27,7 +27,7 @@ class Historian:
 		self.first = None
 		self.width = -1
 		self.max_width = 0
-	
+
 	def select_column (self, commit, debug):
 
 		if debug: print
@@ -251,10 +251,13 @@ class Historian:
 
 		self.get_options()
 
+		hd = self.all_debug or self.debug / 2 % 2
+
 		self.hunter = hunter.HeadHunter(self.all_debug or self.debug % 2)
 		self.head = self.hunter.hunt(self.all_heads, self.args)
 
-		self.node = self.hunter.get_history(self.all_debug or self.debug / 2 % 2)
+		self.node = hunter.HistoryHunter(self.head, hd).hunt()
+
 		self.bind_children(self.all_debug or self.debug / 4 % 2)
 		self.clear()
 		self.row_unroll(self.all_debug or self.debug / 8 % 2)

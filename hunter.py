@@ -102,7 +102,14 @@ class HeadHunter:
 
 		self.ohead.extend([e[0] for e in self.head])
 
-	def get_history(self, debug):
+class HistoryHunter:
+
+	def __init__ (self, target, debug = 0):
+
+		self.target = target
+		self.debug = debug
+
+	def hunt (self):
 
 		nodes = {}
 
@@ -110,16 +117,16 @@ class HeadHunter:
 		cmdlist = ['git', 'log', '--pretty="%H %P"']
 
 		# … starting from know heads only
-		cmdlist.extend(self.ohead)
+		cmdlist.extend(self.target)
 
 		# Print the request
-		if debug: print cmdlist
+		if self.debug: print cmdlist
 
 		# Invoking Git
 		git_history_dump = check_output(cmdlist)
 
 		# Print the output
-		if debug: print git_history_dump
+		if self.debug: print git_history_dump
 
 		# Parsing Git response
 		for line in git_history_dump.split('\n'):
@@ -142,7 +149,7 @@ class HeadHunter:
 			nodes[current.hash] = current
 
 		# Showing results
-		if debug: print nodes
+		if self.debug: print nodes
 		return nodes
 
 class MessageHunter:
