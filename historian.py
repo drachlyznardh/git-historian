@@ -356,7 +356,17 @@ class Historian:
 		print "Git-Historian %s (C) 2014 Ivan Simonini" % VERSION
 
 	def print_help(self):
-		print "Usage: %s " % sys.argv[0]
+		print "Usage: %s [options] heads…" % sys.argv[0]
+		print ' -D, --all-debug : print all kinds of debug messages'
+		print ' -d N, --debug N : add N to the debug counter'
+		print
+		print 'debug 1  : show heads'
+		print 'debug 2  : show data loading'
+		print 'debug 4  : show bindings'
+		print 'debug 8  : show vertical unroll'
+		print 'debug 16 : show head jumps'
+		print 'debug 32 : show column assignments'
+		print 'debug 64 : show layout construction'
 
 	def get_options(self):
 
