@@ -27,15 +27,18 @@ class HeadHunter:
 		self.load_configfile('.git-historian')
 		self.load_args(args)
 
-		print '  HeadHunter.Name (%s)' % ', '.join(self.name)
+		if self.debug:
+			print '  HeadHunter.Name (%s)' % ', '.join(self.name)
 
 		self.load_heads()
 
-		print '  HeadHunter.Head(%s)' % ', '.join([e[0][:7] for e in self.head])
+		if self.debug:
+			print '  HeadHunter.Head(%s)' % ', '.join([e[0][:7] for e in self.head])
 
 		self.order_heads(all_heads)
 
-		print '  HeadHunter.Head(%s)' % ', '.join([e[:7] for e in self.ohead])
+		if self.debug:
+			print '  HeadHunter.Head(%s)' % ', '.join([e[:7] for e in self.ohead])
 
 		return self.ohead
 
