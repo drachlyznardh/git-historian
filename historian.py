@@ -399,7 +399,7 @@ class Historian:
 		self.get_options()
 
 		hunter = headhunter.HeadHunter(self.all_debug or self.debug % 2)
-		hunter.hunt(self.args)
+		hunter.hunt(self.all_heads, self.args)
 
 		self.get_heads(self.all_debug or self.debug % 2)
 		self.get_history(self.all_debug or self.debug / 2 % 2)
