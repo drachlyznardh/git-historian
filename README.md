@@ -70,8 +70,8 @@ from the first parent, as you can do with the usual `git log --graph` layout.
 Closer arrows (those with less horizontal gap from the respective target) take
 precedence over other arrows. This affects the color, not the direction.
 
-At the end of its row, each commit is resented with its `git show --pretty`
-output.
+At the end of its row, each commit is resented with its `git show -s --online
+--decorate --color` output.
 
 Testing
 -------
