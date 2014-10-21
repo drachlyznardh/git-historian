@@ -22,6 +22,7 @@ class Historian:
 		self.debug = 0
 		self.all_debug = 0
 
+		self.all_heads = 0
 		self.head = []
 		self.head_by_name = {}
 		self.commit = {}
@@ -366,8 +367,9 @@ class Historian:
 	def get_options(self):
 
 		try:
-			optlist, args = getopt.gnu_getopt(sys.argv[1:], 'hvDd:',
+			optlist, args = getopt.gnu_getopt(sys.argv[1:], 'ahvDd:',
 				['help', 'verbose', 'version',
+				'all', 'all-heads',
 				'debug', 'all-debug'])
 		except getopt.GetoptError as err:
 			print str(err)
@@ -380,6 +382,8 @@ class Historian:
 				sys.exit(0)
 			elif key in ('-v', '--verbose'):
 				self.verbose = 1
+			elif key in ('-a', '--all', '--all-heads'):
+				self.all_heads = 1
 			elif key in ('-D', '--all-debug'):
 				self.all_debug = 1
 			elif key in ('-d', '--debug'):
