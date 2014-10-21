@@ -105,7 +105,7 @@ class Historian:
 			if len(line) == 0: continue
 
 			# New node to store info
-			current = node.Node()
+			current = node.Node(1)
 
 			hashes = line[1:-1].split()
 
