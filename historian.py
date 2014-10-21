@@ -299,8 +299,8 @@ class Historian:
 
 		self.get_options()
 
-		hunter = headhunter.HeadHunter(self.all_debug or self.debug % 2)
-		self.head = hunter.hunt(self.all_heads, self.args)
+		self.hunter = headhunter.HeadHunter(self.all_debug or self.debug % 2)
+		self.head = self.hunter.hunt(self.all_heads, self.args)
 
 		self.get_history(self.all_debug or self.debug / 2 % 2)
 
