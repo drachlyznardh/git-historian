@@ -25,7 +25,7 @@ class Historian:
 		self.all_heads = 0
 		self.head = []
 		self.head_by_name = {}
-		self.commit = {}
+		self.node = {}
 
 		self.first = None
 		self.width = -1
@@ -51,14 +51,14 @@ class Historian:
 		if debug: print '  Processing %s' % commit.hash[:7]
 		while name:
 
-			target = self.commit[name]
+			target = self.node[name]
 
 			if name in commit.child and target.has_column():
 				if debug: print '  %s is a child of %s (%d), halting' % (
 					name[:7], commit.hash[:7],
-					self.commit[name].column)
+					self.node[name].column)
 
-				booked = 1 + max([self.commit[j].column for j in target.parent])
+				booked = 1 + max([self.node[j].column for j in target.parent])
 				if debug: print booked
 				column = max(result, target.column, booked)
 				self.max_width = max(self.max_width, column)
@@ -78,14 +78,14 @@ class Historian:
 		result = []
 
 		for name in names:
-			if not self.commit[name].done:
+			if not self.node[name].done:
 				result.append(name)
 
 		return result
 
 	def clear (self):
 
-		for commit in self.commit.values():
+		for commit in self.node.values():
 			commit.done = 0
 
 	def bind_children (self, debug):
@@ -98,7 +98,7 @@ class Historian:
 		while visit.has_more():
 
 			name = visit.pop()
-			commit = self.commit[name]
+			commit = self.node[name]
 
 			if debug: print '  Visiting %s' % name[:7]
 
@@ -107,7 +107,7 @@ class Historian:
 				continue
 
 			for i in commit.parent:
-				self.commit[i].add_child(name)
+				self.node[i].add_child(name)
 
 			visit.push(self.skip_if_done(commit.parent))
 
@@ -129,7 +129,7 @@ class Historian:
 			while visit.has_more():
 				
 				name = visit.pop()
-				commit = self.commit[name]
+				commit = self.node[name]
 
 				if debug: print '  Visiting %s' % name[:7]
 
@@ -144,7 +144,7 @@ class Historian:
 
 				if current:
 					commit.top = current
-					self.commit[current].bottom = name
+					self.node[current].bottom = name
 				else: self.first = name
 				current = name
 
@@ -164,7 +164,7 @@ class Historian:
 		while visit.has_more():
 
 			name = visit.pop()
-			commit = self.commit[name]
+			commit = self.node[name]
 			if d1 or d2: print '  Visiting %s' % name[:7]
 
 			if commit.done: continue
@@ -178,13 +178,13 @@ class Historian:
 		
 		if debug: print '-- Print Graph --'
 
-		t = layout.Layout(self.max_width + 1, self.commit, debug)
+		t = layout.Layout(self.max_width + 1, self.node, debug)
 
 		name = self.first
 
 		while name:
 
-			commit = self.commit[name]
+			commit = self.node[name]
 			if not commit:
 				print "No Commit for name %s" % name[:7]
 				break
@@ -256,7 +256,7 @@ class Historian:
 		self.hunter = headhunter.HeadHunter(self.all_debug or self.debug % 2)
 		self.head = self.hunter.hunt(self.all_heads, self.args)
 
-		self.commit = self.hunter.get_history(self.all_debug or self.debug / 2 % 2)
+		self.node = self.hunter.get_history(self.all_debug or self.debug / 2 % 2)
 		self.bind_children(self.all_debug or self.debug / 4 % 2)
 		self.clear()
 		self.row_unroll(self.all_debug or self.debug / 8 % 2)
