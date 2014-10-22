@@ -273,7 +273,7 @@ class Historian:
 	def tell_the_story(self):
 
 		self.head = hunter.HeadHunter(self.o, self.o.d(1)).hunt()
-		self.node = hunter.HistoryHunter(self.o).hunt()
+		self.node = hunter.HistoryHunter(self.head, self.o.d(2)).hunt()
 
 		self.bind_children(self.o.d(4))
 		self.clear()
