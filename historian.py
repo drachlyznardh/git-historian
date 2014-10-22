@@ -28,6 +28,9 @@ class Option:
 		self.width = -1
 		self.max_width = 0
 
+		self.o = historian.Option()
+		self.o.parse()
+
 	def print_version(self):
 		print "Git-Historian %s (C) 2014 Ivan Simonini" % VERSION
 
@@ -45,7 +48,7 @@ class Option:
 		print 'debug 32 : show column assignments'
 		print 'debug 16 : show layout construction'
 
-	def get_options(self):
+	def parse (self):
 
 		try:
 			optlist, args = getopt.gnu_getopt(sys.argv[1:], 'ahvDd:',
@@ -74,6 +77,9 @@ class Option:
 				sys.exit(0)
 
 		self.args = args
+	
+	def d (self, value):
+		return self.all_debug or self.debug / value % 2
 
 class Historian:
 
@@ -266,13 +272,15 @@ class Historian:
 
 	def tell_the_story(self):
 
-		self.get_options()
+		#self.get_options()
 
-		hed = self.all_debug or self.debug % 2
-		hid = self.all_debug or self.debug / 2 % 2
+		#hed = self.all_debug or self.debug % 2
+		#hid = self.all_debug or self.debug / 2 % 2
 
-		self.head = hunter.HeadHunter(self.all_heads, self.args, hed).hunt()
-		self.node = hunter.HistoryHunter(self.head, hid).hunt()
+		#self.head = hunter.HeadHunter(self.all_heads, self.args, hed).hunt()
+		self.head = hunter.HeadHunter(self.o).hunt()
+		#self.node = hunter.HistoryHunter(self.head, hid).hunt()
+		self.node = hunter.HistoryHunter(self.o).hunt()
 
 		self.bind_children(self.all_debug or self.debug / 4 % 2)
 		self.clear()
