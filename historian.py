@@ -272,24 +272,16 @@ class Historian:
 
 	def tell_the_story(self):
 
-		#self.get_options()
-
-		#hed = self.all_debug or self.debug % 2
-		#hid = self.all_debug or self.debug / 2 % 2
-
-		#self.head = hunter.HeadHunter(self.all_heads, self.args, hed).hunt()
 		self.head = hunter.HeadHunter(self.o).hunt()
-		#self.node = hunter.HistoryHunter(self.head, hid).hunt()
 		self.node = hunter.HistoryHunter(self.o).hunt()
 
-		self.bind_children(self.all_debug or self.debug / 4 % 2)
+		self.bind_children(self.o.d(4))
 		self.clear()
-		self.row_unroll(self.all_debug or self.debug / 8 % 2)
+		self.row_unroll(self.o.d(8))
 		self.clear()
-		self.column_unroll(self.all_debug or self.debug / 16 % 2,
-			self.all_debug or self.debug / 32 % 2)
+		self.column_unroll(self.o.d(16), self.o.d(32))
 
-		self.print_graph(self.all_debug or self.debug / 64 % 2)
+		self.print_graph(self.o.d(64))
 
 		return
 
