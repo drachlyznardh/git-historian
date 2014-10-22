@@ -9,7 +9,7 @@ import order
 
 import layout
 
-VERSION="0.0-b"
+VERSION="0.0-c"
 
 class Option:
 
