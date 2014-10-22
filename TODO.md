@@ -1,0 +1,7 @@
+# TODO
+
+- *Virtual nodes*, which could act as placeholders; plus, it could be somehow
+  useful to have an artificial global head node and a global sink; not sure how
+  to deal with multiple disconnected histories (should I even bother?);
+- *Layers*: brothers could live inside the same layer, and so could cousins; it
+  may be easier to align them by layer than by actual vertical order;

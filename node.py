@@ -2,15 +2,16 @@
 
 class Node:
 
-	def __init__ (self):
+	def __init__ (self, real):
 
 		self.hash = None
 		self.parent = []
 		self.child = []
 		self.column = -1
 
+		self.real = real
+
 		self.done = 0
-		self.mark = 0
 		self.top = None    # Previous commit
 		self.bottom = None # Next commit
 
@@ -21,6 +22,12 @@ class Node:
 
 	def has_column (self):
 		return self.column >= 0
+
+	def is_real (self):
+		return self.real
+
+	def is_virtual (self):
+		return not self.real
 
 	def get_indent (self):
 		if self.column > 0:
