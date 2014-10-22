@@ -11,7 +11,7 @@ import node
 
 class HeadHunter:
 
-	def __init__ (self, all_heads, args, debug = 0):
+	def __init__ (self, o, debug):
 
 		self.head = []
 		self.ohead = []
@@ -20,8 +20,8 @@ class HeadHunter:
 		self.name = []
 		self.cname = []
 
-		self.all_heads = all_heads
-		self.args = args
+		self.all_heads = o.all_heads
+		self.args = o.args
 
 	def hunt (self):
 
