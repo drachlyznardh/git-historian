@@ -28,9 +28,6 @@ class Option:
 		self.width = -1
 		self.max_width = 0
 
-		self.o = historian.Option()
-		self.o.parse()
-
 	def print_version(self):
 		print "Git-Historian %s (C) 2014 Ivan Simonini" % VERSION
 
@@ -97,6 +94,9 @@ class Historian:
 		self.first = None
 		self.width = -1
 		self.max_width = 0
+
+		self.o = Option()
+		self.o.parse()
 
 	def select_column (self, commit, debug):
 
