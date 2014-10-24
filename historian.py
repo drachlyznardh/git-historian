@@ -83,12 +83,8 @@ class Historian:
 	def __init__ (self):
 
 		self.verbose = 0
-		self.debug = 0
-		self.all_debug = 0
 
-		self.all_heads = 0
 		self.head = []
-		self.head_by_name = {}
 		self.node = {}
 
 		self.first = None
