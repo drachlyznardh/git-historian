@@ -81,7 +81,7 @@ class HeadHunter:
 
 	def load_heads (self):
 
-		if len(self.head) == 0 and not self.all_heads:
+		if len(self.name) == 0 and not self.all_heads:
 			self.load_HEAD()
 			return
 
