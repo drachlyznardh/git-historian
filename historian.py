@@ -190,10 +190,28 @@ class Historian:
 			target = self.node[name]
 
 			if debug:
-				print ' Visiting %s ' % name[:7]
-				visit.show()
+				print 'Visiting %s %s' % (name[:7], visit.show())
 
-			if target.done: continue
+			if target.done:
+				print '%s re-invoked, dropping down' % name[:7]
+				if current == target.hash: continue
+				if target.top:
+					print 'Selecting top (%s)' % target.top[:7]
+					top = self.node[target.top]
+					bottom = self.node[target.bottom]
+					top.bottom = bottom.hash
+					bottom.top = top.hash
+					print '%s and %s are now linked' % (
+						target.bottom[:7], target.top[:7])
+				else:
+					self.first = target.bottom
+					self.node[target.bottom].top = None
+				target.top = current
+				self.node[current].bottom = name
+				print 'And so are %s and %s' % (
+					current[:7], name[:7])
+				current = name
+				continue
 
 			children = self.skip_if_done(target.child)
 			if len(children): continue
