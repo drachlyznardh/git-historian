@@ -41,9 +41,8 @@ class Option:
 		print 'debug  2 : show data loading'
 		print 'debug  4 : show bindings'
 		print 'debug  8 : show vertical unroll'
-		print 'debug 16 : show head jumps'
-		print 'debug 32 : show column assignments'
-		print 'debug 16 : show layout construction'
+		print 'debug 16 : show column assignments'
+		print 'debug 32 : show layout construction'
 
 	def parse (self):
 
@@ -238,9 +237,9 @@ class Historian:
 			# The current node is done
 			target.done = 1
 
-	def column_unroll (self, d1, d2):
+	def column_unroll (self, debug):
 
-		if d1 or d2: print '-- Column Unroll --'
+		if debug: print '-- Column Unroll --'
 
 		self.width = -1
 
@@ -251,13 +250,13 @@ class Historian:
 
 			name = visit.pop()
 			commit = self.node[name]
-			if d1 or d2: print '  Visiting %s' % name[:7]
+			if debug: print '  Visiting %s' % name[:7]
 
 			if commit.done: continue
 
 			visit.push(self.skip_if_done(commit.parent))
 
-			commit.column = self.select_column(commit, d2)
+			commit.column = self.select_column(commit, debug)
 			commit.done = 1
 
 	def print_graph (self, debug):
@@ -298,9 +297,9 @@ class Historian:
 		self.clear()
 		self.row_unroll(self.o.d(8))
 		self.clear()
-		self.column_unroll(self.o.d(16), self.o.d(32))
+		self.column_unroll(self.o.d(16))
 
-		self.print_graph(self.o.d(64))
+		self.print_graph(self.o.d(32))
 
 		return
 
