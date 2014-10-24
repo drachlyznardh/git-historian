@@ -212,10 +212,10 @@ class Historian:
 				target.top = previous
 				self.node[previous].bottom = name
 			else: self.first = name
-			previous = name
 
 			visit.push(self.skip_if_done(target.parent))
 
+			previous = name
 			target.done = 1
 
 	def column_unroll (self, d1, d2):
