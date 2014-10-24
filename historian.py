@@ -181,22 +181,29 @@ class Historian:
 		if debug: print '-- Row Unroll --'
 
 		visit = order.RowOrder()
+		visit.push(self.head)
 		current = None
 
-		visit.push(self.head)
 		while visit.has_more():
+
 			name = visit.pop()
 			target = self.node[name]
+
 			if debug: print ' Visiting %s ' % name[:7]
+
 			if target.done: continue
+
 			children = self.skip_if_done(target.child)
 			if len(children): continue
+
 			if current:
 				target.top = current
 				self.node[current].bottom = name
 			else: self.first = name
 			current = name
+
 			visit.push(self.skip_if_done(target.parent))
+
 			target.done = 1
 
 	def column_unroll (self, d1, d2):
