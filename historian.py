@@ -249,20 +249,20 @@ class Historian:
 		while visit.has_more():
 
 			name = visit.pop()
-			commit = self.node[name]
+			target = self.node[name]
 			
-			if commit.done: continue
+			if target.done: continue
 
 			if debug: print '  Visiting %s' % name[:7]
 
 			self.width += 1
 			column = self.width
-			self.max_width = max(self.max_width, commit.column)
-			#commit.column = self.select_column(commit, debug)
+			self.max_width = max(self.max_width, target.column)
+			#target.column = self.select_column(target, debug)
 			
-			commit.column = column
-			visit.push(self.skip_if_done(commit.parent))
-			commit.done = 1
+			target.column = column
+			visit.push(self.skip_if_done(target.parent))
+			target.done = 1
 			
 			print
 			self.print_graph(0)
