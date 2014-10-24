@@ -255,12 +255,15 @@ class Historian:
 
 			if debug: print '  Visiting %s' % name[:7]
 
-			self.width += 1
-			column = self.width
-			self.max_width = max(self.max_width, target.column)
-			#target.column = self.select_column(target, debug)
+			if len(target.child) == 0:
+				self.width += 1
+				column = self.width
+			else:
+				self.width += 1
+				column = self.width
 			
 			target.column = column
+			self.max_width = max(self.max_width, column)
 			visit.push(self.skip_if_done(target.parent))
 			target.done = 1
 			
