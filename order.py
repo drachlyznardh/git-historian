@@ -26,6 +26,9 @@ class RowOrder:
 		try: return self.content.pop(0)
 		except: return None
 
+	def show (self):
+		return '    [%s]' % ', '.join([e[:7] for e in self.content])
+
 class ColumnOrder:
 
 	def __init__ (self):
@@ -51,6 +54,9 @@ class ColumnOrder:
 	def pop (self):
 		try: return self.content.pop(0)
 		except: return None
+
+	def show (self):
+		return '    [%s]' % ', '.join([e[:7] for e in self.content])
 
 class LeftmostFirst:
 

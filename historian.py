@@ -189,7 +189,9 @@ class Historian:
 			name = visit.pop()
 			target = self.node[name]
 
-			if debug: print ' Visiting %s ' % name[:7]
+			if debug:
+				print ' Visiting %s ' % name[:7]
+				visit.show()
 
 			if target.done: continue
 
