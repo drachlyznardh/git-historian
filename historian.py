@@ -259,8 +259,8 @@ class Historian:
 				self.width += 1
 				column = self.width
 			else:
-				self.width += 1
-				column = self.width
+				rightmost_parent = max([self.node[name].column for name in target.child])
+				column = rightmost_parent
 			
 			target.column = column
 			self.max_width = max(self.max_width, column)
