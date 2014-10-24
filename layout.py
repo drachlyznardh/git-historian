@@ -43,11 +43,13 @@ class Layout:
 			if len(target.parent): padding = '│' # \u2502
 			else: padding = ' '
 
-			print target.hash
-			print self.track[index]
-			print target.parent
+			overlap = []
+			for e in self.track[index]:
+				if e == target.hash: continue
+				if e in target.parent: continue
+				overlap.append(e)
 
-			if len(self.track[index]) > 1 and target.hash in self.track[index]:
+			if len(overlap):
 				transition = '╳' # \u2573
 			else:
 				transition = '•' # \u2022
