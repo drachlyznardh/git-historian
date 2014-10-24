@@ -180,30 +180,62 @@ class Historian:
 
 		if debug: print '-- Row Unroll --'
 
+		# Visit starts with all the heads
 		visit = order.RowOrder()
 		visit.push(self.head)
-		current = None
+
+		# Reference to previous node, to build the chain
+		previous = None
 
 		while visit.has_more():
 
 			name = visit.pop()
 			target = self.node[name]
 
-			if debug: print ' Visiting %s ' % name[:7]
+			if debug:
+				print 'Visiting %s %s' % (name[:7], visit.show())
 
-			if target.done: continue
+			# Even if done, a node can drop down in the chain after its
+			# last-calling child
+			if target.done:
 
+				# No need to drop down beyond the last element
+				if previous == target.hash: continue
+
+				# Binding top and bottom nodes together
+				self.node[target.top].bottom = target.bottom
+				self.node[target.bottom].top = target.top
+
+				# Binding previous and current nodes together
+				target.top = previous
+				self.node[previous].bottom = name
+
+				# This node is now the last
+				target.bottom = None
+
+				# Recording current node as the next previous
+				previous = name
+				continue
+
+			# No node can appear before any of its children
 			children = self.skip_if_done(target.child)
 			if len(children): continue
 
-			if current:
-				target.top = current
-				self.node[current].bottom = name
-			else: self.first = name
-			current = name
+			# Bind this node with the previous, if any, or…
+			if previous:
+				target.top = previous
+				self.node[previous].bottom = name
 
+			# … record this node as the first in the chain
+			else: self.first = name
+
+			# Add parents to the visit
 			visit.push(self.skip_if_done(target.parent))
 
+			# The current node is the next previous
+			previous = name
+
+			# The current node is done
 			target.done = 1
 
 	def column_unroll (self, d1, d2):
@@ -212,7 +244,7 @@ class Historian:
 
 		self.width = -1
 
-		visit = order.LeftmostFirst()
+		visit = order.LeftmostFirst()#ColumnOrder()#LeftmostFirst()
 		visit.push(self.head)
 
 		while visit.has_more():
