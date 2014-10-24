@@ -243,21 +243,25 @@ class Historian:
 
 		self.width = -1
 
-		visit = order.LeftmostFirst()#ColumnOrder()#LeftmostFirst()
+		visit = order.ColumnOrder()#LeftmostFirst()
 		visit.push(self.head)
 
 		while visit.has_more():
 
 			name = visit.pop()
 			commit = self.node[name]
-			if debug: print '  Visiting %s' % name[:7]
-
+			
 			if commit.done: continue
 
-			visit.push(self.skip_if_done(commit.parent))
+			if debug: print '  Visiting %s' % name[:7]
 
-			commit.column = self.select_column(commit, debug)
+			commit.column = 0
+			#commit.column = self.select_column(commit, debug)
+			visit.push(self.skip_if_done(commit.parent))
 			commit.done = 1
+			
+			print
+			self.print_graph(0)
 
 	def print_graph (self, debug):
 		
@@ -299,6 +303,7 @@ class Historian:
 		self.clear()
 		self.column_unroll(self.o.d(16))
 
+		print
 		self.print_graph(self.o.d(32))
 
 		return

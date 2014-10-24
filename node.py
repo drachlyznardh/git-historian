@@ -7,7 +7,7 @@ class Node:
 		self.hash = None
 		self.parent = []
 		self.child = []
-		self.column = -1
+		self.column = 0
 
 		self.real = real
 
