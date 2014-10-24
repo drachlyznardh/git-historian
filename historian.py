@@ -195,7 +195,6 @@ class Historian:
 			if target.done:
 				print '%s re-invoked, dropping down' % name[:7]
 				if current == target.hash: continue
-				if target.top:
 					print 'Selecting top (%s)' % target.top[:7]
 					top = self.node[target.top]
 					bottom = self.node[target.bottom]
@@ -203,9 +202,6 @@ class Historian:
 					bottom.top = top.hash
 					print '%s and %s are now linked' % (
 						target.bottom[:7], target.top[:7])
-				else:
-					self.first = target.bottom
-					self.node[target.bottom].top = None
 				target.top = current
 				self.node[current].bottom = name
 				target.bottom = None
