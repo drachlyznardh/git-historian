@@ -182,7 +182,7 @@ class Historian:
 
 		visit = order.RowOrder()
 		visit.push(self.head)
-		current = None
+		previous = None
 
 		while visit.has_more():
 
@@ -194,25 +194,25 @@ class Historian:
 
 			if target.done:
 
-				if current == target.hash: continue
+				if previous == target.hash: continue
 
 				self.node[target.top].bottom = target.bottom
 				self.node[target.bottom].top = target.top
 
-				target.top = current
-				self.node[current].bottom = name
+				target.top = previous
+				self.node[previous].bottom = name
 				target.bottom = None
-				current = name
+				previous = name
 				continue
 
 			children = self.skip_if_done(target.child)
 			if len(children): continue
 
-			if current:
-				target.top = current
-				self.node[current].bottom = name
+			if previous:
+				target.top = previous
+				self.node[previous].bottom = name
 			else: self.first = name
-			current = name
+			previous = name
 
 			visit.push(self.skip_if_done(target.parent))
 
