@@ -255,7 +255,9 @@ class Historian:
 
 			if debug: print '  Visiting %s' % name[:7]
 
-			commit.column = 0
+			self.width += 1
+			commit.column = self.width
+			self.max_width = max(self.max_width, commit.column)
 			#commit.column = self.select_column(commit, debug)
 			visit.push(self.skip_if_done(commit.parent))
 			commit.done = 1
