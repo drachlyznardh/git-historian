@@ -26,6 +26,32 @@ class RowOrder:
 		try: return self.content.pop(0)
 		except: return None
 
+class ColumnOrder:
+
+	def __init__ (self):
+		self.content = []
+
+	def has_more (self):
+		return len(self.content)
+
+	def push (self, arg):
+
+		if isinstance(arg, basestring):
+			self.content.append(arg)
+			return
+
+		if not isinstance(arg, list):
+			print 'WTF is %s?' % arg
+			return
+
+		if len(arg) == 0: return
+
+		self.content.extend(arg)
+
+	def pop (self):
+		try: return self.content.pop(0)
+		except: return None
+
 class LeftmostFirst:
 
 	def __init__ (self):
