@@ -208,6 +208,7 @@ class Historian:
 					self.node[target.bottom].top = None
 				target.top = current
 				self.node[current].bottom = name
+				target.bottom = None
 				print 'And so are %s and %s' % (
 					current[:7], name[:7])
 				current = name
