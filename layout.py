@@ -42,8 +42,16 @@ class Layout:
 
 			if len(target.parent): padding = '│' # \u2502
 			else: padding = ' '
-			
-			self.put_char(target.column, '•', padding) # \u2022 \u2502
+
+			print target.hash
+			print self.track[index]
+			print target.parent
+
+			if len(self.track[index]) > 1 and target.hash in self.track[index]:
+				transition = '╳' # \u2573
+			else:
+				transition = '•' # \u2022
+			self.put_char(target.column, transition, padding)
 			return
 
 		if index > target.column:
