@@ -180,40 +180,31 @@ class Historian:
 
 		if debug: print '-- Row Unroll --'
 
-		visit = order.UppermostFirst()
+		visit = order.RowOrder()
+		visit.push(self.head)
 		current = None
 
-		for head in self.head:
+		while visit.has_more():
 
-			if debug: print '  Head %s' % head[:7]
+			name = visit.pop()
+			target = self.node[name]
 
-			visit.push_children(head)
+			if debug: print ' Visiting %s ' % name[:7]
 
-			while visit.has_more():
-				
-				name = visit.pop()
-				commit = self.node[name]
+			if target.done: continue
 
-				if debug: print '  Visiting %s' % name[:7]
+			children = self.skip_if_done(target.child)
+			if len(children): continue
 
-				if commit.done:
-					if debug: print '  %s is done, skipping…' % name[:7]
-					continue
+			if current:
+				target.top = current
+				self.node[current].bottom = name
+			else: self.first = name
+			current = name
 
-				children = self.skip_if_done(commit.child)
-				if len(children):
-					visit.push_children(children)
-					continue
+			visit.push(self.skip_if_done(target.parent))
 
-				if current:
-					commit.top = current
-					self.node[current].bottom = name
-				else: self.first = name
-				current = name
-
-				visit.push_parents(self.skip_if_done(commit.parent))
-
-				commit.done = 1
+			target.done = 1
 
 	def column_unroll (self, d1, d2):
 
