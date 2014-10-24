@@ -255,15 +255,37 @@ class Historian:
 
 			if debug: print '  Visiting %s' % name[:7]
 
-			if len(target.child) == 0:
+			if not target.has_column():
+
+				print '%s has to find my own column!!!' % name [:7]
+
+				# Some child will assign column, eventually
+				if len(target.child): continue
+
 				self.width += 1
 				column = self.width
-			else:
-				rightmost_parent = max([self.node[name].column for name in target.child])
-				column = rightmost_parent
-			
-			target.column = column
-			self.max_width = max(self.max_width, column)
+				target.column = column
+
+			column = target.column
+			for e in target.parent:
+				parent = self.node[e]
+				if parent.has_column():
+					column = parent.column + 1
+					continue
+
+				upper = parent.top
+				while upper:
+					print 'From %s, Up to %s' % (e[:7], upper[:7])
+					if upper == name: break
+					upper = self.node[upper]
+					if upper.has_column() and upper.column <= column:
+						column = max(column, upper.column + 1)
+					upper = upper.top
+
+				parent.column = column
+				self.max_width = max(self.max_width, column)
+				column += 1
+
 			visit.push(self.skip_if_done(target.parent))
 			target.done = 1
 			
