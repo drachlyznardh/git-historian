@@ -193,20 +193,15 @@ class Historian:
 				print 'Visiting %s %s' % (name[:7], visit.show())
 
 			if target.done:
-				print '%s re-invoked, dropping down' % name[:7]
+
 				if current == target.hash: continue
-					print 'Selecting top (%s)' % target.top[:7]
-					top = self.node[target.top]
-					bottom = self.node[target.bottom]
-					top.bottom = bottom.hash
-					bottom.top = top.hash
-					print '%s and %s are now linked' % (
-						target.bottom[:7], target.top[:7])
+
+				self.node[target.top].bottom = target.bottom
+				self.node[target.bottom].top = target.top
+
 				target.top = current
 				self.node[current].bottom = name
 				target.bottom = None
-				print 'And so are %s and %s' % (
-					current[:7], name[:7])
 				current = name
 				continue
 
@@ -229,7 +224,7 @@ class Historian:
 
 		self.width = -1
 
-		visit = order.LeftmostFirst()
+		visit = order.LeftmostFirst()#ColumnOrder()#LeftmostFirst()
 		visit.push(self.head)
 
 		while visit.has_more():
