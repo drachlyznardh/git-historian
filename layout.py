@@ -42,8 +42,18 @@ class Layout:
 
 			if len(target.parent): padding = '│' # \u2502
 			else: padding = ' '
-			
-			self.put_char(target.column, '•', padding) # \u2022 \u2502
+
+			overlap = []
+			for e in self.track[index]:
+				if e == target.hash: continue
+				if e in target.parent: continue
+				overlap.append(e)
+
+			if len(overlap):
+				transition = '╳' # \u2573
+			else:
+				transition = '•' # \u2022
+			self.put_char(target.column, transition, padding)
 			return
 
 		if index > target.column:

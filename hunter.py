@@ -58,7 +58,32 @@ class HeadHunter:
 
 		self.name.extend(self.args)
 
+	def load_HEAD (self):
+
+		cmdlist = 'git show-ref --heads --head'.split()
+
+		try: output = check_output(cmdlist)
+		except CalledProcessError as error:
+			print 'Command `%s` returned %d' % (' '.join(cmdlist), error.returncode)
+			sys.exit(1)
+			return
+
+		exp = re.compile(r'''(.*) HEAD''')
+
+		for line in output.split('\n'):
+
+			if len(line) == 0: continue
+
+			token = exp.match(line)
+			if not token: continue
+
+			self.ohead.append(token.group(1))
+
 	def load_heads (self):
+
+		if len(self.name) == 0 and not self.all_heads:
+			self.load_HEAD()
+			return
 
 		# Looking for heads, i.e. active branches
 		cmdlist = ['git', 'show-ref', '--heads']
