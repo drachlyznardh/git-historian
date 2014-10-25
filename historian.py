@@ -266,16 +266,14 @@ class Historian:
 
 			if debug: print '  Visiting %s' % name[:7]
 
-			if not target.has_column():
+			if target.hash in self.head:
 
-				print '%s has to find my own column!!!' % name [:7]
-
-				# Some child will assign column, eventually
-				if len(target.child): continue
+				if debug: print '%s has to find its own column!!!' % name [:7]
 
 				self.width += 1
 				column = self.width
 				target.column = column
+				self.max_width = max(self.max_width, column)
 
 			column = target.column
 			for e in sorted(target.parent, key=lambda e: self.node[e].row, reverse=True):
