@@ -268,7 +268,7 @@ class Historian:
 
 			if debug: print '  Visiting %s' % name[:7]
 
-			if target.hash in self.head:
+			if target.hash in self.head and not target.has_column():
 
 				if debug: print '%s has to find its own column!!!' % name [:7]
 
