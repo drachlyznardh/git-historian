@@ -26,7 +26,6 @@ class Option:
 
 		self.first = None
 		self.width = -1
-		self.max_width = 0
 
 	def print_version(self):
 		print "Git-Historian %s (C) 2014 Ivan Simonini" % VERSION
@@ -94,7 +93,7 @@ class Historian:
 		self.o.parse()
 
 	def update_width (self, value):
-		self.max_width = max(self.max_width, value)
+		self.width = max(self.width, value)
 
 	def select_column (self, commit, debug):
 
@@ -274,11 +273,8 @@ class Historian:
 				if debug: print '%s has to find its own column!!!' % name [:7]
 
 				self.width += 1
-				column = self.width
-				#target.column = column
-				target.set_column(column)
-				#self.max_width = max(self.max_width, column)
-				self.update_width(column)
+				target.set_column(self.width)
+				self.update_width(self.width)
 
 			column = target.column
 			for e in sorted(self.skip_if_done(target.parent),
@@ -297,9 +293,7 @@ class Historian:
 						column = max(column, upper.column + 1)
 					upper = upper.top
 
-				#parent.column = column
 				parent.set_column(column)
-				#self.max_width = max(self.max_width, column)
 				self.update_width(column)
 				column += 1
 
@@ -313,7 +307,7 @@ class Historian:
 		
 		if debug: print '-- Print Graph --'
 
-		t = layout.Layout(self.max_width + 1, self.node, debug)
+		t = layout.Layout(self.width + 1, self.node, debug)
 		h = hunter.MessageHunter()
 
 		name = self.first
