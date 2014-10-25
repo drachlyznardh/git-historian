@@ -93,6 +93,9 @@ class Historian:
 		self.o = Option()
 		self.o.parse()
 
+	def update_width (self, value):
+		self.max_width = max(self.max_width, value)
+
 	def select_column (self, commit, debug):
 
 		if debug: print
@@ -272,8 +275,10 @@ class Historian:
 
 				self.width += 1
 				column = self.width
-				target.column = column
-				self.max_width = max(self.max_width, column)
+				#target.column = column
+				target.set_column(column)
+				#self.max_width = max(self.max_width, column)
+				self.update_width(column)
 
 			column = target.column
 			for e in sorted(self.skip_if_done(target.parent),
@@ -292,8 +297,10 @@ class Historian:
 						column = max(column, upper.column + 1)
 					upper = upper.top
 
-				parent.column = column
-				self.max_width = max(self.max_width, column)
+				#parent.column = column
+				parent.set_column(column)
+				#self.max_width = max(self.max_width, column)
+				self.update_width(column)
 				column += 1
 
 			visit.push(self.skip_if_done(target.parent))
