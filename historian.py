@@ -279,9 +279,41 @@ class Historian:
 
 				if debug: print '%s has to find its own column!!!' % name [:7]
 
-				self.width += 1
-				target.set_column(self.width)
-				self.update_width(self.width)
+				parents = self.only_if_has_column(target.parent)
+				parent_no = len(parents)
+				print '%s has %d parents with column, (%s)' % (name[:7],
+					len(parents), ', '.join([e[:7] for e in parents]))
+
+				if parent_no == 1:
+					target.set_column(self.node[parents[0]].column)
+				elif parent_no > 1:
+					lowest = sorted(parents,
+						key=lambda e: self.node[e].row, reverse=True)[0]
+					rightmost = sorted(parents,
+						key=lambda e: self.node[e].border, reverse=True)[0]
+					print 'Lowest (%s), Rightmost (%s)' % (lowest[:7], rightmost[:7])
+
+					if lowest == rightmost:
+						
+						count = 0
+						value = self.node[rightmost].border
+						for e in parents:
+							if self.node[e].border == value:
+								count += 1
+						
+						print 'Count is %d' % count
+						if count == 1:
+							target.set_column(self.node[lowest].column)
+						else:
+							target.set_column(1 + self.node[rightmost].border)
+							self.update_width(target.column)
+					else:
+						target.set_column(1 + self.node[rightmost].border)
+						self.update_width(target.column)
+				else:
+					self.width += 1
+					target.set_column(self.width)
+					self.update_width(self.width)
 
 			column = target.column
 			for e in sorted(target.parent,
