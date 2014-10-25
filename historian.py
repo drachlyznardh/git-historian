@@ -278,7 +278,7 @@ class Historian:
 				target.column = column
 
 			column = target.column
-			for e in target.parent:
+			for e in sorted(target.parent, key=lambda e: self.node[e].row, reverse=True):
 				parent = self.node[e]
 				if parent.has_column():
 					column = parent.column + 1
