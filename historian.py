@@ -147,6 +147,13 @@ class Historian:
 
 		return result
 
+	def only_if_has_column (self, names):
+		result = []
+		for name in names:
+			if self.node[name].has_column():
+				result.append(name)
+		return result
+
 	def clear (self):
 
 		for commit in self.node.values():
