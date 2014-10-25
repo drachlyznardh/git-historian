@@ -277,11 +277,13 @@ class Historian:
 				self.update_width(self.width)
 
 			column = target.column
-			for e in sorted(self.skip_if_done(target.parent),
+			for e in sorted(target.parent,
 					key=lambda e: self.node[e].row, reverse=True):
 				parent = self.node[e]
 				if parent.has_column():
-					column = parent.column + 1
+					parent.set_border(target.column)
+					column = parent.border + 1
+					print 'Pushing column beyond %s\'s border %d' % (e[:7], parent.border)
 					continue
 
 				upper = parent.top
@@ -294,6 +296,7 @@ class Historian:
 					upper = upper.top
 
 				parent.set_column(column)
+				parent.set_border(target.column)
 				self.update_width(column)
 				column += 1
 

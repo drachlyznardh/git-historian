@@ -29,10 +29,10 @@ class Node:
 
 	def set_column (self, value):
 		self.column = value
-		self.border = value
+		self.set_border(value)
 
 	def set_border (self, value):
-		self.border = value
+		self.border = max(self.border, value)
 
 	def is_real (self):
 		return self.real
