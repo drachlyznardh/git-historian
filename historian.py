@@ -186,6 +186,9 @@ class Historian:
 		# Reference to previous node, to build the chain
 		previous = None
 
+		# Starting over the first row
+		row = -1
+
 		while visit.has_more():
 
 			name = visit.pop()
@@ -209,6 +212,10 @@ class Historian:
 				target.top = previous
 				self.node[previous].bottom = name
 
+				# Bumping the row number another time
+				row += 1
+				target.row = row
+
 				# This node is now the last
 				target.bottom = None
 
@@ -227,6 +234,10 @@ class Historian:
 
 			# … record this node as the first in the chain
 			else: self.first = name
+
+			# Bumping the row number
+			row += 1
+			target.row = row
 
 			# Add parents to the visit
 			visit.push(self.skip_if_done(target.parent))
@@ -334,6 +345,12 @@ class Historian:
 
 		print
 		self.print_graph(self.o.d(32))
+
+		walk = self.first
+		while walk:
+			walk = self.node[walk]
+			print walk.to_oneline()
+			walk = walk.bottom
 
 		return
 

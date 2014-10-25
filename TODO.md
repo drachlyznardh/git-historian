@@ -1,5 +1,11 @@
 # TODO
 
+- each node should find itself already assigned by it first child, unless it is
+  a head; each node should then invoke its parent and assign their column; the
+  order of invocation should be reverse vertical, from lower to upper; this
+  makes it necessary that each node knows it relative row; I could use a
+  monotonic value;
+
 - simpler everything; working, but simple;
 - *Virtual nodes*, which could act as placeholders; plus, it could be somehow
   useful to have an artificial global head node and a global sink; not sure how
