@@ -276,7 +276,8 @@ class Historian:
 				self.max_width = max(self.max_width, column)
 
 			column = target.column
-			for e in sorted(target.parent, key=lambda e: self.node[e].row, reverse=True):
+			for e in sorted(self.skip_if_done(target.parent),
+					key=lambda e: self.node[e].row, reverse=True):
 				parent = self.node[e]
 				if parent.has_column():
 					column = parent.column + 1
