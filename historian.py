@@ -330,6 +330,13 @@ class Historian:
 		self.clear()
 		self.row_unroll(self.o.d(8))
 		self.clear()
+
+		walk = self.first
+		while walk:
+			walk = self.node[walk]
+			print walk.to_oneline()
+			walk = walk.bottom
+
 		self.column_unroll(self.o.d(16))
 
 		print
