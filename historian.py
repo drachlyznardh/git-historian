@@ -26,7 +26,6 @@ class Option:
 
 		self.first = None
 		self.width = -1
-		self.max_width = 0
 
 	def print_version(self):
 		print "Git-Historian %s (C) 2014 Ivan Simonini" % VERSION
@@ -92,6 +91,9 @@ class Historian:
 
 		self.o = Option()
 		self.o.parse()
+
+	def update_width (self, value):
+		self.width = max(self.width, value)
 
 	def select_column (self, commit, debug):
 
@@ -266,22 +268,22 @@ class Historian:
 
 			if debug: print '  Visiting %s' % name[:7]
 
-			if not target.has_column():
+			if target.hash in self.head and not target.has_column():
 
-				print '%s has to find my own column!!!' % name [:7]
-
-				# Some child will assign column, eventually
-				if len(target.child): continue
+				if debug: print '%s has to find its own column!!!' % name [:7]
 
 				self.width += 1
-				column = self.width
-				target.column = column
+				target.set_column(self.width)
+				self.update_width(self.width)
 
 			column = target.column
-			for e in target.parent:
+			for e in sorted(target.parent,
+					key=lambda e: self.node[e].row, reverse=True):
 				parent = self.node[e]
 				if parent.has_column():
-					column = parent.column + 1
+					parent.set_border(target.column)
+					column = parent.border + 1
+					print 'Pushing column beyond %s\'s border %d' % (e[:7], parent.border)
 					continue
 
 				upper = parent.top
@@ -293,8 +295,9 @@ class Historian:
 						column = max(column, upper.column + 1)
 					upper = upper.top
 
-				parent.column = column
-				self.max_width = max(self.max_width, column)
+				parent.set_column(column)
+				parent.set_border(target.column)
+				self.update_width(column)
 				column += 1
 
 			visit.push(self.skip_if_done(target.parent))
@@ -307,7 +310,7 @@ class Historian:
 		
 		if debug: print '-- Print Graph --'
 
-		t = layout.Layout(self.max_width + 1, self.node, debug)
+		t = layout.Layout(self.width + 1, self.node, debug)
 		h = hunter.MessageHunter()
 
 		name = self.first
@@ -329,6 +332,8 @@ class Historian:
 			for i in message[1:-1]:
 			#for i in message[1:]:
 				print '%s\x1b[m %s' % (t.draw_padding(), i)
+			#if len(commit.parent) == 1:
+			#	print '%s' % t.draw_padding()
 
 			name = commit.bottom
 

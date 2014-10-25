@@ -10,6 +10,7 @@ class Node:
 		self.child = []
 
 		self.column = -1
+		self.border = -1
 		self.row = -1
 
 		self.real = real
@@ -25,6 +26,13 @@ class Node:
 
 	def has_column (self):
 		return self.column >= 0
+
+	def set_column (self, value):
+		self.column = value
+		self.set_border(value)
+
+	def set_border (self, value):
+		self.border = max(self.border, value)
 
 	def is_real (self):
 		return self.real
