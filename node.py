@@ -7,7 +7,9 @@ class Node:
 		self.hash = None
 		self.parent = []
 		self.child = []
+
 		self.column = -1
+		self.row = -1
 
 		self.real = real
 
@@ -36,8 +38,8 @@ class Node:
 
 	def to_oneline(self):
 	
-		return '%s(%s) \x1b[m%s%s\x1b[m' % (
-			self.get_indent(), self.column, self.hash[:7])
+		return '%s(%d, %d) \x1b[m%s\x1b[m' % (
+			self.get_indent(), self.column, self.row, self.hash[:7])
 
 	def to_string(self):
 		if self.column > 0:
