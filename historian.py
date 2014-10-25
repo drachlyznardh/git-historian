@@ -329,8 +329,8 @@ class Historian:
 			for i in message[1:-1]:
 			#for i in message[1:]:
 				print '%s\x1b[m %s' % (t.draw_padding(), i)
-			if len(commit.parent) == 1:
-				print '%s' % t.draw_padding()
+			#if len(commit.parent) == 1:
+			#	print '%s' % t.draw_padding()
 
 			name = commit.bottom
 
