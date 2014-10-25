@@ -1,4 +1,5 @@
 # Node module for Git-Historian
+# -*- encoding: utf-8 -*-
 
 class Node:
 
@@ -38,8 +39,10 @@ class Node:
 
 	def to_oneline(self):
 	
-		return '%s(%d, %d) \x1b[m%s\x1b[m' % (
-			self.get_indent(), self.column, self.row, self.hash[:7])
+		return '(%2d, %2d)%s • \x1b[33m%s\x1b[m' % (
+			self.column, self.row,
+			self.get_indent(),
+			self.hash[:7])
 
 	def to_string(self):
 		if self.column > 0:
