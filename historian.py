@@ -212,6 +212,10 @@ class Historian:
 				target.top = previous
 				self.node[previous].bottom = name
 
+				# Bumping the row number another time
+				row += 1
+				target.row = row
+
 				# This node is now the last
 				target.bottom = None
 
