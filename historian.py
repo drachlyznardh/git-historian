@@ -267,7 +267,7 @@ class Historian:
 			upper = parent.top
 			while upper:
 				if debug: print 'From %s, Up to %s' % (e[:7], upper[:7])
-				if upper == name: break
+				if upper in parent.child: break
 				upper = self.node[upper]
 				if upper.has_column() and upper.column <= column:
 					column = max(column, upper.column + 1)
