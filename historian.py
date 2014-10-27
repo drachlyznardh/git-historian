@@ -90,13 +90,10 @@ class Historian:
 		self.width = max(self.width, value)
 
 	def skip_if_done (self, names):
-
 		result = []
-
 		for name in names:
 			if not self.node[name].done:
 				result.append(name)
-
 		return result
 
 	def only_if_has_column (self, names):
@@ -107,7 +104,6 @@ class Historian:
 		return result
 
 	def clear (self):
-
 		for commit in self.node.values():
 			commit.done = 0
 
