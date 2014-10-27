@@ -342,9 +342,6 @@ class Historian:
 			visit.push(self.skip_if_done(target.parent))
 			target.done = 1
 			
-			print
-			self.print_graph(0)
-
 	def print_graph (self, debug):
 		
 		if debug: print '-- Print Graph --'
@@ -386,15 +383,7 @@ class Historian:
 		self.row_unroll(self.o.d(8))
 		self.clear()
 		self.column_unroll(self.o.d(16))
-
-		print
 		self.print_graph(self.o.d(32))
-
-		walk = self.first
-		while walk:
-			walk = self.node[walk]
-			print walk.to_oneline()
-			walk = walk.bottom
 
 		return
 
