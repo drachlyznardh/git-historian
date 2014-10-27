@@ -210,22 +210,34 @@ class Historian:
 		if debug: print '%s has to find its own column!!!' % name [:7]
 		target = self.node[name]
 
+		# We do not consider parents which have no column yet, those will be
+		# called in a later step
 		parents = self.only_if_has_column(target.parent)
 		parent_no = len(parents)
 		if debug: print '%s has %d parents with column, (%s)' % (name[:7],
 			len(parents), ', '.join([e[:7] for e in parents]))
 
+		# If there is only one selected parent, the target node can appear on
+		# top of it
 		if parent_no == 1:
 			target.set_column(self.node[parents[0]].column)
+
+		# If there are more than one parent, the situation becomes tricky
 		elif parent_no > 1:
+
+			# Selecting the two parents with the lowest row and the rightmost
+			# column
 			lowest = sorted(parents,
 				key=lambda e: self.node[e].row, reverse=True)[0]
 			rightmost = sorted(parents,
 				key=lambda e: self.node[e].border, reverse=True)[0]
 			if debug: print 'Lowest (%s), Rightmost (%s)' % (lowest[:7], rightmost[:7])
 
+			# If they are same node…
 			if lowest == rightmost:
 
+				# … we must also verify if that node is the only one on that
+				# column
 				count = 0
 				value = self.node[rightmost].border
 				for e in parents:
@@ -233,14 +245,25 @@ class Historian:
 						count += 1
 
 				if debug: print 'Count is %d' % count
+
+				# If that node is lonely, the target can be put on top of it
 				if count == 1:
 					target.set_column(self.node[lowest].column)
+
+				# If there are more than one node on the rightmost column, the
+				# arrow must appear on the next one, so the target node shifts
+				# one more step on the right
 				else:
 					target.set_column(1 + self.node[rightmost].border)
 					self.update_width(target.column)
+
+			# If the rightmost parent is not the lowest, an arrow would cross
+			# it. The target node must be put on the next column
 			else:
 				target.set_column(1 + self.node[rightmost].border)
 				self.update_width(target.column)
+
+		# If there are no parents at all, a whole new column is selected
 		else:
 			self.width += 1
 			target.set_column(self.width)
