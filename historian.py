@@ -224,9 +224,24 @@ class Historian:
 			self.update_width(self.width)
 			return
 
+		rightmost = sorted(parents,
+			key=lambda e: self.node[e].border, reverse=True)[0]
+
+		if parent_no == len(target.parent):
+			target.set_column(self.node[rightmost].column)
+		else:
+			target.set_column(1 + self.node[rightmost].column)
+
+		self.update_width(target.column)
+		return
+
+		# Should I take the column of the rightmost parent, only when ALL the
+		# parents are out there already?
+
 		# If there is only one selected parent, and that is the only parent, the
 		# target node can appear on top of it
-		if parent_no == 1 and len(target.parent) == 1:
+		if parent_no == len(target.parent):
+		#if parent_no == 1 and len(target.parent) == 1:
 			target.set_column(self.node[parents[0]].column)
 			return
 
