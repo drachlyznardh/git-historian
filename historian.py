@@ -224,12 +224,18 @@ class Historian:
 			self.update_width(self.width)
 			return
 
+		# Selecting the parent node with the rightmost column
 		rightmost = sorted(parents,
 			key=lambda e: self.node[e].border, reverse=True)[0]
 		column = self.node[rightmost].column
 
+		# If all the parents were already assigned, the target can sit above the
+		# rightmost column
 		if parent_no == len(target.parent):
 			target.set_column(column)
+
+		# But if there are missing parents, the target must leave the column for
+		# the arrow
 		else:
 			target.set_column(1 + column)
 
