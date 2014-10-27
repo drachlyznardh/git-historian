@@ -1,4 +1,5 @@
 # Node module for Git-Historian
+# -*- encoding: utf-8 -*-
 
 class Node:
 
@@ -7,7 +8,10 @@ class Node:
 		self.hash = None
 		self.parent = []
 		self.child = []
+
 		self.column = -1
+		self.border = -1
+		self.row = -1
 
 		self.real = real
 
@@ -23,6 +27,13 @@ class Node:
 	def has_column (self):
 		return self.column >= 0
 
+	def set_column (self, value):
+		self.column = value
+		self.set_border(value)
+
+	def set_border (self, value):
+		self.border = max(self.border, value)
+
 	def is_real (self):
 		return self.real
 
@@ -36,8 +47,10 @@ class Node:
 
 	def to_oneline(self):
 	
-		return '%s(%s) \x1b[m%s%s\x1b[m' % (
-			self.get_indent(), self.column, self.hash[:7])
+		return '(%2d, %2d)%s • \x1b[33m%s\x1b[m' % (
+			self.column, self.row,
+			self.get_indent(),
+			self.hash[:7])
 
 	def to_string(self):
 		if self.column > 0:

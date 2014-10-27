@@ -26,7 +26,6 @@ class Option:
 
 		self.first = None
 		self.width = -1
-		self.max_width = 0
 
 	def print_version(self):
 		print "Git-Historian %s (C) 2014 Ivan Simonini" % VERSION
@@ -41,9 +40,8 @@ class Option:
 		print 'debug  2 : show data loading'
 		print 'debug  4 : show bindings'
 		print 'debug  8 : show vertical unroll'
-		print 'debug 16 : show head jumps'
-		print 'debug 32 : show column assignments'
-		print 'debug 16 : show layout construction'
+		print 'debug 16 : show column assignments'
+		print 'debug 32 : show layout construction'
 
 	def parse (self):
 
@@ -93,6 +91,9 @@ class Historian:
 
 		self.o = Option()
 		self.o.parse()
+
+	def update_width (self, value):
+		self.width = max(self.width, value)
 
 	def select_column (self, commit, debug):
 
@@ -146,6 +147,13 @@ class Historian:
 
 		return result
 
+	def only_if_has_column (self, names):
+		result = []
+		for name in names:
+			if self.node[name].has_column():
+				result.append(name)
+		return result
+
 	def clear (self):
 
 		for commit in self.node.values():
@@ -187,6 +195,9 @@ class Historian:
 		# Reference to previous node, to build the chain
 		previous = None
 
+		# Starting over the first row
+		row = -1
+
 		while visit.has_more():
 
 			name = visit.pop()
@@ -210,6 +221,10 @@ class Historian:
 				target.top = previous
 				self.node[previous].bottom = name
 
+				# Bumping the row number another time
+				row += 1
+				target.row = row
+
 				# This node is now the last
 				target.bottom = None
 
@@ -229,6 +244,10 @@ class Historian:
 			# … record this node as the first in the chain
 			else: self.first = name
 
+			# Bumping the row number
+			row += 1
+			target.row = row
+
 			# Add parents to the visit
 			visit.push(self.skip_if_done(target.parent))
 
@@ -238,33 +257,96 @@ class Historian:
 			# The current node is done
 			target.done = 1
 
-	def column_unroll (self, d1, d2):
+	def column_unroll (self, debug):
 
-		if d1 or d2: print '-- Column Unroll --'
+		if debug: print '-- Column Unroll --'
 
 		self.width = -1
 
-		visit = order.LeftmostFirst()#ColumnOrder()#LeftmostFirst()
+		visit = order.ColumnOrder()#LeftmostFirst()
 		visit.push(self.head)
 
 		while visit.has_more():
 
 			name = visit.pop()
-			commit = self.node[name]
-			if d1 or d2: print '  Visiting %s' % name[:7]
+			target = self.node[name]
+			
+			if target.done: continue
 
-			if commit.done: continue
+			if debug: print '  Visiting %s' % name[:7]
 
-			visit.push(self.skip_if_done(commit.parent))
+			if target.hash in self.head and not target.has_column():
 
-			commit.column = self.select_column(commit, d2)
-			commit.done = 1
+				if debug: print '%s has to find its own column!!!' % name [:7]
 
+				parents = self.only_if_has_column(target.parent)
+				parent_no = len(parents)
+				if debug: print '%s has %d parents with column, (%s)' % (name[:7],
+					len(parents), ', '.join([e[:7] for e in parents]))
+
+				if parent_no == 1:
+					target.set_column(self.node[parents[0]].column)
+				elif parent_no > 1:
+					lowest = sorted(parents,
+						key=lambda e: self.node[e].row, reverse=True)[0]
+					rightmost = sorted(parents,
+						key=lambda e: self.node[e].border, reverse=True)[0]
+					if debug: print 'Lowest (%s), Rightmost (%s)' % (lowest[:7], rightmost[:7])
+
+					if lowest == rightmost:
+
+						count = 0
+						value = self.node[rightmost].border
+						for e in parents:
+							if self.node[e].border == value:
+								count += 1
+
+						if debug: print 'Count is %d' % count
+						if count == 1:
+							target.set_column(self.node[lowest].column)
+						else:
+							target.set_column(1 + self.node[rightmost].border)
+							self.update_width(target.column)
+					else:
+						target.set_column(1 + self.node[rightmost].border)
+						self.update_width(target.column)
+				else:
+					self.width += 1
+					target.set_column(self.width)
+					self.update_width(self.width)
+
+			column = target.column
+			for e in sorted(target.parent,
+					key=lambda e: self.node[e].row, reverse=True):
+				parent = self.node[e]
+				if parent.has_column():
+					parent.set_border(target.column)
+					column = parent.border + 1
+					if debug: print 'Pushing column beyond %s\'s border %d' % (e[:7], parent.border)
+					continue
+
+				upper = parent.top
+				while upper:
+					if debug: print 'From %s, Up to %s' % (e[:7], upper[:7])
+					if upper == name: break
+					upper = self.node[upper]
+					if upper.has_column() and upper.column <= column:
+						column = max(column, upper.column + 1)
+					upper = upper.top
+
+				parent.set_column(column)
+				parent.set_border(target.column)
+				self.update_width(column)
+				column += 1
+
+			visit.push(self.skip_if_done(target.parent))
+			target.done = 1
+			
 	def print_graph (self, debug):
 		
 		if debug: print '-- Print Graph --'
 
-		t = layout.Layout(self.max_width + 1, self.node, debug)
+		t = layout.Layout(self.width + 1, self.node, debug)
 		h = hunter.MessageHunter()
 
 		name = self.first
@@ -286,6 +368,8 @@ class Historian:
 			for i in message[1:-1]:
 			#for i in message[1:]:
 				print '%s\x1b[m %s' % (t.draw_padding(), i)
+			#if len(commit.parent) == 1:
+			#	print '%s' % t.draw_padding()
 
 			name = commit.bottom
 
@@ -298,9 +382,8 @@ class Historian:
 		self.clear()
 		self.row_unroll(self.o.d(8))
 		self.clear()
-		self.column_unroll(self.o.d(16), self.o.d(32))
-
-		self.print_graph(self.o.d(64))
+		self.column_unroll(self.o.d(16))
+		self.print_graph(self.o.d(32))
 
 		return
 
