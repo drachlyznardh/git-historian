@@ -21,11 +21,6 @@ class Option:
 
 		self.all_heads = 0
 		self.head = []
-		self.head_by_name = {}
-		self.node = {}
-
-		self.first = None
-		self.width = -1
 
 	def print_version(self):
 		print "Git-Historian %s (C) 2014 Ivan Simonini" % VERSION
@@ -87,7 +82,6 @@ class Historian:
 
 		self.first = None
 		self.width = -1
-		self.max_width = 0
 
 		self.o = Option()
 		self.o.parse()
@@ -95,56 +89,11 @@ class Historian:
 	def update_width (self, value):
 		self.width = max(self.width, value)
 
-	def select_column (self, commit, debug):
-
-		if debug: print
-		if not commit.top:
-			if debug: print '  %s is the topmost' % commit.hash[:7]
-			self.width += 1
-			return self.width
-
-		if len(commit.child) == 0:
-			if debug: print '  %s has no children' % commit.hash[:7]
-			self.width += 1
-			#if len(self.skip_if_done(commit.parent)):
-			#	self.width += 1
-			return self.width
-
-		result = self.width
-		name = commit.top
-		if debug: print '  Processing %s' % commit.hash[:7]
-		while name:
-
-			target = self.node[name]
-
-			if name in commit.child and target.has_column():
-				if debug: print '  %s is a child of %s (%d), halting' % (
-					name[:7], commit.hash[:7],
-					self.node[name].column)
-
-				booked = 1 + max([self.node[j].column for j in target.parent])
-				if debug: print booked
-				column = max(result, target.column, booked)
-				self.max_width = max(self.max_width, column)
-				return column
-
-			if debug: print '  Matching %s against %s (%d)' % (
-				commit.hash[:7], name[:7], target.column)
-			result = max(result, target.column)
-			name = target.top
-
-		if debug: print 'No assigned children found. Defaulting'
-		self.width += 1
-		return self.width
-
 	def skip_if_done (self, names):
-
 		result = []
-
 		for name in names:
 			if not self.node[name].done:
 				result.append(name)
-
 		return result
 
 	def only_if_has_column (self, names):
@@ -155,7 +104,6 @@ class Historian:
 		return result
 
 	def clear (self):
-
 		for commit in self.node.values():
 			commit.done = 0
 
@@ -257,13 +205,118 @@ class Historian:
 			# The current node is done
 			target.done = 1
 
+	def find_column_for_head (self, name, debug):
+
+		if debug: print '%s has to find its own column!!!' % name [:7]
+		target = self.node[name]
+
+		# We do not consider parents which have no column yet, those will be
+		# called in a later step
+		parents = self.only_if_has_column(target.parent)
+		parent_no = len(parents)
+		if debug: print '%s has %d parents with column, (%s)' % (name[:7],
+			len(parents), ', '.join([e[:7] for e in parents]))
+
+		# If there is only one selected parent, the target node can appear on
+		# top of it
+		if parent_no == 1:
+			target.set_column(self.node[parents[0]].column)
+
+		# If there are more than one parent, the situation becomes tricky
+		elif parent_no > 1:
+
+			# Selecting the two parents with the lowest row and the rightmost
+			# column
+			lowest = sorted(parents,
+				key=lambda e: self.node[e].row, reverse=True)[0]
+			rightmost = sorted(parents,
+				key=lambda e: self.node[e].border, reverse=True)[0]
+			if debug: print 'Lowest (%s), Rightmost (%s)' % (lowest[:7], rightmost[:7])
+
+			# If they are same node…
+			if lowest == rightmost:
+
+				# … we must also verify if that node is the only one on that
+				# column
+				count = 0
+				value = self.node[rightmost].border
+				for e in parents:
+					if self.node[e].border == value:
+						count += 1
+
+				if debug: print 'Count is %d' % count
+
+				# If that node is lonely, the target can be put on top of it
+				if count == 1:
+					target.set_column(self.node[lowest].column)
+
+				# If there are more than one node on the rightmost column, the
+				# arrow must appear on the next one, so the target node shifts
+				# one more step on the right
+				else:
+					target.set_column(1 + self.node[rightmost].border)
+					self.update_width(target.column)
+
+			# If the rightmost parent is not the lowest, an arrow would cross
+			# it. The target node must be put on the next column
+			else:
+				target.set_column(1 + self.node[rightmost].border)
+				self.update_width(target.column)
+
+		# If there are no parents at all, a whole new column is selected
+		else:
+			self.width += 1
+			target.set_column(self.width)
+			self.update_width(self.width)
+
+	def find_column_for_parents (self, name, debug):
+
+		target = self.node[name]
+		column = target.column
+
+		# Parents are processed in row order, from lower to upper
+		for e in sorted(target.parent,
+				key=lambda e: self.node[e].row, reverse=True):
+			parent = self.node[e]
+
+			# If a parent has already a column, the column next to its marks the
+			# leftmost spot for the following parents, as the border for the
+			# target node
+			if parent.has_column():
+				parent.set_border(target.column)
+				column = parent.border + 1
+				if debug: print 'Pushing column beyond %s\'s border %d' % (e[:7], parent.border)
+				continue
+
+			# Starting from the node atop of the current, the graph is
+			# traversed until the caller is found. The rightmost column
+			# encountered in the process is the boundary for this node's column
+			upper = parent.top
+			while upper:
+				if debug: print 'From %s, Up to %s' % (e[:7], upper[:7])
+				if upper == name: break
+				upper = self.node[upper]
+				if upper.has_column() and upper.column <= column:
+					column = max(column, upper.column + 1)
+				upper = upper.top
+
+			# The parent column is set, as well as the caller's border
+			parent.set_column(column)
+			parent.set_border(target.column)
+
+			# The graph's width is updated. The first available column is the
+			# next one
+			self.update_width(column)
+			column += 1
+
 	def column_unroll (self, debug):
 
 		if debug: print '-- Column Unroll --'
 
 		self.width = -1
 
-		visit = order.ColumnOrder()#LeftmostFirst()
+		# The visit starts for the named heads
+		visit = order.ColumnOrder()
 		visit.push(self.head)
 
 		while visit.has_more():
@@ -271,77 +324,25 @@ class Historian:
 			name = visit.pop()
 			target = self.node[name]
 			
+			# No node is processed more than once
 			if target.done: continue
 
 			if debug: print '  Visiting %s' % name[:7]
 
+			# If a node is a named head and has not yet a column assigned, it
+			# must look for a valid column on its own
 			if target.hash in self.head and not target.has_column():
 
-				if debug: print '%s has to find its own column!!!' % name [:7]
+				self.find_column_for_head (name, debug)
 
-				parents = self.only_if_has_column(target.parent)
-				parent_no = len(parents)
-				if debug: print '%s has %d parents with column, (%s)' % (name[:7],
-					len(parents), ', '.join([e[:7] for e in parents]))
+			# The node assigns a column to each of its parents, in order,
+			# ensuring each starts off on a valid position
+			self.find_column_for_parents (name, debug)
 
-				if parent_no == 1:
-					target.set_column(self.node[parents[0]].column)
-				elif parent_no > 1:
-					lowest = sorted(parents,
-						key=lambda e: self.node[e].row, reverse=True)[0]
-					rightmost = sorted(parents,
-						key=lambda e: self.node[e].border, reverse=True)[0]
-					if debug: print 'Lowest (%s), Rightmost (%s)' % (lowest[:7], rightmost[:7])
-
-					if lowest == rightmost:
-
-						count = 0
-						value = self.node[rightmost].border
-						for e in parents:
-							if self.node[e].border == value:
-								count += 1
-
-						if debug: print 'Count is %d' % count
-						if count == 1:
-							target.set_column(self.node[lowest].column)
-						else:
-							target.set_column(1 + self.node[rightmost].border)
-							self.update_width(target.column)
-					else:
-						target.set_column(1 + self.node[rightmost].border)
-						self.update_width(target.column)
-				else:
-					self.width += 1
-					target.set_column(self.width)
-					self.update_width(self.width)
-
-			column = target.column
-			for e in sorted(target.parent,
-					key=lambda e: self.node[e].row, reverse=True):
-				parent = self.node[e]
-				if parent.has_column():
-					parent.set_border(target.column)
-					column = parent.border + 1
-					if debug: print 'Pushing column beyond %s\'s border %d' % (e[:7], parent.border)
-					continue
-
-				upper = parent.top
-				while upper:
-					if debug: print 'From %s, Up to %s' % (e[:7], upper[:7])
-					if upper == name: break
-					upper = self.node[upper]
-					if upper.has_column() and upper.column <= column:
-						column = max(column, upper.column + 1)
-					upper = upper.top
-
-				parent.set_column(column)
-				parent.set_border(target.column)
-				self.update_width(column)
-				column += 1
-
+			# Parents are added to the visit, then the node is done
 			visit.push(self.skip_if_done(target.parent))
 			target.done = 1
-			
+
 	def print_graph (self, debug):
 		
 		if debug: print '-- Print Graph --'
@@ -366,10 +367,7 @@ class Historian:
 
 			print '%s\x1b[m %s' % (t.draw_transition(), message[0])
 			for i in message[1:-1]:
-			#for i in message[1:]:
 				print '%s\x1b[m %s' % (t.draw_padding(), i)
-			#if len(commit.parent) == 1:
-			#	print '%s' % t.draw_padding()
 
 			name = commit.bottom
 
