@@ -226,11 +226,12 @@ class Historian:
 
 		rightmost = sorted(parents,
 			key=lambda e: self.node[e].border, reverse=True)[0]
+		column = self.node[rightmost].column
 
 		if parent_no == len(target.parent):
-			target.set_column(self.node[rightmost].column)
+			target.set_column(column)
 		else:
-			target.set_column(1 + self.node[rightmost].column)
+			target.set_column(1 + column)
 
 		self.update_width(target.column)
 		return
