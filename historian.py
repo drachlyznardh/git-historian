@@ -233,13 +233,14 @@ class Historian:
 		# rightmost column
 		if parent_no == len(target.parent):
 			target.set_column(column)
+			self.update_width(target.column)
+			return
 
 		# But if there are missing parents, the target must leave the column for
 		# the arrow
-		else:
-			print 'Assigned (%s)' % ', '.join([e[:7] for e in parents])
-			print ' Missing (%s)' % ', '.join([e[:7] for e in target.parent])
-			target.set_column(1 + column)
+		print 'Assigned (%s)' % ', '.join([e[:7] for e in parents])
+		print ' Missing (%s)' % ', '.join([e[:7] for e in target.parent])
+		target.set_column(1 + column)
 
 		self.update_width(target.column)
 		return
