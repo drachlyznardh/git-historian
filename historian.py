@@ -95,48 +95,6 @@ class Historian:
 	def update_width (self, value):
 		self.width = max(self.width, value)
 
-	def select_column (self, commit, debug):
-
-		if debug: print
-		if not commit.top:
-			if debug: print '  %s is the topmost' % commit.hash[:7]
-			self.width += 1
-			return self.width
-
-		if len(commit.child) == 0:
-			if debug: print '  %s has no children' % commit.hash[:7]
-			self.width += 1
-			#if len(self.skip_if_done(commit.parent)):
-			#	self.width += 1
-			return self.width
-
-		result = self.width
-		name = commit.top
-		if debug: print '  Processing %s' % commit.hash[:7]
-		while name:
-
-			target = self.node[name]
-
-			if name in commit.child and target.has_column():
-				if debug: print '  %s is a child of %s (%d), halting' % (
-					name[:7], commit.hash[:7],
-					self.node[name].column)
-
-				booked = 1 + max([self.node[j].column for j in target.parent])
-				if debug: print booked
-				column = max(result, target.column, booked)
-				self.max_width = max(self.max_width, column)
-				return column
-
-			if debug: print '  Matching %s against %s (%d)' % (
-				commit.hash[:7], name[:7], target.column)
-			result = max(result, target.column)
-			name = target.top
-
-		if debug: print 'No assigned children found. Defaulting'
-		self.width += 1
-		return self.width
-
 	def skip_if_done (self, names):
 
 		result = []
