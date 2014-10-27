@@ -211,6 +211,7 @@ class Historian:
 
 		self.width = -1
 
+		# The visit starts for the named heads
 		visit = order.ColumnOrder()
 		visit.push(self.head)
 
@@ -219,10 +220,13 @@ class Historian:
 			name = visit.pop()
 			target = self.node[name]
 			
+			# No node is processed more than once
 			if target.done: continue
 
 			if debug: print '  Visiting %s' % name[:7]
 
+			# If a node is a named head and has not yet a column assigned, it
+			# must look for a valid column on its own
 			if target.hash in self.head and not target.has_column():
 
 				if debug: print '%s has to find its own column!!!' % name [:7]
@@ -263,6 +267,8 @@ class Historian:
 					target.set_column(self.width)
 					self.update_width(self.width)
 
+			# The node assigns a column to each of its parents, in order,
+			# ensuring each starts off on a valid position
 			column = target.column
 			for e in sorted(target.parent,
 					key=lambda e: self.node[e].row, reverse=True):
@@ -287,6 +293,7 @@ class Historian:
 				self.update_width(column)
 				column += 1
 
+			# Parents are added to the visit, then the node is done
 			visit.push(self.skip_if_done(target.parent))
 			target.done = 1
 			
