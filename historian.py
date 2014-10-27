@@ -242,54 +242,6 @@ class Historian:
 		self.update_width(target.column)
 		return
 
-		# Should I take the column of the rightmost parent, only when ALL the
-		# parents are out there already?
-
-		# If there is only one selected parent, and that is the only parent, the
-		# target node can appear on top of it
-		if parent_no == len(target.parent):
-		#if parent_no == 1 and len(target.parent) == 1:
-			target.set_column(self.node[parents[0]].column)
-			return
-
-		# Selecting the two parents with the lowest row and the rightmost
-		# column
-		lowest = sorted(parents,
-			key=lambda e: self.node[e].row, reverse=True)[0]
-		rightmost = sorted(parents,
-			key=lambda e: self.node[e].border, reverse=True)[0]
-		if debug: print 'Lowest (%s), Rightmost (%s)' % (lowest[:7], rightmost[:7])
-
-		# If they are same node…
-		if lowest == rightmost:
-
-			# … we must also verify if that node is the only one on that
-			# column
-			count = 0
-			value = self.node[rightmost].border
-			for e in parents:
-				if self.node[e].border == value:
-					count += 1
-
-			if debug: print 'Count is %d' % count
-
-			# If that node is lonely, the target can be put on top of it
-			if count == 1:
-				target.set_column(self.node[lowest].column)
-
-			# If there are more than one node on the rightmost column, the
-			# arrow must appear on the next one, so the target node shifts
-			# one more step on the right
-			else:
-				target.set_column(1 + self.node[rightmost].border)
-				self.update_width(target.column)
-
-		# If the rightmost parent is not the lowest, an arrow would cross
-		# it. The target node must be put on the next column
-		else:
-			target.set_column(1 + self.node[rightmost].border)
-			self.update_width(target.column)
-
 	def find_column_for_parents (self, name, debug):
 
 		target = self.node[name]
