@@ -250,15 +250,24 @@ class Historian:
 
 		target = self.node[name]
 		column = target.column
+
+		# Parents are processed in row order, from lower to upper
 		for e in sorted(target.parent,
 				key=lambda e: self.node[e].row, reverse=True):
 			parent = self.node[e]
+
+			# If a parent has already a column, the column next to its marks the
+			# leftmost spot for the following parents, as the border for the
+			# target node
 			if parent.has_column():
 				parent.set_border(target.column)
 				column = parent.border + 1
 				if debug: print 'Pushing column beyond %s\'s border %d' % (e[:7], parent.border)
 				continue
 
+			# Starting from the node atop of the current, the graph is
+			# traversed until the caller is found. The rightmost column
+			# encountered in the process is the boundary for this node's column
 			upper = parent.top
 			while upper:
 				if debug: print 'From %s, Up to %s' % (e[:7], upper[:7])
@@ -268,8 +277,12 @@ class Historian:
 					column = max(column, upper.column + 1)
 				upper = upper.top
 
+			# The parent column is set, as well as the caller's border
 			parent.set_column(column)
 			parent.set_border(target.column)
+
+			# The graph's width is updated. The first available column is the
+			# next one
 			self.update_width(column)
 			column += 1
 
