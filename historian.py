@@ -281,7 +281,7 @@ class Historian:
 
 				parents = self.only_if_has_column(target.parent)
 				parent_no = len(parents)
-				print '%s has %d parents with column, (%s)' % (name[:7],
+				if debug: print '%s has %d parents with column, (%s)' % (name[:7],
 					len(parents), ', '.join([e[:7] for e in parents]))
 
 				if parent_no == 1:
@@ -291,17 +291,17 @@ class Historian:
 						key=lambda e: self.node[e].row, reverse=True)[0]
 					rightmost = sorted(parents,
 						key=lambda e: self.node[e].border, reverse=True)[0]
-					print 'Lowest (%s), Rightmost (%s)' % (lowest[:7], rightmost[:7])
+					if debug: print 'Lowest (%s), Rightmost (%s)' % (lowest[:7], rightmost[:7])
 
 					if lowest == rightmost:
-						
+
 						count = 0
 						value = self.node[rightmost].border
 						for e in parents:
 							if self.node[e].border == value:
 								count += 1
-						
-						print 'Count is %d' % count
+
+						if debug: print 'Count is %d' % count
 						if count == 1:
 							target.set_column(self.node[lowest].column)
 						else:
@@ -322,12 +322,12 @@ class Historian:
 				if parent.has_column():
 					parent.set_border(target.column)
 					column = parent.border + 1
-					print 'Pushing column beyond %s\'s border %d' % (e[:7], parent.border)
+					if debug: print 'Pushing column beyond %s\'s border %d' % (e[:7], parent.border)
 					continue
 
 				upper = parent.top
 				while upper:
-					print 'From %s, Up to %s' % (e[:7], upper[:7])
+					if debug: print 'From %s, Up to %s' % (e[:7], upper[:7])
 					if upper == name: break
 					upper = self.node[upper]
 					if upper.has_column() and upper.column <= column:
