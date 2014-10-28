@@ -303,6 +303,10 @@ class Historian:
 			# Starting from the node atop of the current, the graph is
 			# traversed until the caller is found. The rightmost column
 			# encountered in the process is the boundary for this node's column
+
+			# TODO???
+			# Should I proceed upwards until I find a node in the same column?
+			# TODO???
 			upper = parent.top
 			while upper:
 				if debug: print 'From %s, Up to %s' % (e[:7], upper[:7])
