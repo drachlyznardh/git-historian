@@ -231,7 +231,21 @@ class Historian:
 
 		# If all the parents were already assigned, the target can sit above the
 		# rightmost column
-		if len(missing) == 0: return column
+		if len(missing) == 0:
+
+			if len(target.parent) == 1: return column
+
+			assigned.sort(key=lambda e: self.node[e].column, reverse=True)
+			lowest = sorted(assigned, key=lambda e:self.node[e].row, reverse=True)[0]
+
+			first = self.node[assigned[0]]
+			second = self.node[assigned[1]]
+
+			if first.column == second.column: return 1 + column
+
+			if first.hash != lowest: return 1 + column
+
+			return column
 
 		# But if there are missing parents, the target must leave the column for
 		# the arrow
