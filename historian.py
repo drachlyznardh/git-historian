@@ -245,8 +245,21 @@ class Historian:
 		print ' Missing (%s)' % ', '.join([e[:7] for e in missing])
 
 		# TODO: check whether lowest missing is above higher assigned
-		target.set_column(1 + column)
+		assigned.sort(key=lambda e: self.node[e].row, reverse=True)
+		missing.sort(key=lambda e: self.node[e].row, reverse=False)
 
+		print 'Assigned (%s)' % ', '.join([e[:7] for e in assigned])
+		print ' Missing (%s)' % ', '.join([e[:7] for e in missing])
+
+		highest = self.node[assigned[0]]
+		lowest = self.node[missing[0]]
+		print 'Highest Assigned (%s, %d)' % (highest.hash[:7], highest.row)
+		print ' Lowest Missing (%s, %d)' % (lowest.hash[:7], lowest.row)
+
+		if self.node[assigned[0]].row < self.node[missing[0]].row:
+			column += 1
+
+		target.set_column(column)
 		self.update_width(target.column)
 		return
 
