@@ -231,6 +231,13 @@ class Historian:
 			key=lambda e: self.node[e].border, reverse=True)[0]
 		column = self.node[rightmost].border
 
+		# This head should also appear on the right of previous heads
+		index = self.head.index(name)
+		previous = self.head[index - 1]
+		print 'This(%s) Previous(%s)' % (name, previous)
+		column = max(column, self.node[previous].column)# + 1)
+		print 'Porca puttana!!! %d' % column
+
 		# If all the parents were already assigned, the target can sit above the
 		# rightmost column
 		if len(missing) == 0:
