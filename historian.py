@@ -227,7 +227,7 @@ class Historian:
 		# Selecting the parent node with the rightmost column
 		rightmost = sorted(assigned,
 			key=lambda e: self.node[e].border, reverse=True)[0]
-		column = self.node[rightmost].column
+		column = self.node[rightmost].border
 
 		# If all the parents were already assigned, the target can sit above the
 		# rightmost column
@@ -235,7 +235,7 @@ class Historian:
 
 			if len(target.parent) == 1: return column
 
-			assigned.sort(key=lambda e: self.node[e].column, reverse=True)
+			assigned.sort(key=lambda e: self.node[e].border, reverse=True)
 			lowest = sorted(assigned, key=lambda e:self.node[e].row, reverse=True)[0]
 
 			first = self.node[assigned[0]]
