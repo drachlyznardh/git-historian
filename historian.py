@@ -254,7 +254,6 @@ class Historian:
 		print 'Assigned (%s)' % ', '.join([e[:7] for e in assigned])
 		print ' Missing (%s)' % ', '.join([e[:7] for e in missing])
 
-		# TODO: check whether lowest missing is above higher assigned
 		assigned.sort(key=lambda e: self.node[e].row, reverse=True)
 		missing.sort(key=lambda e: self.node[e].row, reverse=False)
 
