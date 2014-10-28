@@ -213,6 +213,7 @@ class Historian:
 		# We do not consider parents which have no column yet, those will be
 		# called in a later step
 		parents = self.only_if_has_column(target.parent)
+		# TODO: split assigned/missing parents in one call
 		parent_no = len(parents)
 		if debug: print '%s has %d parents with column, (%s)' % (name[:7],
 			len(parents), ', '.join([e[:7] for e in parents]))
@@ -240,6 +241,8 @@ class Historian:
 		# the arrow
 		print 'Assigned (%s)' % ', '.join([e[:7] for e in parents])
 		print ' Missing (%s)' % ', '.join([e[:7] for e in target.parent])
+
+		# TODO: check whether lowest missing is above higher assigned
 		target.set_column(1 + column)
 
 		self.update_width(target.column)
@@ -277,6 +280,8 @@ class Historian:
 				upper = upper.top
 
 			# The parent column is set, as well as the caller's border
+			# TODO: consider the selected child's number of undone parent: is it
+			# more than one? If so, step to the right
 			parent.set_column(column)
 			parent.set_border(target.column)
 
