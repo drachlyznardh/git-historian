@@ -222,9 +222,7 @@ class Historian:
 		# If no parent has a column yet, a whole new column is selected
 		if len(assigned) == 0:
 			self.width += 1
-			target.set_column(self.width)
-			self.update_width(self.width)
-			return
+			return self.width
 
 		# Selecting the parent node with the rightmost column
 		rightmost = sorted(assigned,
@@ -233,10 +231,7 @@ class Historian:
 
 		# If all the parents were already assigned, the target can sit above the
 		# rightmost column
-		if len(missing) == 0:
-			target.set_column(column)
-			self.update_width(target.column)
-			return
+		if len(missing) == 0: return column
 
 		# But if there are missing parents, the target must leave the column for
 		# the arrow
@@ -258,9 +253,7 @@ class Historian:
 		if self.node[assigned[0]].row < self.node[missing[0]].row:
 			column += 1
 
-		target.set_column(column)
-		self.update_width(target.column)
-		return
+		return column
 
 	def find_column_for_parents (self, name, debug):
 
@@ -328,7 +321,9 @@ class Historian:
 			# must look for a valid column on its own
 			if target.hash in self.head and not target.has_column():
 
-				self.find_column_for_head (name, debug)
+				column = self.find_column_for_head (name, debug)
+				target.set_column(column)
+				self.update_width(column)
 
 			# The node assigns a column to each of its parents, in order,
 			# ensuring each starts off on a valid position
