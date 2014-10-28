@@ -306,6 +306,9 @@ class Historian:
 					continue
 				upper = self.node[upper]
 				if upper.has_column() and upper.column == column:
+					if len(upper.parent) == 0:
+						upper = upper.top
+						continue
 					lowest = sorted([self.node[e].row for e in upper.parent])[-1]
 					if lowest > parent.row:
 					#if len(self.skip_if_done(upper.parent)):
