@@ -214,35 +214,35 @@ class Historian:
 
 		# We do not consider parents which have no column yet, those will be
 		# called in a later step
-		parents = self.only_if_has_column(target.parent)
+		assigned, missing = self.split_assigned_from_missing(target.parent)
 		# TODO: split assigned/missing parents in one call
-		parent_no = len(parents)
+		assigned_size = len(assigned)
 		if debug: print '%s has %d parents with column, (%s)' % (name[:7],
-			len(parents), ', '.join([e[:7] for e in parents]))
+			len(assigned), ', '.join([e[:7] for e in assigned]))
 
 		# If no parent has a column yet, a whole new column is selected
-		if parent_no == 0:
+		if assigned_size == 0:
 			self.width += 1
 			target.set_column(self.width)
 			self.update_width(self.width)
 			return
 
 		# Selecting the parent node with the rightmost column
-		rightmost = sorted(parents,
+		rightmost = sorted(assigned,
 			key=lambda e: self.node[e].border, reverse=True)[0]
 		column = self.node[rightmost].column
 
 		# If all the parents were already assigned, the target can sit above the
 		# rightmost column
-		if parent_no == len(target.parent):
+		if assigned_size == len(target.parent):
 			target.set_column(column)
 			self.update_width(target.column)
 			return
 
 		# But if there are missing parents, the target must leave the column for
 		# the arrow
-		print 'Assigned (%s)' % ', '.join([e[:7] for e in parents])
-		print ' Missing (%s)' % ', '.join([e[:7] for e in target.parent])
+		print 'Assigned (%s)' % ', '.join([e[:7] for e in assigned])
+		print ' Missing (%s)' % ', '.join([e[:7] for e in missing])
 
 		# TODO: check whether lowest missing is above higher assigned
 		target.set_column(1 + column)
