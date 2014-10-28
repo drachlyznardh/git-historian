@@ -384,8 +384,8 @@ class Historian:
 			visit.push(self.skip_if_done(target.parent))
 			target.done = 1
 
-			print
-			self.print_graph(0)
+			#print
+			#self.print_graph(0)
 
 	def print_graph (self, debug):
 		
