@@ -267,7 +267,18 @@ class Historian:
 		print ' Lowest Missing (%s, %d)' % (lowest.hash[:7], lowest.row)
 
 		if self.node[assigned[0]].row < self.node[missing[0]].row:
-			column += 1
+			return 1 + column
+
+		# Still, between the highest parent and the target there could be some
+		# other node taking the border column for itself
+		upper = highest.top
+		while upper:
+			if debug: print 'From %s, up to %s' % (name[:7], upper[:7])
+			if upper == name: break
+			upper = self.node[upper]
+			if upper.has_column() and upper.column <= column:
+				column = max(column, upper.column + 1)
+			upper = upper.top
 
 		return column
 
