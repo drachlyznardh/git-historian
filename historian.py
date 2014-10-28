@@ -96,12 +96,14 @@ class Historian:
 				result.append(name)
 		return result
 
-	def only_if_has_column (self, names):
-		result = []
+	def split_assigned_from_missing (self, names):
+		assigned = []
+		missing = []
 		for name in names:
 			if self.node[name].has_column():
-				result.append(name)
-		return result
+				assigned.append(name)
+			else: missing.append(name)
+		return assigned, missing
 
 	def clear (self):
 		for commit in self.node.values():
