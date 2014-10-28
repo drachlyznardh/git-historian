@@ -96,12 +96,14 @@ class Historian:
 				result.append(name)
 		return result
 
-	def only_if_has_column (self, names):
-		result = []
+	def split_assigned_from_missing (self, names):
+		assigned = []
+		missing = []
 		for name in names:
 			if self.node[name].has_column():
-				result.append(name)
-		return result
+				assigned.append(name)
+			else: missing.append(name)
+		return assigned, missing
 
 	def clear (self):
 		for commit in self.node.values():
@@ -212,62 +214,66 @@ class Historian:
 
 		# We do not consider parents which have no column yet, those will be
 		# called in a later step
-		parents = self.only_if_has_column(target.parent)
-		parent_no = len(parents)
+		assigned, missing = self.split_assigned_from_missing(target.parent)
+
 		if debug: print '%s has %d parents with column, (%s)' % (name[:7],
-			len(parents), ', '.join([e[:7] for e in parents]))
+			len(assigned), ', '.join([e[:7] for e in assigned]))
+		if debug: print '%s has %d parents without column, (%s)' % (name[:7],
+			len(missing), ', '.join([e[:7] for e in missing]))
 
-		# If there is only one selected parent, the target node can appear on
-		# top of it
-		if parent_no == 1:
-			target.set_column(self.node[parents[0]].column)
-
-		# If there are more than one parent, the situation becomes tricky
-		elif parent_no > 1:
-
-			# Selecting the two parents with the lowest row and the rightmost
-			# column
-			lowest = sorted(parents,
-				key=lambda e: self.node[e].row, reverse=True)[0]
-			rightmost = sorted(parents,
-				key=lambda e: self.node[e].border, reverse=True)[0]
-			if debug: print 'Lowest (%s), Rightmost (%s)' % (lowest[:7], rightmost[:7])
-
-			# If they are same node…
-			if lowest == rightmost:
-
-				# … we must also verify if that node is the only one on that
-				# column
-				count = 0
-				value = self.node[rightmost].border
-				for e in parents:
-					if self.node[e].border == value:
-						count += 1
-
-				if debug: print 'Count is %d' % count
-
-				# If that node is lonely, the target can be put on top of it
-				if count == 1:
-					target.set_column(self.node[lowest].column)
-
-				# If there are more than one node on the rightmost column, the
-				# arrow must appear on the next one, so the target node shifts
-				# one more step on the right
-				else:
-					target.set_column(1 + self.node[rightmost].border)
-					self.update_width(target.column)
-
-			# If the rightmost parent is not the lowest, an arrow would cross
-			# it. The target node must be put on the next column
-			else:
-				target.set_column(1 + self.node[rightmost].border)
-				self.update_width(target.column)
-
-		# If there are no parents at all, a whole new column is selected
-		else:
+		# If no parent has a column yet, a whole new column is selected
+		if len(assigned) == 0:
 			self.width += 1
-			target.set_column(self.width)
-			self.update_width(self.width)
+			return self.width
+
+		# Selecting the parent node with the rightmost column
+		rightmost = sorted(assigned,
+			key=lambda e: self.node[e].border, reverse=True)[0]
+		column = self.node[rightmost].border
+
+		# This head should also appear on the right of previous heads
+		index = self.head.index(name)
+		previous = self.head[index - 1]
+		print 'This(%s) Previous(%s)' % (name, previous)
+		column = max(column, self.node[previous].column)# + 1)
+		print 'Porca puttana!!! %d' % column
+
+		# If all the parents were already assigned, the target can sit above the
+		# rightmost column
+		if len(missing) == 0:
+
+			if len(target.parent) == 1: return column
+
+			assigned.sort(key=lambda e: self.node[e].border, reverse=True)
+			lowest = sorted(assigned, key=lambda e:self.node[e].row, reverse=True)[0]
+
+			first = self.node[assigned[0]]
+			second = self.node[assigned[1]]
+
+			if first.column == second.column: return 1 + column
+
+			if first.hash != lowest: return 1 + column
+
+			return column
+
+		assigned.sort(key=lambda e: self.node[e].row, reverse=True)
+		missing.sort(key=lambda e: self.node[e].row, reverse=False)
+
+		if self.node[assigned[0]].row < self.node[missing[0]].row:
+			return 1 + column
+
+		# Still, between the highest parent and the target there could be some
+		# other node taking the border column for itself
+		upper = self.node[missing[0]].top
+		while upper:
+			if debug: print 'From %s, up to %s' % (name[:7], upper[:7])
+			if upper == name: break
+			upper = self.node[upper]
+			if upper.has_column() and upper.column <= column:
+				column = max(column, upper.column + 1)
+			upper = upper.top
+
+		return column
 
 	def find_column_for_parents (self, name, debug):
 
@@ -294,13 +300,46 @@ class Historian:
 			upper = parent.top
 			while upper:
 				if debug: print 'From %s, Up to %s' % (e[:7], upper[:7])
-				if upper == name: break
+				if upper in parent.child: break
 				upper = self.node[upper]
 				if upper.has_column() and upper.column <= column:
 					column = max(column, upper.column + 1)
 				upper = upper.top
 
-			# The parent column is set, as well as the caller's border
+			while upper:
+				if debug: print 'Higher, from %s to %s' % (e[:7], upper[:7])
+				if upper in parent.child:
+					upper = self.node[upper].top
+					continue
+				upper = self.node[upper]
+				if upper.has_column() and upper.column == column:
+					if len(upper.parent) == 0:
+						upper = upper.top
+						continue
+					lowest = sorted([self.node[e].row for e in upper.parent])[-1]
+					if lowest > parent.row:
+					#if len(self.skip_if_done(upper.parent)):
+						if debug: print '  Aligned node %s has lower parents' % upper.hash[:7]
+						column = max(column, upper.border + 1)
+						break
+				upper = upper.top
+
+			lower = parent.bottom
+			while lower:
+				if lower in parent.parent:
+					lower = self.node[lower].bottom
+					continue
+				lower = self.node[lower]
+				if lower.has_column() and lower.column == column:
+					if len(lower.child) == 0:
+						lower = lower.bottom
+						continue
+					highest = sorted([self.node[e].row for e in lower.child])[-1]
+					if highest < parent.row:
+						column = max(column, lower.border + 1)
+						break
+				lower = lower.bottom
+
 			parent.set_column(column)
 			parent.set_border(target.column)
 
@@ -333,7 +372,9 @@ class Historian:
 			# must look for a valid column on its own
 			if target.hash in self.head and not target.has_column():
 
-				self.find_column_for_head (name, debug)
+				column = self.find_column_for_head (name, debug)
+				target.set_column(column)
+				self.update_width(column)
 
 			# The node assigns a column to each of its parents, in order,
 			# ensuring each starts off on a valid position
@@ -342,6 +383,9 @@ class Historian:
 			# Parents are added to the visit, then the node is done
 			visit.push(self.skip_if_done(target.parent))
 			target.done = 1
+
+			#print
+			#self.print_graph(0)
 
 	def print_graph (self, debug):
 		
