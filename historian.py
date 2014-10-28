@@ -315,6 +315,37 @@ class Historian:
 			# The parent column is set, as well as the caller's border
 			# TODO: consider the selected child's number of undone parent: is it
 			# more than one? If so, step to the right
+			'''
+			assigned, missing = self.split_assigned_from_missing(parent.child)
+			if len(missing):
+				#missing.sort(key=lambda e:self.node[e].row, reverse=True)
+				lowest = max([self.node[e].row for e in missing])
+				print
+				print 'Parent (%s)' % parent.hash[:7]
+				print 'Target (%s) row (%d)' % (name[:7], target.row)
+				print 'Missing rows (%s)' % [self.node[e].row for e in missing]
+				print
+				if lowest > target.row:
+					print
+					print 'That\'s not it!!!'
+					print
+					#column += 1
+
+			if len(assigned):
+				#assigned.sort(key=lambda e:self.node[e].row, reverse=True)
+				lowest = max([self.node[e].row for e in assigned])
+				print
+				print 'Parent (%s)' % parent.hash[:7]
+				print 'Target (%s) row (%d)' % (name[:7], target.row)
+				print 'Assigned rows (%s)' % [self.node[e].row for e in assigned]
+				print
+				if lowest > target.row:
+					print
+					print 'That\'s it!!!'
+					print
+					#column += 1
+			'''
+
 			parent.set_column(column)
 			parent.set_border(target.column)
 
