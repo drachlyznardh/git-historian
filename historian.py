@@ -216,12 +216,11 @@ class Historian:
 		# called in a later step
 		assigned, missing = self.split_assigned_from_missing(target.parent)
 
-		assigned_size = len(assigned)
 		if debug: print '%s has %d parents with column, (%s)' % (name[:7],
 			len(assigned), ', '.join([e[:7] for e in assigned]))
 
 		# If no parent has a column yet, a whole new column is selected
-		if assigned_size == 0:
+		if len(assigned) == 0:
 			self.width += 1
 			target.set_column(self.width)
 			self.update_width(self.width)
