@@ -96,12 +96,14 @@ class Historian:
 				result.append(name)
 		return result
 
-	def only_if_has_column (self, names):
-		result = []
+	def split_assigned_from_missing (self, names):
+		assigned = []
+		missing = []
 		for name in names:
 			if self.node[name].has_column():
-				result.append(name)
-		return result
+				assigned.append(name)
+			else: missing.append(name)
+		return assigned, missing
 
 	def clear (self):
 		for commit in self.node.values():
@@ -212,41 +214,72 @@ class Historian:
 
 		# We do not consider parents which have no column yet, those will be
 		# called in a later step
-		parents = self.only_if_has_column(target.parent)
-		# TODO: split assigned/missing parents in one call
-		parent_no = len(parents)
+		assigned, missing = self.split_assigned_from_missing(target.parent)
+
 		if debug: print '%s has %d parents with column, (%s)' % (name[:7],
-			len(parents), ', '.join([e[:7] for e in parents]))
+			len(assigned), ', '.join([e[:7] for e in assigned]))
+		if debug: print '%s has %d parents without column, (%s)' % (name[:7],
+			len(missing), ', '.join([e[:7] for e in missing]))
 
 		# If no parent has a column yet, a whole new column is selected
-		if parent_no == 0:
+		if len(assigned) == 0:
 			self.width += 1
-			target.set_column(self.width)
-			self.update_width(self.width)
-			return
+			return self.width
 
 		# Selecting the parent node with the rightmost column
-		rightmost = sorted(parents,
+		rightmost = sorted(assigned,
 			key=lambda e: self.node[e].border, reverse=True)[0]
-		column = self.node[rightmost].column
+		column = self.node[rightmost].border
 
 		# If all the parents were already assigned, the target can sit above the
 		# rightmost column
-		if parent_no == len(target.parent):
-			target.set_column(column)
-			self.update_width(target.column)
-			return
+		if len(missing) == 0:
+
+			if len(target.parent) == 1: return column
+
+			assigned.sort(key=lambda e: self.node[e].border, reverse=True)
+			lowest = sorted(assigned, key=lambda e:self.node[e].row, reverse=True)[0]
+
+			first = self.node[assigned[0]]
+			second = self.node[assigned[1]]
+
+			if first.column == second.column: return 1 + column
+
+			if first.hash != lowest: return 1 + column
+
+			return column
 
 		# But if there are missing parents, the target must leave the column for
 		# the arrow
-		print 'Assigned (%s)' % ', '.join([e[:7] for e in parents])
-		print ' Missing (%s)' % ', '.join([e[:7] for e in target.parent])
+		print 'Assigned (%s)' % ', '.join([e[:7] for e in assigned])
+		print ' Missing (%s)' % ', '.join([e[:7] for e in missing])
 
-		# TODO: check whether lowest missing is above higher assigned
-		target.set_column(1 + column)
+		assigned.sort(key=lambda e: self.node[e].row, reverse=True)
+		missing.sort(key=lambda e: self.node[e].row, reverse=False)
 
-		self.update_width(target.column)
-		return
+		print 'Assigned (%s)' % ', '.join([e[:7] for e in assigned])
+		print ' Missing (%s)' % ', '.join([e[:7] for e in missing])
+
+		highest = self.node[assigned[0]]
+		lowest = self.node[missing[0]]
+		print 'Highest Assigned (%s, %d)' % (highest.hash[:7], highest.row)
+		print ' Lowest Missing (%s, %d)' % (lowest.hash[:7], lowest.row)
+
+		if self.node[assigned[0]].row < self.node[missing[0]].row:
+			return 1 + column
+
+		# Still, between the highest parent and the target there could be some
+		# other node taking the border column for itself
+		upper = highest.top
+		while upper:
+			if debug: print 'From %s, up to %s' % (name[:7], upper[:7])
+			if upper == name: break
+			upper = self.node[upper]
+			if upper.has_column() and upper.column <= column:
+				column = max(column, upper.column + 1)
+			upper = upper.top
+
+		return column
 
 	def find_column_for_parents (self, name, debug):
 
@@ -270,6 +303,10 @@ class Historian:
 			# Starting from the node atop of the current, the graph is
 			# traversed until the caller is found. The rightmost column
 			# encountered in the process is the boundary for this node's column
+
+			# TODO???
+			# Should I proceed upwards until I find a node in the same column?
+			# TODO???
 			upper = parent.top
 			while upper:
 				if debug: print 'From %s, Up to %s' % (e[:7], upper[:7])
@@ -279,9 +316,58 @@ class Historian:
 					column = max(column, upper.column + 1)
 				upper = upper.top
 
+			# TODO: what I need is to avoid taking a column with already
+			# contains an arrow. I should find the first node on the target
+			# column, then check it has any parents lower then the current node
+			while upper:
+				if debug: print 'Higher, from %s to %s' % (e[:7], upper[:7])
+				if upper in parent.child:
+					upper = self.node[upper].top
+					continue
+				upper = self.node[upper]
+				if upper.has_column() and upper.column == column:
+					lowest = sorted([self.node[e].row for e in upper.parent])[-1]
+					if lowest > parent.row:
+					#if len(self.skip_if_done(upper.parent)):
+						print '  Aligned node %s has lower parents' % upper.hash[:7]
+						column = max(column, upper.border + 1)
+						break
+				upper = upper.top
+
 			# The parent column is set, as well as the caller's border
 			# TODO: consider the selected child's number of undone parent: is it
 			# more than one? If so, step to the right
+			'''
+			assigned, missing = self.split_assigned_from_missing(parent.child)
+			if len(missing):
+				#missing.sort(key=lambda e:self.node[e].row, reverse=True)
+				lowest = max([self.node[e].row for e in missing])
+				print
+				print 'Parent (%s)' % parent.hash[:7]
+				print 'Target (%s) row (%d)' % (name[:7], target.row)
+				print 'Missing rows (%s)' % [self.node[e].row for e in missing]
+				print
+				if lowest > target.row:
+					print
+					print 'That\'s not it!!!'
+					print
+					#column += 1
+
+			if len(assigned):
+				#assigned.sort(key=lambda e:self.node[e].row, reverse=True)
+				lowest = max([self.node[e].row for e in assigned])
+				print
+				print 'Parent (%s)' % parent.hash[:7]
+				print 'Target (%s) row (%d)' % (name[:7], target.row)
+				print 'Assigned rows (%s)' % [self.node[e].row for e in assigned]
+				print
+				if lowest > target.row:
+					print
+					print 'That\'s it!!!'
+					print
+					#column += 1
+			'''
+
 			parent.set_column(column)
 			parent.set_border(target.column)
 
@@ -314,7 +400,9 @@ class Historian:
 			# must look for a valid column on its own
 			if target.hash in self.head and not target.has_column():
 
-				self.find_column_for_head (name, debug)
+				column = self.find_column_for_head (name, debug)
+				target.set_column(column)
+				self.update_width(column)
 
 			# The node assigns a column to each of its parents, in order,
 			# ensuring each starts off on a valid position
