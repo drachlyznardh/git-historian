@@ -215,7 +215,7 @@ class Historian:
 		# We do not consider parents which have no column yet, those will be
 		# called in a later step
 		assigned, missing = self.split_assigned_from_missing(target.parent)
-		# TODO: split assigned/missing parents in one call
+
 		assigned_size = len(assigned)
 		if debug: print '%s has %d parents with column, (%s)' % (name[:7],
 			len(assigned), ', '.join([e[:7] for e in assigned]))
