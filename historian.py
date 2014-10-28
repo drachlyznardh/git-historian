@@ -257,7 +257,7 @@ class Historian:
 
 		# Still, between the highest parent and the target there could be some
 		# other node taking the border column for itself
-		upper = highest.top
+		upper = self.node[missing[0]].top
 		while upper:
 			if debug: print 'From %s, up to %s' % (name[:7], upper[:7])
 			if upper == name: break
@@ -316,6 +316,22 @@ class Historian:
 						column = max(column, upper.border + 1)
 						break
 				upper = upper.top
+
+			lower = parent.bottom
+			while lower:
+				if lower in parent.parent:
+					lower = self.node[lower].bottom
+					continue
+				lower = self.node[lower]
+				if lower.has_column() and lower.column == column:
+					if len(lower.child) == 0:
+						lower = lower.bottom
+						continue
+					highest = sorted([self.node[e].row for e in lower.child])[-1]
+					if highest < parent.row:
+						column = max(column, lower.border + 1)
+						break
+				lower = lower.bottom
 
 			parent.set_column(column)
 			parent.set_border(target.column)
