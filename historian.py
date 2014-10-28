@@ -233,7 +233,7 @@ class Historian:
 
 		# If all the parents were already assigned, the target can sit above the
 		# rightmost column
-		if assigned_size == len(target.parent):
+		if len(missing) == 0:
 			target.set_column(column)
 			self.update_width(target.column)
 			return
