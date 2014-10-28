@@ -326,8 +326,10 @@ class Historian:
 					continue
 				upper = self.node[upper]
 				if upper.has_column() and upper.column == column:
-					if len(self.skip_if_done(upper.parent)):
-						print '  Aligned node %s has undone parents' % upper.hash[:7]
+					lowest = sorted([self.node[e].row for e in upper.parent])[-1]
+					if lowest > parent.row:
+					#if len(self.skip_if_done(upper.parent)):
+						print '  Aligned node %s has lower parents' % upper.hash[:7]
 						column = max(column, upper.border + 1)
 						break
 				upper = upper.top
