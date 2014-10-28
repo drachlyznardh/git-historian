@@ -218,6 +218,8 @@ class Historian:
 
 		if debug: print '%s has %d parents with column, (%s)' % (name[:7],
 			len(assigned), ', '.join([e[:7] for e in assigned]))
+		if debug: print '%s has %d parents without column, (%s)' % (name[:7],
+			len(missing), ', '.join([e[:7] for e in missing]))
 
 		# If no parent has a column yet, a whole new column is selected
 		if len(assigned) == 0:
