@@ -316,6 +316,9 @@ class Historian:
 					column = max(column, upper.column + 1)
 				upper = upper.top
 
+			# TODO: what I need is to avoid taking a column with already
+			# contains an arrow. I should find the first node on the target
+			# column, then check it has any parents lower then the current node
 			while upper:
 				if debug: print 'Higher, from %s to %s' % (e[:7], upper[:7])
 				if upper in parent.child:
