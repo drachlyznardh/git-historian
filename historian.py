@@ -316,6 +316,19 @@ class Historian:
 					column = max(column, upper.column + 1)
 				upper = upper.top
 
+			while upper:
+				if debug: print 'Higher, from %s to %s' % (e[:7], upper[:7])
+				if upper in parent.child:
+					upper = self.node[upper].top
+					continue
+				upper = self.node[upper]
+				if upper.has_column() and upper.column == column:
+					if len(self.skip_if_done(upper.parent)):
+						print '  Aligned node %s has undone parents' % upper.hash[:7]
+						column = max(column, upper.border + 1)
+						break
+				upper = upper.top
+
 			# The parent column is set, as well as the caller's border
 			# TODO: consider the selected child's number of undone parent: is it
 			# more than one? If so, step to the right
