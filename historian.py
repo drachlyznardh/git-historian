@@ -43,10 +43,6 @@ class Historian:
 			else: missing.append(name)
 		return assigned, missing
 
-	def clear (self):
-		for commit in self.node.values():
-			commit.done = 0
-
 	def bind_children (self, debug):
 
 		if debug: print '-- Binding Children --'
@@ -361,9 +357,9 @@ class Historian:
 		self.node = hunter.HistoryHunter(self.head, self.o.d(2)).hunt()
 
 		self.bind_children(self.o.d(4))
-		self.clear()
+		self.db.clear()
 		self.row_unroll(self.o.d(8))
-		self.clear()
+		self.db.clear()
 		self.column_unroll(self.o.d(16))
 		self.print_graph(self.o.d(32))
 

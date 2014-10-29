@@ -10,3 +10,8 @@ class NodeDB:
 
 	def at (self, name):
 		return self.store[name]
+
+	def clear (self):
+		for commit in self.node.values():
+			commit.done = 0
+
