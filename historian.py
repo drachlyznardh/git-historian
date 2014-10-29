@@ -409,9 +409,11 @@ class Historian:
 
 			message = h.describe(name)
 
-			print '%s\x1b[m %s' % (t.draw_transition(), message[0])
-			for i in message[1:-1]:
-				print '%s\x1b[m %s' % (t.draw_padding(), i)
+			try:
+				print '%s\x1b[m %s' % (t.draw_transition(), message[0])
+				for i in message[1:-1]:
+					print '%s\x1b[m %s' % (t.draw_padding(), i)
+			except IOError as error: return
 
 			name = commit.bottom
 
