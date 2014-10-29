@@ -307,7 +307,8 @@ class Historian:
 						highest = parent.row
 					else: highest = sorted([self.db.at(e).row for e in assigned])[0]
 					#highest = sorted(self.db.at(e).row for e in lower.child)[0]
-					highest = min(self.db.at(e).row for e in lower.child)
+					#highest = min(self.db.at(e).row for e in lower.child)
+					highest = self.db.select_highest(lower.child, column)
 					if highest >= parent.row:
 						grid.remove(column, parent.row)
 						#column = max(column, lower.border + 1)
