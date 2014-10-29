@@ -8,3 +8,5 @@ class NodeDB:
 	def add_node (self, node):
 		self.store[node.name] = node
 
+	def at (self, name):
+		return self.store[name]
