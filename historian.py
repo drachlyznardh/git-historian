@@ -27,13 +27,6 @@ class Historian:
 	def update_width (self, value):
 		self.width = max(self.width, value)
 
-	def skip_if_done (self, names):
-		result = []
-		for name in names:
-			if not self.db.at(name).done:
-				result.append(name)
-		return result
-
 	def split_assigned_from_missing (self, names):
 		assigned = []
 		missing = []

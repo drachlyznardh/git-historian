@@ -15,3 +15,10 @@ class NodeDB:
 		for node in self.store.values():
 			node.done = 0
 
+	def skip_if_done (self, names):
+		result = []
+		for name in names:
+			if not self.store[name].done:
+				result.append(name)
+		return result
+
