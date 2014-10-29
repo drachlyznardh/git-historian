@@ -57,7 +57,7 @@ class Historian:
 			for i in commit.parent:
 				self.db.at(i).add_child(name)
 
-			visit.push(self.skip_if_done(commit.parent))
+			visit.push(self.db.skip_if_done(commit.parent))
 
 			commit.done = 1
 
@@ -110,7 +110,7 @@ class Historian:
 				continue
 
 			# No node can appear before any of its children
-			children = self.skip_if_done(target.child)
+			children = self.db.skip_if_done(target.child)
 			if len(children): continue
 
 			# Bind this node with the previous, if any, or…
@@ -126,7 +126,7 @@ class Historian:
 			target.row = row
 
 			# Add parents to the visit
-			visit.push(self.skip_if_done(target.parent))
+			visit.push(self.db.skip_if_done(target.parent))
 
 			# The current node is the next previous
 			previous = name
@@ -308,7 +308,7 @@ class Historian:
 			self.find_column_for_parents (name, debug)
 
 			# Parents are added to the visit, then the node is done
-			visit.push(self.skip_if_done(target.parent))
+			visit.push(self.db.skip_if_done(target.parent))
 			target.done = 1
 
 			#print
