@@ -287,6 +287,8 @@ class Historian:
 			downward = 0
 			while upward and downward:
 
+				grid.add(column, parent.row, 'MARKER')
+
 				lower = grid.lower(column)
 				if lower:
 					lower = self.db.at(lower)
@@ -295,10 +297,11 @@ class Historian:
 					if highest < parent.row:
 						column = max(column, lower.border + 1)
 						downward = 0
-						continue
 					else:
 						upward = 1
 						downward = 1
+						grid.remove(column, parent.row)
+						continue
 				else: downward = 0
 
 				upper = grid.upper(column)
@@ -309,15 +312,16 @@ class Historian:
 						print 'Aligned node (%s) has no lower parents' % upper.name[:7]
 						column = max(column, upper.border + 1)
 						upward = 0
-						continue
 					else:
 						upward = 1
 						downward = 1
+						grid.remove(column, parent.row)
+						continue
 				else: upward = 0
 
 			parent.set_column(column)
 			parent.set_border(target.column)
-			grid.add(parent)
+			grid.add(parent.column, parent.row, parent.name)
 
 			# The graph's width is updated. The first available column is the
 			# next one
