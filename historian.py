@@ -313,7 +313,7 @@ class Historian:
 						#column = max(column, lower.border + 1)
 						print '!!!  Aligned node (%s) has no higher parents' % lower.name[:7]
 						print '     Assigned (%s)' % ', '.join([e[:7] for e in assigned])
-						print '      Missing (%s)' % ', '.join([(e[:7], self.db.at(e).row) for e in missing])
+						print '      Missing (%s)' % ', '.join(['(%s, %d)' % (e[:7], self.db.at(e).row) for e in missing])
 						print '!!!  Highest (%d) >= (%d)' % (highest, parent.row)
 						downward = 0
 					else:
