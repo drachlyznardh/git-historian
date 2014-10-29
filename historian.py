@@ -27,15 +27,6 @@ class Historian:
 	def update_width (self, value):
 		self.width = max(self.width, value)
 
-	def split_assigned_from_missing (self, names):
-		assigned = []
-		missing = []
-		for name in names:
-			if self.db.at(name).has_column():
-				assigned.append(name)
-			else: missing.append(name)
-		return assigned, missing
-
 	def bind_children (self, debug):
 
 		if debug: print '-- Binding Children --'

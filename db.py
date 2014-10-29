@@ -22,3 +22,12 @@ class NodeDB:
 				result.append(name)
 		return result
 
+	def split_assigned_from_missing (self, names):
+		assigned = []
+		missing = []
+		for name in names:
+			if self.store[name].has_column():
+				assigned.append(name)
+			else: missing.append(name)
+		return assigned, missing
+
