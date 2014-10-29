@@ -99,7 +99,7 @@ class Historian:
 			if target.done:
 
 				# No need to drop down beyond the last element
-				if previous == target.hash: continue
+				if previous == target.name: continue
 
 				# Binding top and bottom nodes together
 				self.node[target.top].bottom = target.bottom
@@ -190,7 +190,7 @@ class Historian:
 
 			if first.column == second.column: return 1 + column
 
-			if first.hash != lowest: return 1 + column
+			if first.name != lowest: return 1 + column
 
 			return column
 
@@ -257,7 +257,7 @@ class Historian:
 					lowest = sorted([self.node[e].row for e in upper.parent])[-1]
 					if lowest > parent.row:
 					#if len(self.skip_if_done(upper.parent)):
-						if debug: print '  Aligned node %s has lower parents' % upper.hash[:7]
+						if debug: print '  Aligned node %s has lower parents' % upper.name[:7]
 						column = max(column, upper.border + 1)
 						break
 				upper = upper.top
@@ -308,7 +308,7 @@ class Historian:
 
 			# If a node is a named head and has not yet a column assigned, it
 			# must look for a valid column on its own
-			if target.hash in self.head and not target.has_column():
+			if target.name in self.head and not target.has_column():
 
 				column = self.find_column_for_head (name, debug)
 				target.set_column(column)

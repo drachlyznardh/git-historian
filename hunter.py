@@ -107,16 +107,16 @@ class HeadHunter:
 			# Skipping empty lines (the last one should be empty)
 			if len(line) == 0: continue
 
-			# Matching hash and name
-			hash_n_ref = re.compile(r'''(.*) refs\/.*\/(.*)''').match(line)
+			# Matching name and name
+			name_n_ref = re.compile(r'''(.*) refs\/.*\/(.*)''').match(line)
 
 			# Broken ref: display message and skip line
-			if not hash_n_ref:
+			if not name_n_ref:
 				print 'No match for (%s)' % line
 				continue
 
 			# Save result in order and by name
-			self.head.append((hash_n_ref.group(1), hash_n_ref.group(2)))
+			self.head.append((name_n_ref.group(1), name_n_ref.group(2)))
 
 	def order_heads (self):
 
@@ -141,7 +141,7 @@ class HistoryHunter:
 
 		nodes = {}
 
-		# Looking for commit's and parents' hashes…
+		# Looking for commit's and parents' namees…
 		cmdlist = ['git', 'log', '--pretty="%H %P"']
 
 		# … starting from know heads only
@@ -165,16 +165,16 @@ class HistoryHunter:
 			# New node to store info
 			current = node.Node(1)
 
-			hashes = line[1:-1].split()
+			namees = line[1:-1].split()
 
 			# Store self
-			current.hash = hashes[0]
+			current.name = namees[0]
 
 			# Store parents
-			for i in hashes[1:]: current.parent.append(i)
+			for i in namees[1:]: current.parent.append(i)
 
 			# Store node in map
-			nodes[current.hash] = current
+			nodes[current.name] = current
 
 		# Showing results
 		if self.debug: print nodes

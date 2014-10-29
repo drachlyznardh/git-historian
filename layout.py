@@ -45,7 +45,7 @@ class Layout:
 
 			overlap = []
 			for e in self.track[index]:
-				if e == target.hash: continue
+				if e == target.name: continue
 				if e in target.parent: continue
 				overlap.append(e)
 
@@ -58,7 +58,7 @@ class Layout:
 
 		if index > target.column:
 
-			if target.hash in self.track[index]:
+			if target.name in self.track[index]:
 				if len(self.track[index]) > 1:
 					self.put_char(index, '┤', '│') # \u2524 \u2502
 				else:
@@ -70,13 +70,13 @@ class Layout:
 				return
 
 			for jndex in range(index, self.size):
-				if target.hash in self.track[jndex]:
+				if target.name in self.track[jndex]:
 					self.put_char(jndex, '→', ' ')
 					return
 
 		else:
 
-			if target.hash in self.track[index]:
+			if target.name in self.track[index]:
 				if len(self.track[index]) > 1:
 					self.put_char(index, '├', '│') # \u251c \u2502
 				else:
@@ -88,7 +88,7 @@ class Layout:
 				return
 
 			for jndex in reversed(range(0, index)):
-				if target.hash in self.track[jndex]:
+				if target.name in self.track[jndex]:
 					self.put_char(jndex, '←', ' ') # \u2500
 					return
 
@@ -103,23 +103,23 @@ class Layout:
 
 		if index > target.column:
 			
-			if target.hash in self.track[index]:
+			if target.name in self.track[index]:
 				self.put_char(index, '→', ' ')
 				return
 			
 			for jndex in range(index, self.size):
-				if target.hash in self.track[jndex]:
+				if target.name in self.track[jndex]:
 					self.put_char(jndex, '→', ' ')
 					return
 		
 		else:
 
-			if target.hash in self.track[index - 1]:
+			if target.name in self.track[index - 1]:
 				self.put_char(index - 1, '←', ' ')
 				return
 
 			for jndex in reversed(range(0, index - 1)):
-				if target.hash in self.track[jndex]:
+				if target.name in self.track[jndex]:
 					self.put_char(jndex, '←', ' ')
 					return
 
@@ -140,7 +140,7 @@ class Layout:
 			self.compute_even_column(i, target)
 
 		for track in self.track.values():
-			track.discard(target.hash)
+			track.discard(target.name)
 
 		for name in target.parent:
 			self.track[target.column].add(name)

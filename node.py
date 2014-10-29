@@ -5,7 +5,7 @@ class Node:
 
 	def __init__ (self, real):
 
-		self.hash = None
+		self.name = None
 		self.parent = []
 		self.child = []
 
@@ -50,13 +50,13 @@ class Node:
 		return '(%2d, %2d)%s • \x1b[33m%s\x1b[m' % (
 			self.column, self.row,
 			self.get_indent(),
-			self.hash[:7])
+			self.name[:7])
 
 	def to_string(self):
 		if self.column > 0:
 			indent = ('%%%ds' % (2 * self.column)) % (' ')
 		else: indent = ''
-		str = "%s  Hash {%s}" % (indent, self.hash)
+		str = "%s  Name {%s}" % (indent, self.name)
 		for i in self.parent: str += "\n%sParent {%s}" % (indent, i)
 		for i in self.child:  str += "\n%s Child {%s}" % (indent, i)
 		return str
