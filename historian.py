@@ -180,6 +180,8 @@ class Historian:
 		# If no parent has a column yet, a whole new column is selected
 		if len(assigned) == 0:
 			self.width += 1
+			print
+			print 'Selecting incremented width (%d)' % self.width
 			return self.width
 
 		# Selecting the parent node with the rightmost column
@@ -191,7 +193,7 @@ class Historian:
 		index = self.head.index(name)
 		previous = self.head[index - 1]
 		if debug: print 'This(%s) Previous(%s)' % (name, previous)
-		column = max(column, self.db.at(previous).column)
+		column = max(column, self.db.at(previous).column + 1)
 		if debug: print 'Porca puttana!!! %d' % column
 
 		# If all the parents were already assigned, the target can sit above the
@@ -206,7 +208,7 @@ class Historian:
 			first = self.db.at(assigned[0])
 			second = self.db.at(assigned[1])
 
-			if first.column == second.column: return 1 + column
+			if first.border == second.border: return column
 
 			if first.name != lowest: return 1 + column
 
