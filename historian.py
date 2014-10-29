@@ -281,6 +281,38 @@ class Historian:
 						break
 				lower = lower.bottom
 
+			upward = 1
+			downward = 0
+			while upward and downward:
+
+				lower = grid.lower(column)
+				if lower:
+					lower = self.db.at(lower)
+					highest = sorted([self.db.at(e).row for e in lower.child])[0]
+
+					if highest < parent.row:
+						column = max(column, lower.border + 1)
+						downward = 0
+						continue
+					else:
+						upward = 1
+						downward = 1
+				else: downward = 0
+
+				upper = grid.upper(column)
+				if upper:
+					upper = self.db.at(upper)
+					lowest = sorted([self.db.at(e).row for e in upper.parent])[-1]
+					if lowest > parent.row:
+						print 'Aligned node (%s) has no lower parents' % upper.name[:7]
+						column = max(column, upper.border + 1)
+						upward = 0
+						continue
+					else:
+						upward = 1
+						downward = 1
+				else: upward = 0
+
 			parent.set_column(column)
 			parent.set_border(target.column)
 			grid.add(parent)
