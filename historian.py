@@ -123,7 +123,7 @@ class Historian:
 			# Bind this node with the previous, if any, or…
 			if previous:
 				target.top = previous
-				self.db[previous].bottom = name
+				self.db.at(previous).bottom = name
 
 			# … record this node as the first in the chain
 			else: self.first = name
@@ -162,14 +162,14 @@ class Historian:
 
 		# Selecting the parent node with the rightmost column
 		rightmost = sorted(assigned,
-			key=lambda e: self.db[e].border, reverse=True)[0]
-		column = self.db[rightmost].border
+			key=lambda e: self.db.at(e).border, reverse=True)[0]
+		column = self.db.at(rightmost).border
 
 		# This head should also appear on the right of previous heads
 		index = self.head.index(name)
 		previous = self.head[index - 1]
 		print 'This(%s) Previous(%s)' % (name, previous)
-		column = max(column, self.db[previous].column)# + 1)
+		column = max(column, self.db.at(previous).column)
 		print 'Porca puttana!!! %d' % column
 
 		# If all the parents were already assigned, the target can sit above the
@@ -178,11 +178,11 @@ class Historian:
 
 			if len(target.parent) == 1: return column
 
-			assigned.sort(key=lambda e: self.db[e].border, reverse=True)
-			lowest = sorted(assigned, key=lambda e:self.db[e].row, reverse=True)[0]
+			assigned.sort(key=lambda e: self.db.at(e).border, reverse=True)
+			lowest = sorted(assigned, key=lambda e:self.db.at(e).row, reverse=True)[0]
 
-			first = self.db[assigned[0]]
-			second = self.db[assigned[1]]
+			first = self.db.at(assigned[0])
+			second = self.d.at(assigned[1])
 
 			if first.column == second.column: return 1 + column
 
@@ -190,10 +190,10 @@ class Historian:
 
 			return column
 
-		assigned.sort(key=lambda e: self.db[e].row, reverse=True)
-		missing.sort(key=lambda e: self.db[e].row, reverse=False)
+		assigned.sort(key=lambda e: self.db.at(e).row, reverse=True)
+		missing.sort(key=lambda e: self.db.at(e).row, reverse=False)
 
-		if self.db[assigned[0]].row < self.db[missing[0]].row:
+		if self.db.at(assigned[0]).row < self.db.at(missing[0]).row:
 			return 1 + column
 
 		# Still, between the highest parent and the target there could be some
@@ -216,8 +216,8 @@ class Historian:
 
 		# Parents are processed in row order, from lower to upper
 		for e in sorted(target.parent,
-				key=lambda e: self.db[e].row, reverse=True):
-			parent = self.db[e]
+				key=lambda e: self.db.at(e).row, reverse=True):
+			parent = self.db.at(e)
 
 			# If a parent has already a column, the column next to its marks the
 			# leftmost spot for the following parents, as the border for the
@@ -235,7 +235,7 @@ class Historian:
 			while upper:
 				if debug: print 'From %s, Up to %s' % (e[:7], upper[:7])
 				if upper in parent.child: break
-				upper = self.db[upper]
+				upper = self.db.at(upper)
 				if upper.has_column() and upper.column <= column:
 					column = max(column, upper.column + 1)
 				upper = upper.top
@@ -243,14 +243,14 @@ class Historian:
 			while upper:
 				if debug: print 'Higher, from %s to %s' % (e[:7], upper[:7])
 				if upper in parent.child:
-					upper = self.db[upper].top
+					upper = self.db.at(upper).top
 					continue
-				upper = self.db[upper]
+				upper = self.db.at(upper)
 				if upper.has_column() and upper.column == column:
 					if len(upper.parent) == 0:
 						upper = upper.top
 						continue
-					lowest = sorted([self.db[e].row for e in upper.parent])[-1]
+					lowest = sorted([self.db.at(e).row for e in upper.parent])[-1]
 					if lowest > parent.row:
 					#if len(self.skip_if_done(upper.parent)):
 						if debug: print '  Aligned node %s has lower parents' % upper.name[:7]
@@ -261,14 +261,14 @@ class Historian:
 			lower = parent.bottom
 			while lower:
 				if lower in parent.parent:
-					lower = self.db[lower].bottom
+					lower = self.db.at(lower).bottom
 					continue
-				lower = self.db[lower]
+				lower = self.db.at(lower)
 				if lower.has_column() and lower.column == column:
 					if len(lower.child) == 0:
 						lower = lower.bottom
 						continue
-					highest = sorted([self.db[e].row for e in lower.child])[-1]
+					highest = sorted([self.db.at(e).row for e in lower.child])[-1]
 					if highest < parent.row:
 						column = max(column, lower.border + 1)
 						break
