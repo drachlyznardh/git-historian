@@ -35,6 +35,7 @@ class NodeDB:
 		result = []
 		for name in names:
 			target = self.store[name]
-			if target.has_column() and target.column < column: continue
+			if target.has_column() and target.column <= column: continue
 			result.append(target.row)
+		if len(result) == 0: return 0
 		return min(result)

@@ -215,7 +215,13 @@ class Historian:
 		assigned.sort(key=lambda e: self.db.at(e).row, reverse=True)
 		missing.sort(key=lambda e: self.db.at(e).row, reverse=False)
 
-		if self.db.at(assigned[0]).row < self.db.at(missing[0]).row:
+		#highest = min([self.db.at(e).row for e in assigned])
+		highest = self.db.select_highest(assigned, column)
+		lowest = max([self.db.at(e).row for e in missing])
+
+		#if self.db.at(assigned[0]).row < self.db.at(missing[0]).row:
+		if highest > lowest:
+			print 'Highest assigned (%d) is higher that lowest missing (%d)' % (highest, lowest)
 			return 1 + column
 
 		# Still, between the highest parent and the target there could be some
