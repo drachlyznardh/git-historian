@@ -16,7 +16,7 @@ class Historian:
 		self.verbose = 0
 
 		self.head = []
-		self.node = {}
+		self.db = None
 
 		self.first = None
 		self.width = -1
@@ -26,26 +26,6 @@ class Historian:
 
 	def update_width (self, value):
 		self.width = max(self.width, value)
-
-	def skip_if_done (self, names):
-		result = []
-		for name in names:
-			if not self.node[name].done:
-				result.append(name)
-		return result
-
-	def split_assigned_from_missing (self, names):
-		assigned = []
-		missing = []
-		for name in names:
-			if self.node[name].has_column():
-				assigned.append(name)
-			else: missing.append(name)
-		return assigned, missing
-
-	def clear (self):
-		for commit in self.node.values():
-			commit.done = 0
 
 	def bind_children (self, debug):
 
@@ -57,7 +37,7 @@ class Historian:
 		while visit.has_more():
 
 			name = visit.pop()
-			commit = self.node[name]
+			commit = self.db.at(name)
 
 			if debug: print '  Visiting %s' % name[:7]
 
@@ -66,9 +46,9 @@ class Historian:
 				continue
 
 			for i in commit.parent:
-				self.node[i].add_child(name)
+				self.db.at(i).add_child(name)
 
-			visit.push(self.skip_if_done(commit.parent))
+			visit.push(self.db.skip_if_done(commit.parent))
 
 			commit.done = 1
 
@@ -89,7 +69,7 @@ class Historian:
 		while visit.has_more():
 
 			name = visit.pop()
-			target = self.node[name]
+			target = self.db.at(name)
 
 			if debug:
 				print 'Visiting %s %s' % (name[:7], visit.show())
@@ -102,12 +82,12 @@ class Historian:
 				if previous == target.name: continue
 
 				# Binding top and bottom nodes together
-				self.node[target.top].bottom = target.bottom
-				self.node[target.bottom].top = target.top
+				self.db.at(target.top).bottom = target.bottom
+				self.db.at(target.bottom).top = target.top
 
 				# Binding previous and current nodes together
 				target.top = previous
-				self.node[previous].bottom = name
+				self.db.at(previous).bottom = name
 
 				# Bumping the row number another time
 				row += 1
@@ -121,13 +101,13 @@ class Historian:
 				continue
 
 			# No node can appear before any of its children
-			children = self.skip_if_done(target.child)
+			children = self.db.skip_if_done(target.child)
 			if len(children): continue
 
 			# Bind this node with the previous, if any, or…
 			if previous:
 				target.top = previous
-				self.node[previous].bottom = name
+				self.db.at(previous).bottom = name
 
 			# … record this node as the first in the chain
 			else: self.first = name
@@ -137,7 +117,7 @@ class Historian:
 			target.row = row
 
 			# Add parents to the visit
-			visit.push(self.skip_if_done(target.parent))
+			visit.push(self.db.skip_if_done(target.parent))
 
 			# The current node is the next previous
 			previous = name
@@ -148,11 +128,11 @@ class Historian:
 	def find_column_for_head (self, name, debug):
 
 		if debug: print '%s has to find its own column!!!' % name [:7]
-		target = self.node[name]
+		target = self.db.at(name)
 
 		# We do not consider parents which have no column yet, those will be
 		# called in a later step
-		assigned, missing = self.split_assigned_from_missing(target.parent)
+		assigned, missing = self.db.split_assigned_from_missing(target.parent)
 
 		if debug: print '%s has %d parents with column, (%s)' % (name[:7],
 			len(assigned), ', '.join([e[:7] for e in assigned]))
@@ -166,14 +146,14 @@ class Historian:
 
 		# Selecting the parent node with the rightmost column
 		rightmost = sorted(assigned,
-			key=lambda e: self.node[e].border, reverse=True)[0]
-		column = self.node[rightmost].border
+			key=lambda e: self.db.at(e).border, reverse=True)[0]
+		column = self.db.at(rightmost).border
 
 		# This head should also appear on the right of previous heads
 		index = self.head.index(name)
 		previous = self.head[index - 1]
 		print 'This(%s) Previous(%s)' % (name, previous)
-		column = max(column, self.node[previous].column)# + 1)
+		column = max(column, self.db.at(previous).column)
 		print 'Porca puttana!!! %d' % column
 
 		# If all the parents were already assigned, the target can sit above the
@@ -182,11 +162,11 @@ class Historian:
 
 			if len(target.parent) == 1: return column
 
-			assigned.sort(key=lambda e: self.node[e].border, reverse=True)
-			lowest = sorted(assigned, key=lambda e:self.node[e].row, reverse=True)[0]
+			assigned.sort(key=lambda e: self.db.at(e).border, reverse=True)
+			lowest = sorted(assigned, key=lambda e:self.db.at(e).row, reverse=True)[0]
 
-			first = self.node[assigned[0]]
-			second = self.node[assigned[1]]
+			first = self.db.at(assigned[0])
+			second = self.db.at(assigned[1])
 
 			if first.column == second.column: return 1 + column
 
@@ -194,19 +174,19 @@ class Historian:
 
 			return column
 
-		assigned.sort(key=lambda e: self.node[e].row, reverse=True)
-		missing.sort(key=lambda e: self.node[e].row, reverse=False)
+		assigned.sort(key=lambda e: self.db.at(e).row, reverse=True)
+		missing.sort(key=lambda e: self.db.at(e).row, reverse=False)
 
-		if self.node[assigned[0]].row < self.node[missing[0]].row:
+		if self.db.at(assigned[0]).row < self.db.at(missing[0]).row:
 			return 1 + column
 
 		# Still, between the highest parent and the target there could be some
 		# other node taking the border column for itself
-		upper = self.node[missing[0]].top
+		upper = self.db.at(missing[0]).top
 		while upper:
 			if debug: print 'From %s, up to %s' % (name[:7], upper[:7])
 			if upper == name: break
-			upper = self.node[upper]
+			upper = self.db.at(upper)
 			if upper.has_column() and upper.column <= column:
 				column = max(column, upper.column + 1)
 			upper = upper.top
@@ -215,13 +195,13 @@ class Historian:
 
 	def find_column_for_parents (self, name, debug):
 
-		target = self.node[name]
+		target = self.db.at(name)
 		column = target.column
 
 		# Parents are processed in row order, from lower to upper
 		for e in sorted(target.parent,
-				key=lambda e: self.node[e].row, reverse=True):
-			parent = self.node[e]
+				key=lambda e: self.db.at(e).row, reverse=True):
+			parent = self.db.at(e)
 
 			# If a parent has already a column, the column next to its marks the
 			# leftmost spot for the following parents, as the border for the
@@ -239,7 +219,7 @@ class Historian:
 			while upper:
 				if debug: print 'From %s, Up to %s' % (e[:7], upper[:7])
 				if upper in parent.child: break
-				upper = self.node[upper]
+				upper = self.db.at(upper)
 				if upper.has_column() and upper.column <= column:
 					column = max(column, upper.column + 1)
 				upper = upper.top
@@ -247,14 +227,14 @@ class Historian:
 			while upper:
 				if debug: print 'Higher, from %s to %s' % (e[:7], upper[:7])
 				if upper in parent.child:
-					upper = self.node[upper].top
+					upper = self.db.at(upper).top
 					continue
-				upper = self.node[upper]
+				upper = self.db.at(upper)
 				if upper.has_column() and upper.column == column:
 					if len(upper.parent) == 0:
 						upper = upper.top
 						continue
-					lowest = sorted([self.node[e].row for e in upper.parent])[-1]
+					lowest = sorted([self.db.at(e).row for e in upper.parent])[-1]
 					if lowest > parent.row:
 					#if len(self.skip_if_done(upper.parent)):
 						if debug: print '  Aligned node %s has lower parents' % upper.name[:7]
@@ -265,14 +245,14 @@ class Historian:
 			lower = parent.bottom
 			while lower:
 				if lower in parent.parent:
-					lower = self.node[lower].bottom
+					lower = self.db.at(lower).bottom
 					continue
-				lower = self.node[lower]
+				lower = self.db.at(lower)
 				if lower.has_column() and lower.column == column:
 					if len(lower.child) == 0:
 						lower = lower.bottom
 						continue
-					highest = sorted([self.node[e].row for e in lower.child])[-1]
+					highest = sorted([self.db.at(e).row for e in lower.child])[-1]
 					if highest < parent.row:
 						column = max(column, lower.border + 1)
 						break
@@ -299,7 +279,7 @@ class Historian:
 		while visit.has_more():
 
 			name = visit.pop()
-			target = self.node[name]
+			target = self.db.at(name)
 			
 			# No node is processed more than once
 			if target.done: continue
@@ -319,7 +299,7 @@ class Historian:
 			self.find_column_for_parents (name, debug)
 
 			# Parents are added to the visit, then the node is done
-			visit.push(self.skip_if_done(target.parent))
+			visit.push(self.db.skip_if_done(target.parent))
 			target.done = 1
 
 			#print
@@ -329,14 +309,14 @@ class Historian:
 		
 		if debug: print '-- Print Graph --'
 
-		t = layout.Layout(self.width + 1, self.node, debug)
+		t = layout.Layout(self.width + 1, self.db, debug)
 		h = hunter.MessageHunter()
 
 		name = self.first
 
 		while name:
 
-			node = self.node[name]
+			node = self.db.at(name)
 			if not node:
 				print "No Commit for name %s" % name[:7]
 				break
@@ -358,12 +338,12 @@ class Historian:
 	def tell_the_story(self):
 
 		self.head = hunter.HeadHunter(self.o, self.o.d(1)).hunt()
-		self.node = hunter.HistoryHunter(self.head, self.o.d(2)).hunt()
+		self.db = hunter.HistoryHunter(self.head, self.o.d(2)).hunt()
 
 		self.bind_children(self.o.d(4))
-		self.clear()
+		self.db.clear()
 		self.row_unroll(self.o.d(8))
-		self.clear()
+		self.db.clear()
 		self.column_unroll(self.o.d(16))
 		self.print_graph(self.o.d(32))
 

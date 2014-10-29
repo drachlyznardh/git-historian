@@ -8,6 +8,7 @@ import sys
 import json
 
 import node
+import db
 
 class HeadHunter:
 
@@ -139,9 +140,9 @@ class HistoryHunter:
 
 	def hunt (self):
 
-		nodes = {}
+		nodes = db.NodeDB()
 
-		# Looking for commit's and parents' namees…
+		# Looking for commit's and parents' names…
 		cmdlist = ['git', 'log', '--pretty="%H %P"']
 
 		# … starting from know heads only
@@ -165,16 +166,16 @@ class HistoryHunter:
 			# New node to store info
 			current = node.Node(1)
 
-			namees = line[1:-1].split()
+			names = line[1:-1].split()
 
 			# Store self
-			current.name = namees[0]
+			current.name = names[0]
 
 			# Store parents
-			for i in namees[1:]: current.parent.append(i)
+			for i in names[1:]: current.parent.append(i)
 
 			# Store node in map
-			nodes[current.name] = current
+			nodes.add_node(current)
 
 		# Showing results
 		if self.debug: print nodes
