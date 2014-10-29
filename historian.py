@@ -249,6 +249,7 @@ class Historian:
 			# Starting from the node atop of the current, the graph is
 			# traversed until the caller is found. The rightmost column
 			# encountered in the process is the boundary for this node's column
+			'''
 			upper = parent.top
 			while upper:
 				if debug: print 'Higher, from %s to %s' % (e[:7], upper[:7])
@@ -282,6 +283,7 @@ class Historian:
 						column = max(column, lower.border + 1)
 						break
 				lower = lower.bottom
+			'''
 
 			upward = 1
 			downward = 0
