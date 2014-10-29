@@ -217,14 +217,6 @@ class Historian:
 			# encountered in the process is the boundary for this node's column
 			upper = parent.top
 			while upper:
-				if debug: print 'From %s, Up to %s' % (e[:7], upper[:7])
-				if upper in parent.child: break
-				upper = self.db.at(upper)
-				if upper.has_column() and upper.column <= column:
-					column = max(column, upper.column + 1)
-				upper = upper.top
-
-			while upper:
 				if debug: print 'Higher, from %s to %s' % (e[:7], upper[:7])
 				if upper in parent.child:
 					upper = self.db.at(upper).top
