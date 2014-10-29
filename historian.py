@@ -221,7 +221,7 @@ class Historian:
 
 		return column
 
-	def find_column_for_parents (self, name, debug):
+	def find_column_for_parents (self, name, grid, debug):
 
 		target = self.db.at(name)
 		column = target.column
@@ -280,6 +280,7 @@ class Historian:
 
 			parent.set_column(column)
 			parent.set_border(target.column)
+			grid.add(parent)
 
 			# The graph's width is updated. The first available column is the
 			# next one
@@ -318,7 +319,7 @@ class Historian:
 
 			# The node assigns a column to each of its parents, in order,
 			# ensuring each starts off on a valid position
-			self.find_column_for_parents (name, debug)
+			self.find_column_for_parents (name, grid, debug)
 
 			# Parents are added to the visit, then the node is done
 			visit.push(self.db.skip_if_done(target.parent))
