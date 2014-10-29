@@ -27,13 +27,13 @@ class Grid:
 		size = len(column)
 
 		if size == 0:
-			column.append(node.name)
+			column.append((node.name, node.row))
 			return
 
 		index = 0
 		for e in column:
-			if e.row > node.row:
-				column.insert(index, node)
+			if e[1] > node.row:
+				column.insert(index, (node.name, node.row))
 				break
 			index += 1
 
