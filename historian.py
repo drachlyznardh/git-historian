@@ -9,6 +9,8 @@ import layout
 
 VERSION="0.0-c"
 
+import bintrees
+
 class Grid:
 
 	def __init__ (self):
@@ -18,24 +20,14 @@ class Grid:
 		try:
 			return self.store[index]
 		except:
-			self.store[index] = []
+			self.store[index] = bintrees.RBTree()
 			return self.store[index]
 
 	def add (self, node):
 
-		column = self.at(node.column)
-		size = len(column)
-
-		if size == 0:
-			column.append((node.name, node.row))
-			return
-
-		index = 0
-		for e in column:
-			if e[1] > node.row:
-				column.insert(index, (node.name, node.row))
-				break
-			index += 1
+		t = self.at(node.column)
+		t.insert(node.column, node.name)
+		return
 
 class Historian:
 
