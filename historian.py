@@ -218,7 +218,7 @@ class Historian:
 		missing.sort(key=lambda e: self.db.at(e).row, reverse=False)
 
 		#highest = min([self.db.at(e).row for e in assigned])
-		highest = self.db.select_highest(assigned, column)
+		highest = self.db.select_highest(assigned, column, target.row)
 		lowest = max([self.db.at(e).row for e in missing])
 
 		#if self.db.at(assigned[0]).row < self.db.at(missing[0]).row:
@@ -316,7 +316,7 @@ class Historian:
 					else: highest = sorted([self.db.at(e).row for e in assigned])[0]
 					#highest = sorted(self.db.at(e).row for e in lower.child)[0]
 					#highest = min(self.db.at(e).row for e in lower.child)
-					highest = self.db.select_highest(lower.child, column)
+					highest = self.db.select_highest(lower.child, column, parent.row)
 					if highest >= parent.row:
 						grid.remove(column, parent.row)
 						#column = max(column, lower.border + 1)

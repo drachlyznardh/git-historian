@@ -31,11 +31,11 @@ class NodeDB:
 			else: missing.append(name)
 		return assigned, missing
 
-	def select_highest (self, names, column):
+	def select_highest (self, names, column, default):
 		result = []
 		for name in names:
 			target = self.store[name]
 			if target.has_column() and target.column <= column: continue
 			result.append(target.row)
-		if len(result) == 0: return 0
+		if len(result) == 0: return default
 		return min(result)
