@@ -42,8 +42,6 @@ class Grid:
 
 	def lower (self, column, row):
 		try:
-			t = self.at(column)
-			print 'Column(%d) %s' % (column, t)
 			key, value = self.at(column).succ_item(row)
 			print 'Down Grid (%d × %d) = %s' % (column, row, value)
 			return value
@@ -303,15 +301,18 @@ class Historian:
 				if lower:
 					lower = self.db.at(lower)
 					assigned, missing = self.db.split_assigned_from_missing(lower.child)
-					if len(missing) == 0:
-						print 'Upper node as no missing parent'
+					if len(assigned) == 0:
+						print 'Upper node (%s) as no assigned parent' % lower.name[:7]
 						upward = 0
 						highest = parent.row
-					else: highest = sorted([self.db.at(e).row for e in missing])[0]
+					else: highest = sorted([self.db.at(e).row for e in assigned])[0]
+					highest = sorted(self.db.at(e).row for e in lower.child)[0]
 					if highest >= parent.row:
 						grid.remove(column, parent.row)
 						#column = max(column, lower.border + 1)
 						print '!!!  Aligned node (%s) has no higher parents' % lower.name[:7]
+						print '     Assigned (%s)' % ', '.join([e[:7] for e in assigned])
+						print '      Missing (%s)' % ', '.join([(e[:7], self.db.at(e).row) for e in missing])
 						print '!!!  Highest (%d) >= (%d)' % (highest, parent.row)
 						downward = 0
 					else:
@@ -330,13 +331,16 @@ class Historian:
 				if upper:
 					upper = self.db.at(upper)
 					assigned, missing = self.db.split_assigned_from_missing(upper.parent)
-					if len(missing) == 0:
-						print 'Upper node as no missing parent'
+					if len(assigned) == 0:
+						print 'Upper node (%s) as no assigned parent' % upper.name[:7]
 						upward = 0
 						lowest = parent.row
-					else: lowest = sorted([self.db.at(e).row for e in missing])[-1]
+					else: lowest = sorted([self.db.at(e).row for e in assigned])[-1]
+					lowest = sorted([self.db.at(e).row for e in upper.parent])[-1]
 					if lowest <= parent.row:
 						print '!!!  Aligned node (%s) has no lower parents' % upper.name[:7]
+						print '     Assigned (%s)' % ', '.join([e[:7] for e in assigned])
+						print '      Missing (%s)' % ', '.join(['(%s, %d)' % (e[:7], self.db.at(e).row) for e in missing])
 						print '!!!  Lowest (%d) <= (%d)' % (lowest, parent.row)
 						grid.remove(column, parent.row)
 						#column = max(column, upper.border + 1)
