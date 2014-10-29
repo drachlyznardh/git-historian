@@ -336,14 +336,14 @@ class Historian:
 
 		while name:
 
-			commit = self.node[name]
-			if not commit:
+			node = self.node[name]
+			if not node:
 				print "No Commit for name %s" % name[:7]
 				break
 
 			if debug: print "\nP %s" % name[:7]
 			
-			t.compute_layout(commit)
+			t.compute_layout(node)
 
 			message = h.describe(name)
 
@@ -353,7 +353,7 @@ class Historian:
 					print '%s\x1b[m %s' % (t.draw_padding(), i)
 			except IOError as error: return
 
-			name = commit.bottom
+			name = node.bottom
 
 	def tell_the_story(self):
 
