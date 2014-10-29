@@ -98,12 +98,12 @@ class Historian:
 				if previous == target.name: continue
 
 				# Binding top and bottom nodes together
-				self.db[target.top].bottom = target.bottom
-				self.db[target.bottom].top = target.top
+				self.db.at(target.top).bottom = target.bottom
+				self.db.at(target.bottom).top = target.top
 
 				# Binding previous and current nodes together
 				target.top = previous
-				self.db[previous].bottom = name
+				self.db.at(previous).bottom = name
 
 				# Bumping the row number another time
 				row += 1
@@ -182,7 +182,7 @@ class Historian:
 			lowest = sorted(assigned, key=lambda e:self.db.at(e).row, reverse=True)[0]
 
 			first = self.db.at(assigned[0])
-			second = self.d.at(assigned[1])
+			second = self.db.at(assigned[1])
 
 			if first.column == second.column: return 1 + column
 
@@ -198,11 +198,11 @@ class Historian:
 
 		# Still, between the highest parent and the target there could be some
 		# other node taking the border column for itself
-		upper = self.db[missing[0]].top
+		upper = self.db.at(missing[0]).top
 		while upper:
 			if debug: print 'From %s, up to %s' % (name[:7], upper[:7])
 			if upper == name: break
-			upper = self.db[upper]
+			upper = self.db.at(upper)
 			if upper.has_column() and upper.column <= column:
 				column = max(column, upper.column + 1)
 			upper = upper.top
