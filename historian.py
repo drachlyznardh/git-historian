@@ -356,7 +356,7 @@ class Historian:
 				column = self.find_column_for_head (name, debug)
 				target.set_column(column)
 				self.update_width(column)
-				grid.add(target)
+				grid.add(target.column, target.row, target.name)
 
 			# The node assigns a column to each of its parents, in order,
 			# ensuring each starts off on a valid position
