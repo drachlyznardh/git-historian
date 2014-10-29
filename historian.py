@@ -256,7 +256,6 @@ class Historian:
 						continue
 					lowest = sorted([self.db.at(e).row for e in upper.parent])[-1]
 					if lowest > parent.row:
-					#if len(self.skip_if_done(upper.parent)):
 						if debug: print '  Aligned node %s has lower parents' % upper.name[:7]
 						column = max(column, upper.border + 1)
 						break
