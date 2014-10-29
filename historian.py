@@ -30,7 +30,7 @@ class Historian:
 	def skip_if_done (self, names):
 		result = []
 		for name in names:
-			if not self.node[name].done:
+			if not self.node.at(name).done:
 				result.append(name)
 		return result
 
@@ -38,7 +38,7 @@ class Historian:
 		assigned = []
 		missing = []
 		for name in names:
-			if self.node[name].has_column():
+			if self.node.at(name).has_column():
 				assigned.append(name)
 			else: missing.append(name)
 		return assigned, missing
@@ -57,7 +57,7 @@ class Historian:
 		while visit.has_more():
 
 			name = visit.pop()
-			commit = self.node[name]
+			commit = self.node.at(name)
 
 			if debug: print '  Visiting %s' % name[:7]
 
@@ -66,7 +66,7 @@ class Historian:
 				continue
 
 			for i in commit.parent:
-				self.node[i].add_child(name)
+				self.node.at(i).add_child(name)
 
 			visit.push(self.skip_if_done(commit.parent))
 
@@ -89,7 +89,7 @@ class Historian:
 		while visit.has_more():
 
 			name = visit.pop()
-			target = self.node[name]
+			target = self.node.at(name)
 
 			if debug:
 				print 'Visiting %s %s' % (name[:7], visit.show())
@@ -148,7 +148,7 @@ class Historian:
 	def find_column_for_head (self, name, debug):
 
 		if debug: print '%s has to find its own column!!!' % name [:7]
-		target = self.node[name]
+		target = self.node.at(name)
 
 		# We do not consider parents which have no column yet, those will be
 		# called in a later step
@@ -215,7 +215,7 @@ class Historian:
 
 	def find_column_for_parents (self, name, debug):
 
-		target = self.node[name]
+		target = self.node.at(name)
 		column = target.column
 
 		# Parents are processed in row order, from lower to upper
@@ -299,7 +299,7 @@ class Historian:
 		while visit.has_more():
 
 			name = visit.pop()
-			target = self.node[name]
+			target = self.node.at(name)
 			
 			# No node is processed more than once
 			if target.done: continue
@@ -336,7 +336,7 @@ class Historian:
 
 		while name:
 
-			node = self.node[name]
+			node = self.node.at(name)
 			if not node:
 				print "No Commit for name %s" % name[:7]
 				break
