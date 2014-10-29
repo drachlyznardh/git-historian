@@ -12,6 +12,6 @@ class NodeDB:
 		return self.store[name]
 
 	def clear (self):
-		for commit in self.node.values():
-			commit.done = 0
+		for node in self.store.values():
+			node.done = 0
 
