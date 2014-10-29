@@ -24,22 +24,28 @@ class Grid:
 			return self.store[index]
 
 	def add (self, column, row, name):
+		print 'Adding (%d × %d) (%s)' % (column, row, name)
 		t = self.at(column)
 		t.insert(row, name)
 
 	def remove (self, column, row):
+		print 'Removin (%d × %d)' % (column, row)
 		t = self.at(column)
 		t.remove(row)
 
-	def upper (self, column):
+	def upper (self, column, row):
 		try:
-			key, value = self.store.prev_item(column)
+			key, value = self.at(column).prev_item(row)
+			print 'Up   Grid (%d × %d) = %s' % (column, row, value)
 			return value
 		except KeyError: return None
 
-	def lower (self, column):
+	def lower (self, column, row):
 		try:
-			key, value = self.store.succ_item(column)
+			t = self.at(column)
+			print 'Column(%d) %s' % (column, t)
+			key, value = self.at(column).succ_item(row)
+			print 'Down Grid (%d × %d) = %s' % (column, row, value)
 			return value
 		except KeyError: return None
 
@@ -285,45 +291,64 @@ class Historian:
 				lower = lower.bottom
 			'''
 
+			print
 			upward = 1
-			downward = 0
+			downward = 1
 			while upward and downward:
 
+				print 'Testing %s on column %d' % (parent.name[:7], column)
 				grid.add(column, parent.row, 'MARKER')
 
-				lower = grid.lower(column)
+				lower = grid.lower(column, parent.row)
 				if lower:
 					lower = self.db.at(lower)
 					highest = sorted([self.db.at(e).row for e in lower.child])[0]
 
-					if highest < parent.row:
-						column = max(column, lower.border + 1)
+					if highest >= parent.row:
+						grid.remove(column, parent.row)
+						#column = max(column, lower.border + 1)
+						print '!!!  Aligned node (%s) has no higher parents' % lower.name[:7]
+						print '!!!  Highest (%d) <= (%d)' % (highest, parent.row)
 						downward = 0
 					else:
+						print 'Highest (%d) (%s) is lower that (%d)' % (highest,
+							lower.name[:7], parent.row)
 						upward = 1
 						downward = 1
 						grid.remove(column, parent.row)
+						column += 1
 						continue
-				else: downward = 0
+				else:
+					print 'No lower node'
+					downward = 0
 
-				upper = grid.upper(column)
+				upper = grid.upper(column, parent.row)
 				if upper:
 					upper = self.db.at(upper)
 					lowest = sorted([self.db.at(e).row for e in upper.parent])[-1]
-					if lowest > parent.row:
-						print 'Aligned node (%s) has no lower parents' % upper.name[:7]
-						column = max(column, upper.border + 1)
+					if lowest <= parent.row:
+						print '!!!  Aligned node (%s) has no lower parents' % upper.name[:7]
+						print '!!!  Lowest (%d) >= (%d)' % (lowest, parent.row)
+						grid.remove(column, parent.row)
+						#column = max(column, upper.border + 1)
 						upward = 0
 					else:
+						print 'Lowest (%d) (%s) is higher than (%d)' % (lowest,
+							upper.name[:7], parent.row)
 						upward = 1
 						downward = 1
 						grid.remove(column, parent.row)
+						column += 1
 						continue
-				else: upward = 0
+				else:
+					print 'No upper node'
+					upward = 0
 
 			parent.set_column(column)
 			parent.set_border(target.column)
 			grid.add(parent.column, parent.row, parent.name)
+			print 'Outside (%d × %d) = %s' % (column, parent.row,
+			grid.store[column][parent.row])
 
 			# The graph's width is updated. The first available column is the
 			# next one
