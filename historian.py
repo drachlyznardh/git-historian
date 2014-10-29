@@ -132,7 +132,7 @@ class Historian:
 
 		# We do not consider parents which have no column yet, those will be
 		# called in a later step
-		assigned, missing = self.split_assigned_from_missing(target.parent)
+		assigned, missing = self.db.split_assigned_from_missing(target.parent)
 
 		if debug: print '%s has %d parents with column, (%s)' % (name[:7],
 			len(assigned), ', '.join([e[:7] for e in assigned]))
