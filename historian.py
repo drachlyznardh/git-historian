@@ -14,6 +14,29 @@ class Grid:
 	def __init__ (self):
 		self.store = {}
 
+	def at (self, index):
+		try:
+			return self.store[index]
+		except:
+			self.store[index] = []
+			return self.store[index]
+
+	def add (self, node):
+
+		column = self.at(node.column)
+		size = len(column)
+
+		if size == 0:
+			column.append(node.name)
+			return
+
+		index = 0
+		for e in column:
+			if e.row > node.row:
+				column.insert(index, node)
+				break
+			index += 1
+
 class Historian:
 
 	def __init__ (self):
