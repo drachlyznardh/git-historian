@@ -152,9 +152,9 @@ class Historian:
 		# This head should also appear on the right of previous heads
 		index = self.head.index(name)
 		previous = self.head[index - 1]
-		print 'This(%s) Previous(%s)' % (name, previous)
+		if debug: print 'This(%s) Previous(%s)' % (name, previous)
 		column = max(column, self.db.at(previous).column)
-		print 'Porca puttana!!! %d' % column
+		if debug: print 'Porca puttana!!! %d' % column
 
 		# If all the parents were already assigned, the target can sit above the
 		# rightmost column
