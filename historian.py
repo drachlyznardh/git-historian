@@ -9,6 +9,11 @@ import layout
 
 VERSION="0.0-c"
 
+class Grid:
+
+	def __init__ (self):
+		self.store = {}
+
 class Historian:
 
 	def __init__ (self):
