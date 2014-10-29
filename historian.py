@@ -308,7 +308,7 @@ class Historian:
 						grid.remove(column, parent.row)
 						#column = max(column, lower.border + 1)
 						print '!!!  Aligned node (%s) has no higher parents' % lower.name[:7]
-						print '!!!  Highest (%d) <= (%d)' % (highest, parent.row)
+						print '!!!  Highest (%d) >= (%d)' % (highest, parent.row)
 						downward = 0
 					else:
 						print 'Highest (%d) (%s) is lower that (%d)' % (highest,
@@ -328,7 +328,7 @@ class Historian:
 					lowest = sorted([self.db.at(e).row for e in upper.parent])[-1]
 					if lowest <= parent.row:
 						print '!!!  Aligned node (%s) has no lower parents' % upper.name[:7]
-						print '!!!  Lowest (%d) >= (%d)' % (lowest, parent.row)
+						print '!!!  Lowest (%d) <= (%d)' % (lowest, parent.row)
 						grid.remove(column, parent.row)
 						#column = max(column, upper.border + 1)
 						upward = 0
