@@ -306,7 +306,8 @@ class Historian:
 						upward = 0
 						highest = parent.row
 					else: highest = sorted([self.db.at(e).row for e in assigned])[0]
-					highest = sorted(self.db.at(e).row for e in lower.child)[0]
+					#highest = sorted(self.db.at(e).row for e in lower.child)[0]
+					highest = min(self.db.at(e).row for e in lower.child)
 					if highest >= parent.row:
 						grid.remove(column, parent.row)
 						#column = max(column, lower.border + 1)
@@ -336,7 +337,8 @@ class Historian:
 						upward = 0
 						lowest = parent.row
 					else: lowest = sorted([self.db.at(e).row for e in assigned])[-1]
-					lowest = sorted([self.db.at(e).row for e in upper.parent])[-1]
+					#lowest = sorted([self.db.at(e).row for e in upper.parent])[-1]
+					lowest = max([self.db.at(e).row for e in upper.parent])
 					if lowest <= parent.row:
 						print '!!!  Aligned node (%s) has no lower parents' % upper.name[:7]
 						print '     Assigned (%s)' % ', '.join([e[:7] for e in assigned])
