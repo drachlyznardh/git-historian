@@ -23,11 +23,13 @@ class Grid:
 			self.store[index] = bintrees.RBTree()
 			return self.store[index]
 
-	def add (self, node):
+	def add (self, column, row, name):
+		t = self.at(column)
+		t.insert(row, name)
 
-		t = self.at(node.column)
-		t.insert(node.column, node.name)
-		return
+	def remove (self, column, row):
+		t = self.at(column)
+		t.remove(row)
 
 	def upper (self, column):
 		try:
