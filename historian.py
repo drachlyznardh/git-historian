@@ -29,6 +29,18 @@ class Grid:
 		t.insert(node.column, node.name)
 		return
 
+	def upper (self, column):
+		try:
+			key, value = self.store.prev_item(column)
+			return value
+		except KeyError: return None
+
+	def lower (self, column):
+		try:
+			key, value = self.store.succ_item(column)
+			return value
+		except KeyError: return None
+
 class Historian:
 
 	def __init__ (self):
