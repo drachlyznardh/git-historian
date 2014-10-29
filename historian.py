@@ -302,8 +302,12 @@ class Historian:
 				lower = grid.lower(column, parent.row)
 				if lower:
 					lower = self.db.at(lower)
-					highest = sorted([self.db.at(e).row for e in lower.child])[0]
-
+					assigned, missing = self.db.split_assigned_from_missing(lower.child)
+					if len(missing) == 0:
+						print 'Upper node as no missing parent'
+						upward = 0
+						highest = parent.row
+					else: highest = sorted([self.db.at(e).row for e in missing])[0]
 					if highest >= parent.row:
 						grid.remove(column, parent.row)
 						#column = max(column, lower.border + 1)
@@ -325,7 +329,12 @@ class Historian:
 				upper = grid.upper(column, parent.row)
 				if upper:
 					upper = self.db.at(upper)
-					lowest = sorted([self.db.at(e).row for e in upper.parent])[-1]
+					assigned, missing = self.db.split_assigned_from_missing(upper.parent)
+					if len(missing) == 0:
+						print 'Upper node as no missing parent'
+						upward = 0
+						lowest = parent.row
+					else: lowest = sorted([self.db.at(e).row for e in missing])[-1]
 					if lowest <= parent.row:
 						print '!!!  Aligned node (%s) has no lower parents' % upper.name[:7]
 						print '!!!  Lowest (%d) <= (%d)' % (lowest, parent.row)
