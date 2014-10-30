@@ -270,6 +270,8 @@ class Historian:
 				grid.add(column, parent.row, 'MARKER')
 
 				# Test
+				upper_flag = self.upper_check(parent, column, grid)
+				lower_flag = self.lower_check(parent, column, grid)
 
 				# Verify
 				if upper_flag or lower_flag:
