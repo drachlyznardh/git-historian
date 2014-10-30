@@ -326,8 +326,7 @@ class Historian:
 					parent.set_column(column)
 					self.update_width(column)
 					break
-			return
-
+		return
 
 	def column_unroll (self, debug):
 
