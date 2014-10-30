@@ -139,6 +139,7 @@ class HistoryHunter:
 		self.debug = debug
 
 		# Parse options for format stuff…
+		self.pretty = r'''--pretty=''%H %P#%C(yellow)%h%C(bold green)%d%Creset %s %C(bold red)%ar%Cblue %an'''
 
 	def hunt (self):
 
@@ -146,6 +147,7 @@ class HistoryHunter:
 
 		# Looking for commit's and parents' names…
 		cmdlist = ['git', 'log', '--pretty="%H %P"']
+		cmdlist = ['git', 'log', self.pretty]
 
 		# … starting from know heads only
 		cmdlist.extend(self.target)
