@@ -251,8 +251,8 @@ class Historian:
 					grid.remove(column, parent.row)
 					column += 1
 				else:
-					print 'Both tests passed! %s on %d' % (e[:7], column)
-					grid.add(column, parent.row, e)
+					print 'Both tests passed! %s on %d' % (parent.name[:7], column)
+					grid.add(column, parent.row, parent.name)
 					parent.set_column(column)
 					self.update_width(column)
 					break
