@@ -47,3 +47,11 @@ class NodeDB:
 			if target.has_column() and target.column < column: continue
 			result.append(target.row)
 		return result
+
+	def select_starting_column (self, names):
+		selection = []
+		for name in names:
+			target = self.store[name]
+			if target.has_column():
+				selection.append(target.column)
+		return min(selection)

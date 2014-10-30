@@ -231,6 +231,8 @@ class Historian:
 				if debug: print 'Pushing column beyond %s\'s border %d' % (parent.name[:7], parent.border)
 				continue
 
+			column = self.db.select_starting_column(parent.child)
+
 			# Check should probably test whever the bounding boxes overlap. One
 			# check between the lowest parent of previous node on column and the
 			# target; one check between the lowest parent of target and the
