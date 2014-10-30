@@ -258,6 +258,10 @@ class Historian:
 				if debug: print 'Pushing column beyond %s\'s border %d' % (e[:7], parent.border)
 				continue
 
+			# Check should probably test whever the bounding boxes overlap. One
+			# check between the lowest parent of previous node on column and the
+			# target; one check between the lowest parent of target and the
+			# following node on column
 			return
 
 			# Starting from the node atop of the current, the graph is
