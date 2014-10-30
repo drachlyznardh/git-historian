@@ -212,14 +212,8 @@ class Historian:
 		target = self.db.at(name)
 		column = target.column
 
-		print
-		print '  Parents of (%s), starting on (%d)' % (name[:7],
-			column)
-
 		# Parents are processed in row order, from lower to upper
 		target.parent.sort(key=lambda e: self.db.at(e).row, reverse=True)
-
-		print '  Calling (%s)' % ', '.join([e[:7] for e in target.parent])
 
 		for parent in [self.db.at(e) for e in target.parent]:
 
@@ -245,10 +239,10 @@ class Historian:
 
 				# Test & Verify
 				if self.upper_check(parent, column, grid) and self.lower_check(parent, column, grid):
-					print 'Both tests passed! %s on %d' % (parent.name[:7], column)
 					grid.add(column, parent.row, parent.name)
 					parent.set_column(column)
 					self.update_width(column)
+					if debug: print 'Both tests passed! %s on %d' % (parent.name[:7], column)
 					break
 
 				grid.remove(column, parent.row)
