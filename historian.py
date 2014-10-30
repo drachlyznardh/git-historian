@@ -175,16 +175,16 @@ class Historian:
 
 		while 1:
 			grid.add(column, target.row, 'MARKER')
-			if self.lower_check(target, column, grid):
-				grid.remove(column, target.row)
-				column += 1
-			else:
+			if self.lower_check(target, column, grid) and self.upper_check(target, column, grid):
 				print 'Test passed! %s on %d' % (name[:7], column)
 				grid.add(column, target.row, name)
 				target.set_column(column)
 				self.update_width(column)
 				print 'Test passed! %s on %d' % (target.name[:7], target.column)
 				break
+
+			grid.remove(column, target.row)
+			column += 1
 		return
 
 	# This should check whether the target row overlaps with any arrow between
@@ -192,19 +192,19 @@ class Historian:
 	def upper_check (self, target, column, grid):
 
 		upper = grid.upper(column, target.row)
-		if not upper: return 0
+		if not upper: return True
 		lowest = max([self.db.at(e).row for e in self.db.at(upper).parent])
-		return lowest > target.row
+		return lowest <= target.row
 
 	# This should check whether the row of the following node on column overlaps
 	# with any arrow between the target and its parents
 	def lower_check (self, target, column, grid):
 
 		lower = grid.lower(column, target.row)
-		if not lower: return 0
-		if len(target.parent) == 0: return 0
+		if not lower: return True
+		if len(target.parent) == 0: return True
 		lowest = max([self.db.at(e).row for e in target.parent])
-		return lowest > self.db.at(lower).row
+		return lowest <= self.db.at(lower).row
 
 	def find_column_for_parents (self, name, grid, debug):
 
@@ -228,34 +228,30 @@ class Historian:
 			if parent.has_column():
 				parent.set_border(target.column)
 				column = parent.border + 1
-				if debug: print 'Pushing column beyond %s\'s border %d' % (e[:7], parent.border)
+				if debug: print 'Pushing column beyond %s\'s border %d' % (parent.name[:7], parent.border)
 				continue
+
+			column = self.db.select_starting_column(parent.child)
 
 			# Check should probably test whever the bounding boxes overlap. One
 			# check between the lowest parent of previous node on column and the
 			# target; one check between the lowest parent of target and the
 			# following node on column
-			upper_flag = 1
-			lower_flag = 1
 			while 1:
 
 				# Try column
 				grid.add(column, parent.row, 'MARKER')
 
-				# Test
-				upper_flag = self.upper_check(parent, column, grid)
-				lower_flag = self.lower_check(parent, column, grid)
-
-				# Verify
-				if upper_flag or lower_flag:
-					grid.remove(column, parent.row)
-					column += 1
-				else:
+				# Test & Verify
+				if self.upper_check(parent, column, grid) and self.lower_check(parent, column, grid):
 					print 'Both tests passed! %s on %d' % (parent.name[:7], column)
 					grid.add(column, parent.row, parent.name)
 					parent.set_column(column)
 					self.update_width(column)
 					break
+
+				grid.remove(column, parent.row)
+				column += 1
 		return
 
 	def column_unroll (self, debug):
