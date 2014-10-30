@@ -258,6 +258,8 @@ class Historian:
 				if debug: print 'Pushing column beyond %s\'s border %d' % (e[:7], parent.border)
 				continue
 
+			return
+
 			# Starting from the node atop of the current, the graph is
 			# traversed until the caller is found. The rightmost column
 			# encountered in the process is the boundary for this node's column
