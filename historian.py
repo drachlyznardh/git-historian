@@ -171,16 +171,15 @@ class Historian:
 		# Start at the immediate right of previous head
 		previous = self.head[self.head.index(name) - 1]
 		column = self.db.at(previous).column + 1
-		print '  %s, Starting from column %d' % (name[:7], column)
+		if debug: print '  %s, Starting from column %d' % (name[:7], column)
 
 		while 1:
 			grid.add(column, target.row, 'MARKER')
 			if self.lower_check(target, column, grid) and self.upper_check(target, column, grid):
-				print 'Test passed! %s on %d' % (name[:7], column)
 				grid.add(column, target.row, name)
 				target.set_column(column)
 				self.update_width(column)
-				print 'Test passed! %s on %d' % (target.name[:7], target.column)
+				if debug: print 'Test passed! %s on %d' % (target.name[:7], target.column)
 				break
 
 			grid.remove(column, target.row)
