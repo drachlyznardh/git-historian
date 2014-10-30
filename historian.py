@@ -297,6 +297,8 @@ class Historian:
 					column += 1
 				else:
 					grid.add(column, parent.row, parent.name)
+					parent.set_column(column)
+					self.update_width(column)
 					break
 			return
 
