@@ -248,8 +248,14 @@ class Historian:
 		lowest = max([self.db.at(e).row for e in self.db.at(upper).parent])
 		return lowest > target.row
 
+	# This should check whether the row of the following node on column overlaps
+	# with any arrow between the target and its parents
 	def lower_check (self, target, column, grid):
-		return 0
+
+		lower = grid.lower(column, target.row)
+		if not lower: return 0
+		lowest = max([self.db.at(e).row for e in target.parent])
+		return lowest > self.db.at(lower).row
 
 	def find_column_for_parents (self, name, grid, debug):
 
