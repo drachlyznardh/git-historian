@@ -8,6 +8,7 @@ import sys
 import json
 
 import node
+import db
 
 class HeadHunter:
 
@@ -107,16 +108,16 @@ class HeadHunter:
 			# Skipping empty lines (the last one should be empty)
 			if len(line) == 0: continue
 
-			# Matching hash and name
-			hash_n_ref = re.compile(r'''(.*) refs\/.*\/(.*)''').match(line)
+			# Matching name and name
+			name_n_ref = re.compile(r'''(.*) refs\/.*\/(.*)''').match(line)
 
 			# Broken ref: display message and skip line
-			if not hash_n_ref:
+			if not name_n_ref:
 				print 'No match for (%s)' % line
 				continue
 
 			# Save result in order and by name
-			self.head.append((hash_n_ref.group(1), hash_n_ref.group(2)))
+			self.head.append((name_n_ref.group(1), name_n_ref.group(2)))
 
 	def order_heads (self):
 
@@ -139,9 +140,9 @@ class HistoryHunter:
 
 	def hunt (self):
 
-		nodes = {}
+		nodes = db.NodeDB()
 
-		# Looking for commit's and parents' hashes…
+		# Looking for commit's and parents' names…
 		cmdlist = ['git', 'log', '--pretty="%H %P"']
 
 		# … starting from know heads only
@@ -165,16 +166,16 @@ class HistoryHunter:
 			# New node to store info
 			current = node.Node(1)
 
-			hashes = line[1:-1].split()
+			names = line[1:-1].split()
 
 			# Store self
-			current.hash = hashes[0]
+			current.name = names[0]
 
 			# Store parents
-			for i in hashes[1:]: current.parent.append(i)
+			for i in names[1:]: current.parent.append(i)
 
 			# Store node in map
-			nodes[current.hash] = current
+			nodes.add_node(current)
 
 		# Showing results
 		if self.debug: print nodes
