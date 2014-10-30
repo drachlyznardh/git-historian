@@ -235,8 +235,8 @@ class Historian:
 			# check between the lowest parent of previous node on column and the
 			# target; one check between the lowest parent of target and the
 			# following node on column
-			upper_flag = 1
-			lower_flag = 1
+			#upper_flag = 1
+			#lower_flag = 1
 			while 1:
 
 				# Try column
@@ -247,7 +247,8 @@ class Historian:
 				lower_flag = self.lower_check(parent, column, grid)
 
 				# Verify
-				if upper_flag or lower_flag:
+				if self.upper_check(parent, column, grid) or self.lower_check(parent, column, grid):
+				#if upper_flag or lower_flag:
 					grid.remove(column, parent.row)
 					column += 1
 				else:
