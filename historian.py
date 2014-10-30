@@ -298,9 +298,9 @@ class Historian:
 			'''
 
 			print
-			upward = 1
+			upward = 0
 			downward = 1
-			while upward and downward:
+			while upward or downward:
 
 				print 'Testing %s on column %d' % (parent.name[:7], column)
 				grid.add(column, parent.row, 'MARKER')
