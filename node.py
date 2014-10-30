@@ -3,7 +3,7 @@
 
 class Node:
 
-	def __init__ (self, real):
+	def __init__ (self):
 
 		self.name = None
 		self.parent = []
@@ -12,8 +12,6 @@ class Node:
 		self.column = -1
 		self.border = -1
 		self.row = -1
-
-		self.real = real
 
 		self.done = 0
 		self.top = None    # Previous commit by line
@@ -35,12 +33,6 @@ class Node:
 
 	def set_border (self, value):
 		self.border = max(self.border, value)
-
-	def is_real (self):
-		return self.real
-
-	def is_virtual (self):
-		return not self.real
 
 	def get_indent (self):
 		if self.column > 0:
