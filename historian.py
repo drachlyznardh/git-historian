@@ -262,6 +262,9 @@ class Historian:
 		target = self.db.at(name)
 		column = target.column
 
+		print
+		print '  Parents of (%s), starting on (%d)' % (name[:7], column)
+
 		# Parents are processed in row order, from lower to upper
 		for e in sorted(target.parent,
 				key=lambda e: self.db.at(e).row, reverse=True):
@@ -296,7 +299,8 @@ class Historian:
 					grid.remove(column, parent.row)
 					column += 1
 				else:
-					grid.add(column, parent.row, parent.name)
+					print 'Both tests passed! %s on %d' % (e[:7], column)
+					grid.add(column, parent.row, e)
 					parent.set_column(column)
 					self.update_width(column)
 					break
