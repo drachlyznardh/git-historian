@@ -182,9 +182,9 @@ class Historian:
 				self.update_width(column)
 				print 'Test passed! %s on %d' % (target.name[:7], target.column)
 				break
-			else:
-				grid.remove(column, target.row)
-				column += 1
+
+			grid.remove(column, target.row)
+			column += 1
 		return
 
 	# This should check whether the target row overlaps with any arrow between
@@ -235,28 +235,21 @@ class Historian:
 			# check between the lowest parent of previous node on column and the
 			# target; one check between the lowest parent of target and the
 			# following node on column
-			#upper_flag = 1
-			#lower_flag = 1
 			while 1:
 
 				# Try column
 				grid.add(column, parent.row, 'MARKER')
 
-				# Test
-				upper_flag = self.upper_check(parent, column, grid)
-				lower_flag = self.lower_check(parent, column, grid)
-
-				# Verify
+				# Test & Verify
 				if self.upper_check(parent, column, grid) and self.lower_check(parent, column, grid):
 					print 'Both tests passed! %s on %d' % (parent.name[:7], column)
 					grid.add(column, parent.row, parent.name)
 					parent.set_column(column)
 					self.update_width(column)
 					break
-				else:
-				#if upper_flag or lower_flag:
-					grid.remove(column, parent.row)
-					column += 1
+
+				grid.remove(column, parent.row)
+				column += 1
 		return
 
 	def column_unroll (self, debug):
