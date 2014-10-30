@@ -176,19 +176,13 @@ class HistoryHunter:
 				if current: nodes.add_node(current)
 				current = node.Node()
 
+				# Split line over the sharp character
 				token = line.split('#', 1)
-				print token
 
-				#names = line[1:-1].split()
+				# Store name, parents, message
 				names = token[0].split()
-
-				# Store self
 				current.name = names[0]
-
-				# Store parents
 				for i in names[1:]: current.parent.append(i)
-
-				# Store message
 				current.message = [token[1]]
 
 			else:
