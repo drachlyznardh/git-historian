@@ -273,6 +273,7 @@ class Historian:
 
 		lower = grid.lower(column, target.row)
 		if not lower: return 0
+		if len(target.parent) == 0: return 0
 		lowest = max([self.db.at(e).row for e in target.parent])
 		return lowest > self.db.at(lower).row
 
