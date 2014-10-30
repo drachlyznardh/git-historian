@@ -183,6 +183,7 @@ class Historian:
 				grid.add(column, target.row, name)
 				target.set_column(column)
 				self.update_width(column)
+				print 'Test passed! %s on %d' % (target.name[:7], target.column)
 				break
 		return
 
@@ -281,6 +282,8 @@ class Historian:
 		column = target.column
 
 		print
+		print '  Parents of (%s)' % target.name[:7]
+		print '  Start on (%s)' % target.column
 		print '  Parents of (%s), starting on (%d)' % (name[:7],
 			column)
 
