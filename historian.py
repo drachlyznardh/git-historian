@@ -282,12 +282,7 @@ class Historian:
 			# If a node is a named head and has not yet a column assigned, it
 			# must look for a valid column on its own
 			if target.name in self.head and not target.has_column():
-
-				#column =
 				self.find_column_for_head (name, grid, debug)
-				#target.set_column(column)
-				#self.update_width(column)
-				#grid.add(target.column, target.row, target.name)
 
 			# The node assigns a column to each of its parents, in order,
 			# ensuring each starts off on a valid position
@@ -296,9 +291,6 @@ class Historian:
 			# Parents are added to the visit, then the node is done
 			visit.push(self.db.skip_if_done(target.parent))
 			target.done = 1
-
-			#print
-			#self.print_graph(0)
 
 	def print_graph (self, debug):
 		
