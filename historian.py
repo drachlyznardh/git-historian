@@ -282,8 +282,6 @@ class Historian:
 		column = target.column
 
 		print
-		print '  Parents of (%s)' % target.name[:7]
-		print '  Start on (%s)' % target.column
 		print '  Parents of (%s), starting on (%d)' % (name[:7],
 			column)
 
