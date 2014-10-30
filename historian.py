@@ -175,7 +175,7 @@ class Historian:
 
 		while 1:
 			grid.add(column, target.row, 'MARKER')
-			if self.lower_check(target, column, grid):
+			if self.lower_check(target, column, grid) or self.upper_check(target, column, grid):
 				grid.remove(column, target.row)
 				column += 1
 			else:
