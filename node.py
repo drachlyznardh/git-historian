@@ -16,8 +16,10 @@ class Node:
 		self.real = real
 
 		self.done = 0
-		self.top = None    # Previous commit
-		self.bottom = None # Next commit
+		self.top = None    # Previous commit by line
+		self.bottom = None # Next commit by line
+		self.left = None   # Previous commit by column
+		self.right = None  # Next commit by line
 
 	def add_child (self, name):
 
