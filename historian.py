@@ -160,7 +160,7 @@ class Historian:
 			# The current node is done
 			target.done = 1
 
-	def find_column_for_head (self, name, grid, debug):
+	def find_column_for_head (self, name, debug):
 
 		if debug: print '%s has to find its own column!!!' % name [:7]
 		target = self.db.at(name)
@@ -171,23 +171,23 @@ class Historian:
 		if debug: print '  %s, Starting from column %d' % (name[:7], column)
 
 		while 1:
-			grid.add(column, target.row, 'MARKER')
-			if self.lower_check(target, column, grid) and self.upper_check(target, column, grid):
-				grid.add(column, target.row, name)
+			self.grid.add(column, target.row, 'MARKER')
+			if self.lower_check(target, column) and self.upper_check(target, column):
+				self.grid.add(column, target.row, name)
 				target.set_column(column)
 				self.update_width(column)
 				if debug: print 'Test passed! %s on %d' % (target.name[:7], target.column)
 				break
 
-			grid.remove(column, target.row)
+			self.grid.remove(column, target.row)
 			column += 1
 		return
 
 	# This checks whether the target row overlaps with any arrow between
 	# the upper node on the column and its parents
-	def upper_check (self, target, column, grid):
+	def upper_check (self, target, column):
 
-		upper = grid.upper(column, target.row)
+		upper = self.grid.upper(column, target.row)
 		if not upper: return True
 		parents = self.db.at(upper).parent
 		if len(parents) == 0: return True
@@ -196,15 +196,15 @@ class Historian:
 
 	# This checks whether the row of the following node on column overlaps
 	# with any arrow between the target and its parents
-	def lower_check (self, target, column, grid):
+	def lower_check (self, target, column):
 
-		lower = grid.lower(column, target.row)
+		lower = self.grid.lower(column, target.row)
 		if not lower: return True
 		if len(target.parent) == 0: return True
 		lowest = max([self.db.at(e).row for e in target.parent])
 		return lowest <= self.db.at(lower).row
 
-	def find_column_for_parents (self, name, grid, debug):
+	def find_column_for_parents (self, name, debug):
 
 		target = self.db.at(name)
 
@@ -221,16 +221,16 @@ class Historian:
 
 			column = self.db.select_starting_column(parent.child)
 			while 1:
-				grid.add(column, parent.row, 'MARKER')
+				self.grid.add(column, parent.row, 'MARKER')
 
-				if self.upper_check(parent, column, grid) and self.lower_check(parent, column, grid):
-					grid.add(column, parent.row, parent.name)
+				if self.upper_check(parent, column) and self.lower_check(parent, column):
+					self.grid.add(column, parent.row, parent.name)
 					parent.set_column(column)
 					self.update_width(column)
 					if debug: print 'Both tests passed! %s on %d' % (parent.name[:7], column)
 					break
 
-				grid.remove(column, parent.row)
+				self.grid.remove(column, parent.row)
 				column += 1
 		return
 
@@ -239,7 +239,7 @@ class Historian:
 		if debug: print '-- Column Unroll --'
 
 		self.width = -1
-		grid = Grid()
+		self.grid = Grid()
 
 		# The visit starts for the named heads
 		visit = order.ColumnOrder()
@@ -258,15 +258,17 @@ class Historian:
 			# If a node is a named head and has not yet a column assigned, it
 			# must look for a valid column on its own
 			if target.name in self.head and not target.has_column():
-				self.find_column_for_head (name, grid, debug)
+				self.find_column_for_head (name, debug)
 
 			# The node assigns a column to each of its parents, in order,
 			# ensuring each starts off on a valid position
-			self.find_column_for_parents (name, grid, debug)
+			self.find_column_for_parents (name, debug)
 
 			# Parents are added to the visit, then the node is done
 			visit.push(self.db.skip_if_done(target.parent))
 			target.done = 1
+
+		del self.grid
 
 	def print_graph (self, debug):
 		
