@@ -192,7 +192,9 @@ class Historian:
 
 		upper = grid.upper(column, target.row)
 		if not upper: return True
-		lowest = max([self.db.at(e).row for e in self.db.at(upper).parent])
+		parents = self.db.at(upper).parent
+		if len(parents) == 0: return True
+		lowest = max([self.db.at(e).row for e in parents])
 		return lowest <= target.row
 
 	# This should check whether the row of the following node on column overlaps
