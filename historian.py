@@ -21,6 +21,7 @@ class Grid:
 			return self.store[index]
 		except:
 			self.store[index] = bintrees.RBTree()
+			#self.store[index] = bintrees.BinaryTree()
 			return self.store[index]
 
 	def add (self, column, row, name):
