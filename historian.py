@@ -24,26 +24,22 @@ class Grid:
 			return self.store[index]
 
 	def add (self, column, row, name):
-		#print 'Adding (%d × %d) (%s)' % (column, row, name)
 		t = self.at(column)
 		t.insert(row, name)
 
 	def remove (self, column, row):
-		#print 'Removin (%d × %d)' % (column, row)
 		t = self.at(column)
 		t.remove(row)
 
 	def upper (self, column, row):
 		try:
 			key, value = self.at(column).prev_item(row)
-			#print 'Up   Grid (%d × %d) = %s' % (column, row, value)
 			return value
 		except KeyError: return None
 
 	def lower (self, column, row):
 		try:
 			key, value = self.at(column).succ_item(row)
-			#print 'Down Grid (%d × %d) = %s' % (column, row, value)
 			return value
 		except KeyError: return None
 
