@@ -286,9 +286,11 @@ class Historian:
 			column)
 
 		# Parents are processed in row order, from lower to upper
-		for e in sorted(target.parent,
-				key=lambda e: self.db.at(e).row, reverse=True):
-			parent = self.db.at(e)
+		target.parent.sort(key=lambda e: self.db.at(e).row, reverse=True)
+
+		print '  Calling (%s)' % ', '.join([e[:7] for e in target.parent])
+
+		for parent in [self.db.at(e) for e in target.parent]:
 
 			# If a parent has already a column, the column next to its marks the
 			# leftmost spot for the following parents, as the border for the
