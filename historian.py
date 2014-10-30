@@ -21,29 +21,26 @@ class Grid:
 			return self.store[index]
 		except:
 			self.store[index] = bintrees.RBTree()
+			#self.store[index] = bintrees.BinaryTree()
 			return self.store[index]
 
 	def add (self, column, row, name):
-		#print 'Adding (%d × %d) (%s)' % (column, row, name)
 		t = self.at(column)
 		t.insert(row, name)
 
 	def remove (self, column, row):
-		#print 'Removin (%d × %d)' % (column, row)
 		t = self.at(column)
 		t.remove(row)
 
 	def upper (self, column, row):
 		try:
 			key, value = self.at(column).prev_item(row)
-			#print 'Up   Grid (%d × %d) = %s' % (column, row, value)
 			return value
 		except KeyError: return None
 
 	def lower (self, column, row):
 		try:
 			key, value = self.at(column).succ_item(row)
-			#print 'Down Grid (%d × %d) = %s' % (column, row, value)
 			return value
 		except KeyError: return None
 
@@ -171,16 +168,15 @@ class Historian:
 		# Start at the immediate right of previous head
 		previous = self.head[self.head.index(name) - 1]
 		column = self.db.at(previous).column + 1
-		print '  %s, Starting from column %d' % (name[:7], column)
+		if debug: print '  %s, Starting from column %d' % (name[:7], column)
 
 		while 1:
 			grid.add(column, target.row, 'MARKER')
 			if self.lower_check(target, column, grid) and self.upper_check(target, column, grid):
-				print 'Test passed! %s on %d' % (name[:7], column)
 				grid.add(column, target.row, name)
 				target.set_column(column)
 				self.update_width(column)
-				print 'Test passed! %s on %d' % (target.name[:7], target.column)
+				if debug: print 'Test passed! %s on %d' % (target.name[:7], target.column)
 				break
 
 			grid.remove(column, target.row)
@@ -193,7 +189,9 @@ class Historian:
 
 		upper = grid.upper(column, target.row)
 		if not upper: return True
-		lowest = max([self.db.at(e).row for e in self.db.at(upper).parent])
+		parents = self.db.at(upper).parent
+		if len(parents) == 0: return True
+		lowest = max([self.db.at(e).row for e in parents])
 		return lowest <= target.row
 
 	# This should check whether the row of the following node on column overlaps
@@ -211,14 +209,8 @@ class Historian:
 		target = self.db.at(name)
 		column = target.column
 
-		print
-		print '  Parents of (%s), starting on (%d)' % (name[:7],
-			column)
-
 		# Parents are processed in row order, from lower to upper
 		target.parent.sort(key=lambda e: self.db.at(e).row, reverse=True)
-
-		print '  Calling (%s)' % ', '.join([e[:7] for e in target.parent])
 
 		for parent in [self.db.at(e) for e in target.parent]:
 
@@ -244,10 +236,10 @@ class Historian:
 
 				# Test & Verify
 				if self.upper_check(parent, column, grid) and self.lower_check(parent, column, grid):
-					print 'Both tests passed! %s on %d' % (parent.name[:7], column)
 					grid.add(column, parent.row, parent.name)
 					parent.set_column(column)
 					self.update_width(column)
+					if debug: print 'Both tests passed! %s on %d' % (parent.name[:7], column)
 					break
 
 				grid.remove(column, parent.row)
@@ -308,7 +300,8 @@ class Historian:
 			
 			t.compute_layout(node)
 
-			message = h.describe(name)
+			#message = h.describe(name)
+			message = [node.to_oneline()]
 
 			try:
 				print '%s\x1b[m %s' % (t.draw_transition(), message[0])
