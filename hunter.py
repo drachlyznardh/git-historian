@@ -139,7 +139,10 @@ class HistoryHunter:
 		self.debug = debug
 
 		# Parse options for format stuff…
-		self.pretty = r'''--pretty=%H %P#%C(yellow)%h%C(auto)%d%Creset %s %C(bold red)%ar%Cblue %an'''
+		if options.pretty:
+			self.pretty = r'''--pretty=%H %P#''' + options.pretty
+		else:
+			self.pretty = r'''--pretty=%H %P#%C(yellow)%h%C(auto)%d%Creset %s %C(bold red)%ar%Cblue %an'''
 
 	def hunt (self):
 
