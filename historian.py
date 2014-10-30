@@ -239,6 +239,12 @@ class Historian:
 
 		return column
 
+	def upper_check (self, target, column, grid):
+		return 0
+
+	def lower_check (self, target, column, grid):
+		return 0
+
 	def find_column_for_parents (self, name, grid, debug):
 
 		target = self.db.at(name)
