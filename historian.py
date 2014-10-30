@@ -301,12 +301,13 @@ class Historian:
 			t.compute_layout(node)
 
 			#message = h.describe(name)
-			message = [node.to_oneline()]
+			#message = [node.to_oneline()]
+			message = node.message
 
 			try:
-				print '%s\x1b[m %s' % (t.draw_transition(), message[0])
+				print '\x1b[m%s\x1b[m %s' % (t.draw_transition(), message[0])
 				for i in message[1:-1]:
-					print '%s\x1b[m %s' % (t.draw_padding(), i)
+					print '\x1b[m%s\x1b[m %s' % (t.draw_padding(), i)
 			except IOError as error: return
 
 			name = node.bottom

@@ -189,10 +189,10 @@ class HistoryHunter:
 				for i in names[1:]: current.parent.append(i)
 
 				# Store message
-				current.message = token[1]
+				current.message = [token[1]]
 
 			else:
-				current.message.append('\n%s' % line)
+				current.message.append(line)
 
 		# Store the last node
 		nodes.add_node(current)
