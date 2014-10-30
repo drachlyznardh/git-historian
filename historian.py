@@ -285,7 +285,6 @@ class Historian:
 		if debug: print '-- Print Graph --'
 
 		t = layout.Layout(self.width + 1, self.db, debug)
-		h = hunter.MessageHunter()
 
 		name = self.first
 

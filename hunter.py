@@ -198,15 +198,3 @@ class HistoryHunter:
 		if self.debug: print nodes
 		return nodes
 
-class MessageHunter:
-
-	def __init__ (self):
-
-		self.cmdargs = 'git show -s --oneline --decorate --color'.split(' ')
-
-	def describe (self, name):
-
-		self.cmdargs.append(name)
-		message = check_output(self.cmdargs).split('\n')
-		self.cmdargs.pop()
-		return message
