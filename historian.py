@@ -270,6 +270,12 @@ class Historian:
 				# Test
 
 				# Verify
+				if upper_check or lower_check:
+					grid.remove(column, parent.row)
+					column += 1
+				else:
+					grid.add(column, parent.row, parent.name)
+					break
 			return
 
 			# Starting from the node atop of the current, the graph is
