@@ -24,26 +24,26 @@ class Grid:
 			return self.store[index]
 
 	def add (self, column, row, name):
-		print 'Adding (%d × %d) (%s)' % (column, row, name)
+		#print 'Adding (%d × %d) (%s)' % (column, row, name)
 		t = self.at(column)
 		t.insert(row, name)
 
 	def remove (self, column, row):
-		print 'Removin (%d × %d)' % (column, row)
+		#print 'Removin (%d × %d)' % (column, row)
 		t = self.at(column)
 		t.remove(row)
 
 	def upper (self, column, row):
 		try:
 			key, value = self.at(column).prev_item(row)
-			print 'Up   Grid (%d × %d) = %s' % (column, row, value)
+			#print 'Up   Grid (%d × %d) = %s' % (column, row, value)
 			return value
 		except KeyError: return None
 
 	def lower (self, column, row):
 		try:
 			key, value = self.at(column).succ_item(row)
-			print 'Down Grid (%d × %d) = %s' % (column, row, value)
+			#print 'Down Grid (%d × %d) = %s' % (column, row, value)
 			return value
 		except KeyError: return None
 
@@ -163,91 +163,64 @@ class Historian:
 			# The current node is done
 			target.done = 1
 
-	def find_column_for_head (self, name, debug):
+	def find_column_for_head (self, name, grid, debug):
 
 		if debug: print '%s has to find its own column!!!' % name [:7]
 		target = self.db.at(name)
 
-		# We do not consider parents which have no column yet, those will be
-		# called in a later step
-		assigned, missing = self.db.split_assigned_from_missing(target.parent)
+		# Start at the immediate right of previous head
+		previous = self.head[self.head.index(name) - 1]
+		column = self.db.at(previous).column + 1
+		print '  %s, Starting from column %d' % (name[:7], column)
 
-		if debug: print '%s has %d parents with column, (%s)' % (name[:7],
-			len(assigned), ', '.join([e[:7] for e in assigned]))
-		if debug: print '%s has %d parents without column, (%s)' % (name[:7],
-			len(missing), ', '.join([e[:7] for e in missing]))
+		while 1:
+			grid.add(column, target.row, 'MARKER')
+			if self.lower_check(target, column, grid):
+				grid.remove(column, target.row)
+				column += 1
+			else:
+				print 'Test passed! %s on %d' % (name[:7], column)
+				grid.add(column, target.row, name)
+				target.set_column(column)
+				self.update_width(column)
+				print 'Test passed! %s on %d' % (target.name[:7], target.column)
+				break
+		return
 
-		# If no parent has a column yet, a whole new column is selected
-		if len(assigned) == 0:
-			self.width += 1
-			print
-			print 'Selecting incremented width (%d)' % self.width
-			return self.width
+	# This should check whether the target row overlaps with any arrow between
+	# the upper node on the column and its parents
+	def upper_check (self, target, column, grid):
 
-		# Selecting the parent node with the rightmost column
-		rightmost = sorted(assigned,
-			key=lambda e: self.db.at(e).border, reverse=True)[0]
-		column = self.db.at(rightmost).border
+		upper = grid.upper(column, target.row)
+		if not upper: return 0
+		lowest = max([self.db.at(e).row for e in self.db.at(upper).parent])
+		return lowest > target.row
 
-		# This head should also appear on the right of previous heads
-		index = self.head.index(name)
-		previous = self.head[index - 1]
-		if debug: print 'This(%s) Previous(%s)' % (name, previous)
-		column = max(column, self.db.at(previous).column + 1)
-		if debug: print 'Porca puttana!!! %d' % column
+	# This should check whether the row of the following node on column overlaps
+	# with any arrow between the target and its parents
+	def lower_check (self, target, column, grid):
 
-		# If all the parents were already assigned, the target can sit above the
-		# rightmost column
-		if len(missing) == 0:
-
-			if len(target.parent) == 1: return column
-
-			assigned.sort(key=lambda e: self.db.at(e).border, reverse=True)
-			lowest = sorted(assigned, key=lambda e:self.db.at(e).row, reverse=True)[0]
-
-			first = self.db.at(assigned[0])
-			second = self.db.at(assigned[1])
-
-			if first.border == second.border: return column
-
-			if first.name != lowest: return 1 + column
-
-			return column
-
-		assigned.sort(key=lambda e: self.db.at(e).row, reverse=True)
-		missing.sort(key=lambda e: self.db.at(e).row, reverse=False)
-
-		#highest = min([self.db.at(e).row for e in assigned])
-		highest = self.db.select_highest(assigned, column, target.row)
-		lowest = max([self.db.at(e).row for e in missing])
-
-		#if self.db.at(assigned[0]).row < self.db.at(missing[0]).row:
-		if highest > lowest:
-			print 'Highest assigned (%d) is higher that lowest missing (%d)' % (highest, lowest)
-			return 1 + column
-
-		# Still, between the highest parent and the target there could be some
-		# other node taking the border column for itself
-		upper = self.db.at(missing[0]).top
-		while upper:
-			if debug: print 'From %s, up to %s' % (name[:7], upper[:7])
-			if upper == name: break
-			upper = self.db.at(upper)
-			if upper.has_column() and upper.column <= column:
-				column = max(column, upper.column + 1)
-			upper = upper.top
-
-		return column
+		lower = grid.lower(column, target.row)
+		if not lower: return 0
+		if len(target.parent) == 0: return 0
+		lowest = max([self.db.at(e).row for e in target.parent])
+		return lowest > self.db.at(lower).row
 
 	def find_column_for_parents (self, name, grid, debug):
 
 		target = self.db.at(name)
 		column = target.column
 
+		print
+		print '  Parents of (%s), starting on (%d)' % (name[:7],
+			column)
+
 		# Parents are processed in row order, from lower to upper
-		for e in sorted(target.parent,
-				key=lambda e: self.db.at(e).row, reverse=True):
-			parent = self.db.at(e)
+		target.parent.sort(key=lambda e: self.db.at(e).row, reverse=True)
+
+		print '  Calling (%s)' % ', '.join([e[:7] for e in target.parent])
+
+		for parent in [self.db.at(e) for e in target.parent]:
 
 			# If a parent has already a column, the column next to its marks the
 			# leftmost spot for the following parents, as the border for the
@@ -258,130 +231,32 @@ class Historian:
 				if debug: print 'Pushing column beyond %s\'s border %d' % (e[:7], parent.border)
 				continue
 
-			# Starting from the node atop of the current, the graph is
-			# traversed until the caller is found. The rightmost column
-			# encountered in the process is the boundary for this node's column
-			'''
-			upper = parent.top
-			while upper:
-				if debug: print 'Higher, from %s to %s' % (e[:7], upper[:7])
-				if upper in parent.child:
-					upper = self.db.at(upper).top
-					continue
-				upper = self.db.at(upper)
-				if upper.has_column() and upper.column == column:
-					if len(upper.parent) == 0:
-						upper = upper.top
-						continue
-					lowest = sorted([self.db.at(e).row for e in upper.parent])[-1]
-					if lowest > parent.row:
-						if debug: print '  Aligned node %s has lower parents' % upper.name[:7]
-						column = max(column, upper.border + 1)
-						break
-				upper = upper.top
+			# Check should probably test whever the bounding boxes overlap. One
+			# check between the lowest parent of previous node on column and the
+			# target; one check between the lowest parent of target and the
+			# following node on column
+			upper_flag = 1
+			lower_flag = 1
+			while 1:
 
-			lower = parent.bottom
-			while lower:
-				if lower in parent.parent:
-					lower = self.db.at(lower).bottom
-					continue
-				lower = self.db.at(lower)
-				if lower.has_column() and lower.column == column:
-					if len(lower.child) == 0:
-						lower = lower.bottom
-						continue
-					highest = sorted([self.db.at(e).row for e in lower.child])[-1]
-					if highest < parent.row:
-						column = max(column, lower.border + 1)
-						break
-				lower = lower.bottom
-			'''
-
-			print
-			upward = 0
-			downward = 1
-			while upward or downward:
-
-				print 'Testing %s on column %d' % (parent.name[:7], column)
+				# Try column
 				grid.add(column, parent.row, 'MARKER')
 
-				lower = grid.lower(column, parent.row)
-				if lower:
-					lower = self.db.at(lower)
-					assigned, missing = self.db.split_assigned_from_missing(lower.child)
-					if len(assigned) == 0:
-						print 'Upper node (%s) as no assigned parent' % lower.name[:7]
-						upward = 0
-						highest = parent.row
-					else: highest = sorted([self.db.at(e).row for e in assigned])[0]
-					#highest = sorted(self.db.at(e).row for e in lower.child)[0]
-					#highest = min(self.db.at(e).row for e in lower.child)
-					highest = self.db.select_highest(lower.child, column, parent.row)
-					if highest >= parent.row:
-						grid.remove(column, parent.row)
-						#column = max(column, lower.border + 1)
-						print '!!!  Aligned node (%s) has no higher parents' % lower.name[:7]
-						print '     Assigned (%s)' % ', '.join([e[:7] for e in assigned])
-						print '      Missing (%s)' % ', '.join(['(%s, %d)' % (e[:7], self.db.at(e).row) for e in missing])
-						print '!!!  Highest (%d) >= (%d)' % (highest, parent.row)
-						downward = 0
-					else:
-						print 'Highest (%d) (%s) is lower that (%d)' % (highest,
-							lower.name[:7], parent.row)
-						upward = 1
-						downward = 1
-						grid.remove(column, parent.row)
-						column += 1
-						continue
+				# Test
+				upper_flag = self.upper_check(parent, column, grid)
+				lower_flag = self.lower_check(parent, column, grid)
+
+				# Verify
+				if upper_flag or lower_flag:
+					grid.remove(column, parent.row)
+					column += 1
 				else:
-					print 'No lower node'
-					downward = 0
-
-				'''
-				upper = grid.upper(column, parent.row)
-				if upper:
-					upper = self.db.at(upper)
-					#assigned, missing = self.db.split_assigned_from_missing(upper.parent)
-					#if len(assigned) == 0:
-					#	print 'Upper node (%s) as no assigned parent' % upper.name[:7]
-					#	upward = 0
-					#	lowest = parent.row
-					#else: lowest = sorted([self.db.at(e).row for e in assigned])[-1]
-					#lowest = sorted([self.db.at(e).row for e in upper.parent])[-1]
-					lowest = max([self.db.at(e).row for e in upper.parent])
-					box = self.db.select_bounding_box(upper.parent, column)
-					#if len(box) and max(box) <= parent.row:
-					if lowest <= parent.row:
-						print '!!!  Aligned node (%s) has no lower parents' % upper.name[:7]
-						print '     Box (%s)' % box
-						#print '      Missing (%s)' % ', '.join(['(%s, %d)' % (e[:7], self.db.at(e).row) for e in missing])
-						#print '!!!  Lowest (%d) <= (%d)' % (max(box), parent.row)
-						grid.remove(column, parent.row)
-						#column = max(column, upper.border + 1)
-						upward = 0
-					else:
-						print 'Lowest (%d) (%s) is higher than (%d)' % (lowest,
-							upper.name[:7], parent.row)
-						upward = 1
-						downward = 1
-						grid.remove(column, parent.row)
-						column += 1
-						continue
-				else:
-					print 'No upper node'
-					upward = 0
-				'''
-
-			parent.set_column(column)
-			parent.set_border(target.column)
-			grid.add(parent.column, parent.row, parent.name)
-			print 'Outside (%d × %d) = %s' % (column, parent.row,
-			grid.store[column][parent.row])
-
-			# The graph's width is updated. The first available column is the
-			# next one
-			self.update_width(column)
-			column += 1
+					print 'Both tests passed! %s on %d' % (parent.name[:7], column)
+					grid.add(column, parent.row, parent.name)
+					parent.set_column(column)
+					self.update_width(column)
+					break
+		return
 
 	def column_unroll (self, debug):
 
@@ -407,11 +282,7 @@ class Historian:
 			# If a node is a named head and has not yet a column assigned, it
 			# must look for a valid column on its own
 			if target.name in self.head and not target.has_column():
-
-				column = self.find_column_for_head (name, debug)
-				target.set_column(column)
-				self.update_width(column)
-				grid.add(target.column, target.row, target.name)
+				self.find_column_for_head (name, grid, debug)
 
 			# The node assigns a column to each of its parents, in order,
 			# ensuring each starts off on a valid position
@@ -420,9 +291,6 @@ class Historian:
 			# Parents are added to the visit, then the node is done
 			visit.push(self.db.skip_if_done(target.parent))
 			target.done = 1
-
-			#print
-			#self.print_graph(0)
 
 	def print_graph (self, debug):
 		
