@@ -44,6 +44,6 @@ class NodeDB:
 		result = []
 		for name in names:
 			target = self.store[name]
-			if target.has_column() and target.column <= column: continue
+			if target.has_column() and target.column < column: continue
 			result.append(target.row)
 		return result

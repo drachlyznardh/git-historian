@@ -340,19 +340,21 @@ class Historian:
 				upper = grid.upper(column, parent.row)
 				if upper:
 					upper = self.db.at(upper)
-					assigned, missing = self.db.split_assigned_from_missing(upper.parent)
-					if len(assigned) == 0:
-						print 'Upper node (%s) as no assigned parent' % upper.name[:7]
-						upward = 0
-						lowest = parent.row
-					else: lowest = sorted([self.db.at(e).row for e in assigned])[-1]
+					#assigned, missing = self.db.split_assigned_from_missing(upper.parent)
+					#if len(assigned) == 0:
+					#	print 'Upper node (%s) as no assigned parent' % upper.name[:7]
+					#	upward = 0
+					#	lowest = parent.row
+					#else: lowest = sorted([self.db.at(e).row for e in assigned])[-1]
 					#lowest = sorted([self.db.at(e).row for e in upper.parent])[-1]
 					lowest = max([self.db.at(e).row for e in upper.parent])
+					box = self.db.select_bounding_box(upper.parent, column)
+					#if len(box) and max(box) <= parent.row:
 					if lowest <= parent.row:
 						print '!!!  Aligned node (%s) has no lower parents' % upper.name[:7]
-						print '     Assigned (%s)' % ', '.join([e[:7] for e in assigned])
-						print '      Missing (%s)' % ', '.join(['(%s, %d)' % (e[:7], self.db.at(e).row) for e in missing])
-						print '!!!  Lowest (%d) <= (%d)' % (lowest, parent.row)
+						print '     Box (%s)' % box
+						#print '      Missing (%s)' % ', '.join(['(%s, %d)' % (e[:7], self.db.at(e).row) for e in missing])
+						#print '!!!  Lowest (%d) <= (%d)' % (max(box), parent.row)
 						grid.remove(column, parent.row)
 						#column = max(column, upper.border + 1)
 						upward = 0
