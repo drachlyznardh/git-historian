@@ -265,7 +265,9 @@ class Historian:
 			upper_check = 1
 			lower_check = 1
 			while 1:
+
 				# Try column
+				grid.add(column, parent.row, 'MARKER')
 
 				# Test
 
