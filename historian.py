@@ -207,7 +207,6 @@ class Historian:
 	def find_column_for_parents (self, name, grid, debug):
 
 		target = self.db.at(name)
-		column = target.column
 
 		# Parents are processed in row order, from lower to upper
 		target.parent.sort(key=lambda e: self.db.at(e).row, reverse=True)
@@ -219,7 +218,6 @@ class Historian:
 			# target node
 			if parent.has_column():
 				parent.set_border(target.column)
-				column = parent.border + 1
 				if debug: print 'Pushing column beyond %s\'s border %d' % (parent.name[:7], parent.border)
 				continue
 
