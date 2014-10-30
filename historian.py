@@ -337,6 +337,7 @@ class Historian:
 					print 'No lower node'
 					downward = 0
 
+				'''
 				upper = grid.upper(column, parent.row)
 				if upper:
 					upper = self.db.at(upper)
@@ -369,6 +370,7 @@ class Historian:
 				else:
 					print 'No upper node'
 					upward = 0
+				'''
 
 			parent.set_column(column)
 			parent.set_border(target.column)
