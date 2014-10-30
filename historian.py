@@ -300,7 +300,8 @@ class Historian:
 			
 			t.compute_layout(node)
 
-			message = h.describe(name)
+			#message = h.describe(name)
+			message = [node.to_oneline()]
 
 			try:
 				print '%s\x1b[m %s' % (t.draw_transition(), message[0])
