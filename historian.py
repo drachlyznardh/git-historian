@@ -213,12 +213,10 @@ class Historian:
 
 		for parent in [self.db.at(e) for e in target.parent]:
 
-			# If a parent has already a column, the column next to its marks the
-			# leftmost spot for the following parents, as the border for the
-			# target node
+			# If a parent has already a column, just push its border
 			if parent.has_column():
 				parent.set_border(target.column)
-				if debug: print 'Pushing column beyond %s\'s border %d' % (parent.name[:7], parent.border)
+				if debug: print 'Pushing border (%s) to (%d)' % (parent.name[:7], parent.border)
 				continue
 
 			column = self.db.select_starting_column(parent.child)
