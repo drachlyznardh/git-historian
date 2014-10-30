@@ -39,3 +39,11 @@ class NodeDB:
 			result.append(target.row)
 		if len(result) == 0: return default
 		return min(result)
+
+	def select_bounding_box (self, names, column):
+		result = []
+		for name in names:
+			target = self.store[name]
+			if target.has_column() and target.column <= column: continue
+			result.append(target.row)
+		return result
