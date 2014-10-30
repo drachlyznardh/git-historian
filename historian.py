@@ -183,7 +183,7 @@ class Historian:
 			column += 1
 		return
 
-	# This should check whether the target row overlaps with any arrow between
+	# This checks whether the target row overlaps with any arrow between
 	# the upper node on the column and its parents
 	def upper_check (self, target, column, grid):
 
@@ -194,7 +194,7 @@ class Historian:
 		lowest = max([self.db.at(e).row for e in parents])
 		return lowest <= target.row
 
-	# This should check whether the row of the following node on column overlaps
+	# This checks whether the row of the following node on column overlaps
 	# with any arrow between the target and its parents
 	def lower_check (self, target, column, grid):
 
