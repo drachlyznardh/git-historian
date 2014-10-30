@@ -262,6 +262,14 @@ class Historian:
 			# check between the lowest parent of previous node on column and the
 			# target; one check between the lowest parent of target and the
 			# following node on column
+			upper_check = 1
+			lower_check = 1
+			while 1:
+				# Try column
+
+				# Test
+
+				# Verify
 			return
 
 			# Starting from the node atop of the current, the graph is
