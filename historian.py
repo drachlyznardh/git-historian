@@ -228,7 +228,7 @@ class Historian:
 			if parent.has_column():
 				parent.set_border(target.column)
 				column = parent.border + 1
-				if debug: print 'Pushing column beyond %s\'s border %d' % (e[:7], parent.border)
+				if debug: print 'Pushing column beyond %s\'s border %d' % (parent.name[:7], parent.border)
 				continue
 
 			# Check should probably test whever the bounding boxes overlap. One
