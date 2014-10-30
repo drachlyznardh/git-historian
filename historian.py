@@ -163,10 +163,28 @@ class Historian:
 			# The current node is done
 			target.done = 1
 
-	def find_column_for_head (self, name, debug):
+	def find_column_for_head (self, name, grid, debug):
 
 		if debug: print '%s has to find its own column!!!' % name [:7]
 		target = self.db.at(name)
+
+		# Start at the immediate right of previous head
+		previous = self.head[self.head.index(name) - 1]
+		column = self.db.at(previous).column + 1
+		print '  %s, Starting from column %d' % (name[:7], column)
+
+		while 1:
+			grid.add(column, target.row, 'MARKER')
+			if self.lower_check(target, column, grid):
+				grid.remove(column, target.row)
+				column += 1
+			else:
+				print 'Test passed! %s on %d' % (name[:7], column)
+				grid.add(column, target.row, name)
+				target.set_column(column)
+				self.update_width(column)
+				break
+		return
 
 		# We do not consider parents which have no column yet, those will be
 		# called in a later step
@@ -263,7 +281,8 @@ class Historian:
 		column = target.column
 
 		print
-		print '  Parents of (%s), starting on (%d)' % (name[:7], column)
+		print '  Parents of (%s), starting on (%d)' % (name[:7],
+			column)
 
 		# Parents are processed in row order, from lower to upper
 		for e in sorted(target.parent,
@@ -456,7 +475,7 @@ class Historian:
 			# must look for a valid column on its own
 			if target.name in self.head and not target.has_column():
 
-				column = self.find_column_for_head (name, debug)
+				column = self.find_column_for_head (name, grid, debug)
 				target.set_column(column)
 				self.update_width(column)
 				grid.add(target.column, target.row, target.name)
