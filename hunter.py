@@ -133,10 +133,12 @@ class HeadHunter:
 
 class HistoryHunter:
 
-	def __init__ (self, target, debug = 0):
+	def __init__ (self, target, options, debug = 0):
 
 		self.target = target
 		self.debug = debug
+
+		# Parse options for format stuff…
 
 	def hunt (self):
 
