@@ -161,8 +161,8 @@ class HistoryHunter:
 		# Print the output
 		if self.debug: print git_history_dump
 
-		# New node to store info
-		current = node.Node(1)
+		# Ref for current node
+		current = None
 
 		# Parsing Git response
 		for line in git_history_dump.split('\n'):
@@ -172,11 +172,15 @@ class HistoryHunter:
 
 			if '#' in line:
 
+				# Store node in map if any, then create new one
+				if current: nodes.add_node(current)
+				current = node.Node()
+
 				token = line.split('#', 1)
 				print token
-				continue
 
-				names = line[1:-1].split()
+				#names = line[1:-1].split()
+				names = token[0].split()
 
 				# Store self
 				current.name = names[0]
@@ -184,8 +188,14 @@ class HistoryHunter:
 				# Store parents
 				for i in names[1:]: current.parent.append(i)
 
-				# Store node in map
-				nodes.add_node(current)
+				# Store message
+				current.message = token[1]
+
+			else:
+				current.message.append('\n%s' % line)
+
+		# Store the last node
+		nodes.add_node(current)
 
 		# Showing results
 		if self.debug: print nodes
