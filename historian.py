@@ -222,17 +222,9 @@ class Historian:
 				continue
 
 			column = self.db.select_starting_column(parent.child)
-
-			# Check should probably test whever the bounding boxes overlap. One
-			# check between the lowest parent of previous node on column and the
-			# target; one check between the lowest parent of target and the
-			# following node on column
 			while 1:
-
-				# Try column
 				grid.add(column, parent.row, 'MARKER')
 
-				# Test & Verify
 				if self.upper_check(parent, column, grid) and self.lower_check(parent, column, grid):
 					grid.add(column, parent.row, parent.name)
 					parent.set_column(column)
