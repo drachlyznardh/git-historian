@@ -31,8 +31,8 @@ grid and dumps it all on the terminal.
 
 Each line can contain but a single commit. No commit can be displayed before its
 child(ren), and no commit can displayed after its parent(s); commit with no
-relation at all (heads with completely independent history) should appear in
-order.
+relation at all (heads with completely independent chunks of history) appear in
+order, as specified.
 
 ### Horizontal spread
 
