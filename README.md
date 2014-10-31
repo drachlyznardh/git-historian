@@ -73,8 +73,8 @@ octopus merges, crossing branches, multiple heads, multiple bases, a copy of the
 git-flow sample image.
 
 I tested it against some other projects of mine, and also against the Git repo
-itself: I got 37k lines and 410 columns after a wait of ~3 minutes, but it
-worked.
+itself: it took almost 6m to render 146M of text with ~37k rows and 632 columns,
+but it worked.
 
 TODO
 ====
