@@ -7,25 +7,23 @@ Alternative layout for git log --graph, inspired by
 Concept
 -------
 
-The goal of this project is to display the history of a Git repo focusing on
-long-lived parallel branches. In order to be more human-readable, branches are
-displayed as vertical sequences of commits as long as there are no forks and no
-merges, which can both cause a switch of tracks from column to column. Plus, as
-a branch starts, it books its column, so that it can grow on a straight line
-without the risk of being pushed right by other branches, as it happens normally
-in Git.
+The long-term goal of this project is to provide an alternative layout for `git
+log --graph`; the short-term goal is to display the history of a Git repo using
+straight lines to represent long-lived branches. The user can specify how
+branches are ordered, thus having specific branches on specific columns.
 
 Proof of existence
 ------------------
 
 This whole project exists only to prove that a different, more readable layout
 for the graph of a repo is possible, and that I could actually write it. It is
-incomplete, vastly inefficient and completely outside Git.
+now fairly functional, but vastly slower than invoking Git itself and it is a
+standalone application.
 
 Implementation
 --------------
 
-It is a Python script, which queries the git repo for all its history (commit
+It is a Python script, which queries the Git repo for all its history (commit
 relations) and crunches it to build a graph, then it spreads the commits on a
 grid and dumps it all on the terminal.
 
@@ -33,45 +31,38 @@ grid and dumps it all on the terminal.
 
 Each line can contain but a single commit. No commit can be displayed before its
 child(ren), and no commit can displayed after its parent(s); commit with no
-relation at all (heads with completely independent history) should appear in
-order.
+relation at all (heads with completely independent chunks of history) appear in
+order, as specified.
 
 ### Horizontal spread
 
-Branches should occupy the same column, as long as they are but a sequence of
-commits. Heads should appear in order, as specified by cmdline args or
-alphabetically, unless they are related.
+Heads appear in order, as specified, or in alphabetical order by default.
+Commits in the same branch appear in the same column as long as there is no
+overlapping with arrows.
 
-As rules of thumb, it should work more or less like this:
+Relationship between commit may be:
 
- - lone parents belong to the same line as their child;
- - parents of a same commit, as also children of a same commit, must belong each
-   to a different column;
- - no commit can belong to the column of another active branch
-
-This is computed while walking the graph, starting from the first head and
-moving down or up following a commit's parents and children, in a sort of
-leftmost-first visit. Each visited commit takes the first available column,
-which could contain one of the commit's parents or children, but no arrows.
+ - implied, when parent and child are directly one over the other, in the same
+   column and in two consecutive rows;
+ - highlighted with a vertical line, when parent and cihld are directly one over
+   the other, but with one or more row in between them;
+ - highlighted with an arrow, which moves horizontally (left or right) from the
+   parent until it reaches the child's column, bends at a right angle and moves
+   up until it reaches the child
 
 ### Display
 
-Each commit is displayed as a bullet character '⬤' (\u2022).
+Each commit is displayed as a white bullet character '⬤' (\u2022). Arrows take
+the color of their destination column and are drawn with unicode box chars.
 
-Fork and merge relations are displayed with arrows, which move on horizontal
-straight lines until they reach the target column, then bend by 90 degrees and
-move straight up until they touch the target commit. Each arrow gets it color
-from its destination column and keeps it until the end.
+As each merge commit receives all its incoming arrows from the bottom, there is
+no indication of the original order of parents. You cannot infere which parent
+was merged into which, as the relative row and column of each parent depends on
+the whole layout.
 
-All arrows start from the father and point towards the child. The parent order
-is not preserved, so you cannot longer assume that the leftmost arrows comes
-from the first parent, as you can do with the usual `git log --graph` layout.
-
-Closer arrows (those with less horizontal gap from the respective target) take
-precedence over other arrows. This affects the color, not the direction.
-
-At the end of its row, each commit is resented with its `git show -s --online
---decorate --color` output.
+At the end of its row, each commit is resented with its equivalent `git show -s
+--pretty='<format>' ` output. You can specify the format string with options `-p,
+--pretty`, otherwise my own default will be used instead.
 
 Testing
 -------
@@ -82,20 +73,17 @@ octopus merges, crossing branches, multiple heads, multiple bases, a copy of the
 git-flow sample image.
 
 I tested it against some other projects of mine, and also against the Git repo
-itself: I got 37k lines and 410 columns after a wait of ~3 minutes, but it
-worked.
+itself: it took almost 6m to render 146M of text with ~37k rows and 632 columns,
+but it worked.
 
 TODO
 ====
 
-First of all, **Options**: everything is currently hard coded.
-
-**Display options**: the layout could be mirrored both vertically and horizontally,
-the charset could be different (for those terminals / fonts without full unicode
-support), colors could be optional, there could be more colors (with fade and
-bold modes, or with full 256 color if supported), user-defined display message
-for commits (the `--pretty="<format>"` option), map-only display mode could
-ignore any non-merge / non-fork commit…
+**Display options**: the layout could be mirrored both vertically and
+horizontally, the charset could be different (for those terminals / fonts
+without full unicode support), colors could be optional, there could be more
+colors (with fade and bold modes, or with full 256 color if supported), map-only
+display mode could ignore any non-merge / non-fork commit…
 
 **Efficency**: there are no intermediate steps in the layout computation, no
 checkpoints, no nothing. Even with no change in the repo, each invocation must
