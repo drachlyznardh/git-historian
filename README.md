@@ -36,25 +36,27 @@ order, as specified.
 
 ### Horizontal spread
 
-Branches should occupy the same column, as long as they are but a sequence of
-commits. Heads should appear in order, as specified by cmdline args or
-alphabetically, unless they are related.
+Heads appear in order, as specified, or in alphabetical order by default.
+Commits in the same branch appear in the same column as long as there is no
+overlapping with arrows.
 
-As rules of thumb, it should work more or less like this:
+Relationship between commit may be:
 
- - lone parents belong to the same line as their child;
- - parents of a same commit, as also children of a same commit, must belong each
-   to a different column;
- - no commit can belong to the column of another active branch
-
-This is computed while walking the graph, starting from the first head and
-moving down or up following a commit's parents and children, in a sort of
-leftmost-first visit. Each visited commit takes the first available column,
-which could contain one of the commit's parents or children, but no arrows.
+ - implied, when parent and child are directly one over the other, in the same
+   column and in two consecutive rows;
+ - highlighted with a vertical line, when parent and cihld are directly one over
+   the other, but with one or more row in between them;
+ - highlighted with an arrow, which moves horizontally (left or right) from the
+   parent until it reaches the child's column, bends at a right angle and moves
+   up until it reaches the child
 
 ### Display
 
-Each commit is displayed as a bullet character '⬤' (\u2022).
+Each commit is displayed as a white bullet character '⬤' (\u2022). Arrows take
+the color of their destination column and are drawn with unicode box chars.
+
+As each child receives arrows from the bottom, there is no indication of the
+order of merges.
 
 Fork and merge relations are displayed with arrows, which move on horizontal
 straight lines until they reach the target column, then bend by 90 degrees and
