@@ -79,14 +79,11 @@ but it worked.
 TODO
 ====
 
-First of all, **Options**: everything is currently hard coded.
-
-**Display options**: the layout could be mirrored both vertically and horizontally,
-the charset could be different (for those terminals / fonts without full unicode
-support), colors could be optional, there could be more colors (with fade and
-bold modes, or with full 256 color if supported), user-defined display message
-for commits (the `--pretty="<format>"` option), map-only display mode could
-ignore any non-merge / non-fork commit…
+**Display options**: the layout could be mirrored both vertically and
+horizontally, the charset could be different (for those terminals / fonts
+without full unicode support), colors could be optional, there could be more
+colors (with fade and bold modes, or with full 256 color if supported), map-only
+display mode could ignore any non-merge / non-fork commit…
 
 **Efficency**: there are no intermediate steps in the layout computation, no
 checkpoints, no nothing. Even with no change in the repo, each invocation must
