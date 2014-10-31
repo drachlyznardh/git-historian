@@ -7,13 +7,10 @@ Alternative layout for git log --graph, inspired by
 Concept
 -------
 
-The goal of this project is to display the history of a Git repo focusing on
-long-lived parallel branches. In order to be more human-readable, branches are
-displayed as vertical sequences of commits as long as there are no forks and no
-merges, which can both cause a switch of tracks from column to column. Plus, as
-a branch starts, it books its column, so that it can grow on a straight line
-without the risk of being pushed right by other branches, as it happens normally
-in Git.
+The long-term goal of this project is to provide an alternative layout for `git
+log --graph`; the short-term goal is to display the history of a Git repo using
+straight lines to represent long-lived branches. The user can specify how
+branches are ordered, thus having specific branches on specific columns.
 
 Proof of existence
 ------------------
