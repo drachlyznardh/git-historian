@@ -55,23 +55,14 @@ Relationship between commit may be:
 Each commit is displayed as a white bullet character '⬤' (\u2022). Arrows take
 the color of their destination column and are drawn with unicode box chars.
 
-As each child receives arrows from the bottom, there is no indication of the
-order of merges.
+As each merge commit receives all its incoming arrows from the bottom, there is
+no indication of the original order of parents. You cannot infere which parent
+was merged into which, as the relative row and column of each parent depends on
+the whole layout.
 
-Fork and merge relations are displayed with arrows, which move on horizontal
-straight lines until they reach the target column, then bend by 90 degrees and
-move straight up until they touch the target commit. Each arrow gets it color
-from its destination column and keeps it until the end.
-
-All arrows start from the father and point towards the child. The parent order
-is not preserved, so you cannot longer assume that the leftmost arrows comes
-from the first parent, as you can do with the usual `git log --graph` layout.
-
-Closer arrows (those with less horizontal gap from the respective target) take
-precedence over other arrows. This affects the color, not the direction.
-
-At the end of its row, each commit is resented with its `git show -s --online
---decorate --color` output.
+At the end of its row, each commit is resented with its equivalent `git show -s
+--pretty='<format>' ` output. You can specify the format string with options `-p,
+--pretty`, otherwise my own default will be used instead.
 
 Testing
 -------
