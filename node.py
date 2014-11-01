@@ -1,19 +1,23 @@
 # Node module for Git-Historian
+# -*- encoding: utf-8 -*-
 
 class Node:
 
-	def __init__ (self, real):
+	def __init__ (self):
 
-		self.hash = None
+		self.name = None
 		self.parent = []
 		self.child = []
-		self.column = -1
 
-		self.real = real
+		self.column = -1
+		self.border = -1
+		self.row = -1
 
 		self.done = 0
-		self.top = None    # Previous commit
-		self.bottom = None # Next commit
+		self.top = None    # Previous commit by line
+		self.bottom = None # Next commit by line
+		self.left = None   # Previous commit by column
+		self.right = None  # Next commit by line
 
 	def add_child (self, name):
 
@@ -23,11 +27,12 @@ class Node:
 	def has_column (self):
 		return self.column >= 0
 
-	def is_real (self):
-		return self.real
+	def set_column (self, value):
+		self.column = value
+		self.set_border(value)
 
-	def is_virtual (self):
-		return not self.real
+	def set_border (self, value):
+		self.border = max(self.border, value)
 
 	def get_indent (self):
 		if self.column > 0:
@@ -36,14 +41,16 @@ class Node:
 
 	def to_oneline(self):
 	
-		return '%s(%s) \x1b[m%s%s\x1b[m' % (
-			self.get_indent(), self.column, self.hash[:7])
+		return '(%2d, %2d)%s • \x1b[33m%s\x1b[m' % (
+			self.column, self.row,
+			self.get_indent(),
+			self.name[:7])
 
 	def to_string(self):
 		if self.column > 0:
 			indent = ('%%%ds' % (2 * self.column)) % (' ')
 		else: indent = ''
-		str = "%s  Hash {%s}" % (indent, self.hash)
+		str = "%s  Name {%s}" % (indent, self.name)
 		for i in self.parent: str += "\n%sParent {%s}" % (indent, i)
 		for i in self.child:  str += "\n%s Child {%s}" % (indent, i)
 		return str
