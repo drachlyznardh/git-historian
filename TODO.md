@@ -1,5 +1,11 @@
 # TODO
 
+- invoke `git rev-list` instead of `git log`; allow all the options to pass to
+  the request;
+- use right-to-left canonical order for row assignment;
+- implement own binary search, to avoid the insert-search-delete process;
+- include padding and mirroring options for graph layout;
+
 # DONE
 
 - each node should find itself already assigned by it first child, unless it is
