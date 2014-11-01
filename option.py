@@ -15,11 +15,15 @@ class Option:
 		self.all_heads = 0
 		self.head = []
 
+		self.pretty = None
+
 	def print_version(self):
 		print "Git-Historian %s (C) 2014 Ivan Simonini" % VERSION
 
 	def print_help(self):
 		print "Usage: %s [options] heads…" % sys.argv[0]
+		print
+		print ' -p, --pretty : format options'
 		print
 		print ' -D, --all-debug : print all kinds of debug messages'
 		print ' -d N, --debug N : add N to the debug counter'
@@ -34,9 +38,10 @@ class Option:
 	def parse (self):
 
 		try:
-			optlist, args = getopt.gnu_getopt(sys.argv[1:], 'ahvDd:',
+			optlist, args = getopt.gnu_getopt(sys.argv[1:], 'ahvDd:p:',
 				['help', 'verbose', 'version',
 				'all', 'all-heads',
+				'pretty',
 				'debug', 'all-debug'])
 		except getopt.GetoptError as err:
 			print str(err)
@@ -55,6 +60,8 @@ class Option:
 				self.all_debug = 1
 			elif key in ('-d', '--debug'):
 				self.debug += int(value)
+			elif key in ('-p', '--pretty'):
+				self.pretty = value
 			elif key == '--version':
 				self.print_version()
 				sys.exit(0)

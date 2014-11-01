@@ -20,8 +20,8 @@ class Grid:
 		try:
 			return self.store[index]
 		except:
-			self.store[index] = bintrees.RBTree()
-			#self.store[index] = bintrees.BinaryTree()
+			#self.store[index] = bintrees.RBTree()
+			self.store[index] = bintrees.BinaryTree()
 			return self.store[index]
 
 	def add (self, column, row, name):
@@ -117,7 +117,8 @@ class Historian:
 				if previous == target.name: continue
 
 				# Binding top and bottom nodes together
-				self.db.at(target.top).bottom = target.bottom
+				if target.top:
+					self.db.at(target.top).bottom = target.bottom
 				self.db.at(target.bottom).top = target.top
 
 				# Binding previous and current nodes together
@@ -160,7 +161,7 @@ class Historian:
 			# The current node is done
 			target.done = 1
 
-	def find_column_for_head (self, name, grid, debug):
+	def find_column_for_head (self, name, debug):
 
 		if debug: print '%s has to find its own column!!!' % name [:7]
 		target = self.db.at(name)
@@ -171,78 +172,66 @@ class Historian:
 		if debug: print '  %s, Starting from column %d' % (name[:7], column)
 
 		while 1:
-			grid.add(column, target.row, 'MARKER')
-			if self.lower_check(target, column, grid) and self.upper_check(target, column, grid):
-				grid.add(column, target.row, name)
+			self.grid.add(column, target.row, 'MARKER')
+			if self.lower_check(target, column) and self.upper_check(target, column):
+				self.grid.add(column, target.row, name)
 				target.set_column(column)
 				self.update_width(column)
 				if debug: print 'Test passed! %s on %d' % (target.name[:7], target.column)
 				break
 
-			grid.remove(column, target.row)
+			self.grid.remove(column, target.row)
 			column += 1
 		return
 
-	# This should check whether the target row overlaps with any arrow between
+	# This checks whether the target row overlaps with any arrow between
 	# the upper node on the column and its parents
-	def upper_check (self, target, column, grid):
+	def upper_check (self, target, column):
 
-		upper = grid.upper(column, target.row)
+		upper = self.grid.upper(column, target.row)
 		if not upper: return True
 		parents = self.db.at(upper).parent
 		if len(parents) == 0: return True
 		lowest = max([self.db.at(e).row for e in parents])
 		return lowest <= target.row
 
-	# This should check whether the row of the following node on column overlaps
+	# This checks whether the row of the following node on column overlaps
 	# with any arrow between the target and its parents
-	def lower_check (self, target, column, grid):
+	def lower_check (self, target, column):
 
-		lower = grid.lower(column, target.row)
+		lower = self.grid.lower(column, target.row)
 		if not lower: return True
 		if len(target.parent) == 0: return True
 		lowest = max([self.db.at(e).row for e in target.parent])
 		return lowest <= self.db.at(lower).row
 
-	def find_column_for_parents (self, name, grid, debug):
+	def find_column_for_parents (self, name, debug):
 
 		target = self.db.at(name)
-		column = target.column
 
 		# Parents are processed in row order, from lower to upper
 		target.parent.sort(key=lambda e: self.db.at(e).row, reverse=True)
 
 		for parent in [self.db.at(e) for e in target.parent]:
 
-			# If a parent has already a column, the column next to its marks the
-			# leftmost spot for the following parents, as the border for the
-			# target node
+			# If a parent has already a column, just push its border
 			if parent.has_column():
 				parent.set_border(target.column)
-				column = parent.border + 1
-				if debug: print 'Pushing column beyond %s\'s border %d' % (parent.name[:7], parent.border)
+				if debug: print 'Pushing border (%s) to (%d)' % (parent.name[:7], parent.border)
 				continue
 
 			column = self.db.select_starting_column(parent.child)
-
-			# Check should probably test whever the bounding boxes overlap. One
-			# check between the lowest parent of previous node on column and the
-			# target; one check between the lowest parent of target and the
-			# following node on column
 			while 1:
+				self.grid.add(column, parent.row, 'MARKER')
 
-				# Try column
-				grid.add(column, parent.row, 'MARKER')
-
-				# Test & Verify
-				if self.upper_check(parent, column, grid) and self.lower_check(parent, column, grid):
-					grid.add(column, parent.row, parent.name)
+				if self.upper_check(parent, column) and self.lower_check(parent, column):
+					self.grid.add(column, parent.row, parent.name)
 					parent.set_column(column)
 					self.update_width(column)
 					if debug: print 'Both tests passed! %s on %d' % (parent.name[:7], column)
 					break
 
-				grid.remove(column, parent.row)
+				self.grid.remove(column, parent.row)
 				column += 1
 		return
 
@@ -251,7 +240,7 @@ class Historian:
 		if debug: print '-- Column Unroll --'
 
 		self.width = -1
-		grid = Grid()
+		self.grid = Grid()
 
 		# The visit starts for the named heads
 		visit = order.ColumnOrder()
@@ -270,22 +259,23 @@ class Historian:
 			# If a node is a named head and has not yet a column assigned, it
 			# must look for a valid column on its own
 			if target.name in self.head and not target.has_column():
-				self.find_column_for_head (name, grid, debug)
+				self.find_column_for_head (name, debug)
 
 			# The node assigns a column to each of its parents, in order,
 			# ensuring each starts off on a valid position
-			self.find_column_for_parents (name, grid, debug)
+			self.find_column_for_parents (name, debug)
 
 			# Parents are added to the visit, then the node is done
 			visit.push(self.db.skip_if_done(target.parent))
 			target.done = 1
+
+		del self.grid
 
 	def print_graph (self, debug):
 		
 		if debug: print '-- Print Graph --'
 
 		t = layout.Layout(self.width + 1, self.db, debug)
-		h = hunter.MessageHunter()
 
 		name = self.first
 
@@ -300,13 +290,10 @@ class Historian:
 			
 			t.compute_layout(node)
 
-			#message = h.describe(name)
-			message = [node.to_oneline()]
-
 			try:
-				print '%s\x1b[m %s' % (t.draw_transition(), message[0])
-				for i in message[1:-1]:
-					print '%s\x1b[m %s' % (t.draw_padding(), i)
+				print '\x1b[m%s\x1b[m %s' % (t.draw_transition(), node.message[0])
+				for i in node.message[1:]:
+					print '\x1b[m%s\x1b[m %s' % (t.draw_padding(), i)
 			except IOError as error: return
 
 			name = node.bottom
@@ -314,7 +301,7 @@ class Historian:
 	def tell_the_story(self):
 
 		self.head = hunter.HeadHunter(self.o, self.o.d(1)).hunt()
-		self.db = hunter.HistoryHunter(self.head, self.o.d(2)).hunt()
+		self.db = hunter.HistoryHunter(self.head, self.o, self.o.d(2)).hunt()
 
 		self.bind_children(self.o.d(4))
 		self.db.clear()

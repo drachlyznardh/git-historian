@@ -133,10 +133,16 @@ class HeadHunter:
 
 class HistoryHunter:
 
-	def __init__ (self, target, debug = 0):
+	def __init__ (self, target, options, debug = 0):
 
 		self.target = target
 		self.debug = debug
+
+		# Parse options for format stuff…
+		if options.pretty:
+			self.pretty = r'''--pretty=%H %P#''' + options.pretty
+		else:
+			self.pretty = r'''--pretty=%H %P#%C(yellow)%h%C(auto)%d%Creset %s %C(bold red)%ar%Cblue %an'''
 
 	def hunt (self):
 
@@ -144,6 +150,7 @@ class HistoryHunter:
 
 		# Looking for commit's and parents' names…
 		cmdlist = ['git', 'log', '--pretty="%H %P"']
+		cmdlist = ['git', 'log', self.pretty]
 
 		# … starting from know heads only
 		cmdlist.extend(self.target)
@@ -157,39 +164,37 @@ class HistoryHunter:
 		# Print the output
 		if self.debug: print git_history_dump
 
+		# Ref for current node
+		current = None
+
 		# Parsing Git response
 		for line in git_history_dump.split('\n'):
 
 			# Skipping empty lines (the last one should be empty)
 			if len(line) == 0: continue
 
-			# New node to store info
-			current = node.Node(1)
+			if '#' in line:
 
-			names = line[1:-1].split()
+				# Store node in map if any, then create new one
+				if current: nodes.add_node(current)
+				current = node.Node()
 
-			# Store self
-			current.name = names[0]
+				# Split line over the sharp character
+				token = line.split('#', 1)
 
-			# Store parents
-			for i in names[1:]: current.parent.append(i)
+				# Store name, parents, message
+				names = token[0].split()
+				current.name = names[0]
+				for i in names[1:]: current.parent.append(i)
+				current.message = [token[1]]
 
-			# Store node in map
-			nodes.add_node(current)
+			else:
+				current.message.append(line)
+
+		# Store the last node
+		nodes.add_node(current)
 
 		# Showing results
 		if self.debug: print nodes
 		return nodes
 
-class MessageHunter:
-
-	def __init__ (self):
-
-		self.cmdargs = 'git show -s --oneline --decorate --color'.split(' ')
-
-	def describe (self, name):
-
-		self.cmdargs.append(name)
-		message = check_output(self.cmdargs).split('\n')
-		self.cmdargs.pop()
-		return message
