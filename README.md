@@ -9,6 +9,20 @@ Dependencies
 
  - bintrees 2.0.1
 
+Usage
+-----
+
+git-historian [options] [args]
+
+When no arg is given, HEAD is implyed; when one or more args are
+provided, they are displayed in order. If -a is also provided, all other
+branches follow in alphabetical order.
+
+### Options
+
+- -p<format>, --pretty=<format> : format string, passed to `git log`
+- -a, --all, --all-heads        : display all branches in refs/head/*
+
 Concept
 -------
 
