@@ -117,7 +117,8 @@ class Historian:
 				if previous == target.name: continue
 
 				# Binding top and bottom nodes together
-				self.db.at(target.top).bottom = target.bottom
+				if target.top:
+					self.db.at(target.top).bottom = target.bottom
 				self.db.at(target.bottom).top = target.top
 
 				# Binding previous and current nodes together
