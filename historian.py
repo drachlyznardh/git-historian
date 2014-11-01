@@ -1,159 +1,66 @@
 # Main module for Git-Historian
 # -*- encoding: utf-8 -*-
 
-import sys
-import getopt
-
+import option
 import hunter
 import order
 
 import layout
 
-VERSION="0.0-c"
+VERSION="0.0-d"
 
-class Option:
+import bintrees
+
+class Grid:
 
 	def __init__ (self):
+		self.store = {}
 
-		self.verbose = 0
-		self.debug = 0
-		self.all_debug = 0
-
-		self.all_heads = 0
-		self.head = []
-		self.head_by_name = {}
-		self.node = {}
-
-		self.first = None
-		self.width = -1
-		self.max_width = 0
-
-	def print_version(self):
-		print "Git-Historian %s (C) 2014 Ivan Simonini" % VERSION
-
-	def print_help(self):
-		print "Usage: %s [options] heads…" % sys.argv[0]
-		print
-		print ' -D, --all-debug : print all kinds of debug messages'
-		print ' -d N, --debug N : add N to the debug counter'
-		print
-		print 'debug  1 : show heads'
-		print 'debug  2 : show data loading'
-		print 'debug  4 : show bindings'
-		print 'debug  8 : show vertical unroll'
-		print 'debug 16 : show head jumps'
-		print 'debug 32 : show column assignments'
-		print 'debug 16 : show layout construction'
-
-	def parse (self):
-
+	def at (self, index):
 		try:
-			optlist, args = getopt.gnu_getopt(sys.argv[1:], 'ahvDd:',
-				['help', 'verbose', 'version',
-				'all', 'all-heads',
-				'debug', 'all-debug'])
-		except getopt.GetoptError as err:
-			print str(err)
-			self.print_help()
-			sys.exit(2)
+			return self.store[index]
+		except:
+			#self.store[index] = bintrees.RBTree()
+			self.store[index] = bintrees.BinaryTree()
+			return self.store[index]
 
-		for key, value in optlist:
-			if key in ('-h', '--help'):
-				self.print_help()
-				sys.exit(0)
-			elif key in ('-v', '--verbose'):
-				self.verbose = 1
-			elif key in ('-a', '--all', '--all-heads'):
-				self.all_heads = 1
-			elif key in ('-D', '--all-debug'):
-				self.all_debug = 1
-			elif key in ('-d', '--debug'):
-				self.debug += int(value)
-			elif key == '--version':
-				self.print_version()
-				sys.exit(0)
+	def add (self, column, row, name):
+		t = self.at(column)
+		t.insert(row, name)
 
-		self.args = args
-	
-	def d (self, value):
-		return self.all_debug or self.debug / value % 2
+	def remove (self, column, row):
+		t = self.at(column)
+		t.remove(row)
+
+	def upper (self, column, row):
+		try:
+			key, value = self.at(column).prev_item(row)
+			return value
+		except KeyError: return None
+
+	def lower (self, column, row):
+		try:
+			key, value = self.at(column).succ_item(row)
+			return value
+		except KeyError: return None
 
 class Historian:
 
 	def __init__ (self):
 
 		self.verbose = 0
-		self.debug = 0
-		self.all_debug = 0
 
-		self.all_heads = 0
 		self.head = []
-		self.head_by_name = {}
-		self.node = {}
+		self.db = None
 
 		self.first = None
 		self.width = -1
-		self.max_width = 0
 
-		self.o = Option()
+		self.o = option.Option()
 		self.o.parse()
 
-	def select_column (self, commit, debug):
-
-		if debug: print
-		if not commit.top:
-			if debug: print '  %s is the topmost' % commit.hash[:7]
-			self.width += 1
-			return self.width
-
-		if len(commit.child) == 0:
-			if debug: print '  %s has no children' % commit.hash[:7]
-			self.width += 1
-			#if len(self.skip_if_done(commit.parent)):
-			#	self.width += 1
-			return self.width
-
-		result = self.width
-		name = commit.top
-		if debug: print '  Processing %s' % commit.hash[:7]
-		while name:
-
-			target = self.node[name]
-
-			if name in commit.child and target.has_column():
-				if debug: print '  %s is a child of %s (%d), halting' % (
-					name[:7], commit.hash[:7],
-					self.node[name].column)
-
-				booked = 1 + max([self.node[j].column for j in target.parent])
-				if debug: print booked
-				column = max(result, target.column, booked)
-				self.max_width = max(self.max_width, column)
-				return column
-
-			if debug: print '  Matching %s against %s (%d)' % (
-				commit.hash[:7], name[:7], target.column)
-			result = max(result, target.column)
-			name = target.top
-
-		if debug: print 'No assigned children found. Defaulting'
-		self.width += 1
-		return self.width
-
-	def skip_if_done (self, names):
-
-		result = []
-
-		for name in names:
-			if not self.node[name].done:
-				result.append(name)
-
-		return result
-
-	def clear (self):
-
-		for commit in self.node.values():
-			commit.done = 0
+	def update_width (self, value):
+		self.width = max(self.width, value)
 
 	def bind_children (self, debug):
 
@@ -165,7 +72,7 @@ class Historian:
 		while visit.has_more():
 
 			name = visit.pop()
-			commit = self.node[name]
+			commit = self.db.at(name)
 
 			if debug: print '  Visiting %s' % name[:7]
 
@@ -174,9 +81,9 @@ class Historian:
 				continue
 
 			for i in commit.parent:
-				self.node[i].add_child(name)
+				self.db.at(i).add_child(name)
 
-			visit.push(self.skip_if_done(commit.parent))
+			visit.push(self.db.skip_if_done(commit.parent))
 
 			commit.done = 1
 
@@ -184,104 +91,224 @@ class Historian:
 
 		if debug: print '-- Row Unroll --'
 
-		visit = order.UppermostFirst()
-		current = None
+		# Visit starts with all the heads
+		visit = order.RowOrder()
+		visit.push(self.head)
 
-		for head in self.head:
+		# Reference to previous node, to build the chain
+		previous = None
 
-			if debug: print '  Head %s' % head[:7]
+		# Starting over the first row
+		row = -1
 
-			visit.push_children(head)
+		while visit.has_more():
 
-			while visit.has_more():
-				
-				name = visit.pop()
-				commit = self.node[name]
+			name = visit.pop()
+			target = self.db.at(name)
 
-				if debug: print '  Visiting %s' % name[:7]
+			if debug:
+				print 'Visiting %s %s' % (name[:7], visit.show())
 
-				if commit.done:
-					if debug: print '  %s is done, skipping…' % name[:7]
-					continue
+			# Even if done, a node can drop down in the chain after its
+			# last-calling child
+			if target.done:
 
-				children = self.skip_if_done(commit.child)
-				if len(children):
-					visit.push_children(children)
-					continue
+				# No need to drop down beyond the last element
+				if previous == target.name: continue
 
-				if current:
-					commit.top = current
-					self.node[current].bottom = name
-				else: self.first = name
-				current = name
+				# Binding top and bottom nodes together
+				if target.top:
+					self.db.at(target.top).bottom = target.bottom
+				self.db.at(target.bottom).top = target.top
 
-				visit.push_parents(self.skip_if_done(commit.parent))
+				# Binding previous and current nodes together
+				target.top = previous
+				self.db.at(previous).bottom = name
 
-				commit.done = 1
+				# Bumping the row number another time
+				row += 1
+				target.row = row
 
-	def column_unroll (self, d1, d2):
+				# This node is now the last
+				target.bottom = None
 
-		if d1 or d2: print '-- Column Unroll --'
+				# Recording current node as the next previous
+				previous = name
+				continue
+
+			# No node can appear before any of its children
+			children = self.db.skip_if_done(target.child)
+			if len(children): continue
+
+			# Bind this node with the previous, if any, or…
+			if previous:
+				target.top = previous
+				self.db.at(previous).bottom = name
+
+			# … record this node as the first in the chain
+			else: self.first = name
+
+			# Bumping the row number
+			row += 1
+			target.row = row
+
+			# Add parents to the visit
+			visit.push(self.db.skip_if_done(target.parent))
+
+			# The current node is the next previous
+			previous = name
+
+			# The current node is done
+			target.done = 1
+
+	def find_column_for_head (self, name, debug):
+
+		if debug: print '%s has to find its own column!!!' % name [:7]
+		target = self.db.at(name)
+
+		# Start at the immediate right of previous head
+		previous = self.head[self.head.index(name) - 1]
+		column = self.db.at(previous).column + 1
+		if debug: print '  %s, Starting from column %d' % (name[:7], column)
+
+		while 1:
+			self.grid.add(column, target.row, 'MARKER')
+			if self.lower_check(target, column) and self.upper_check(target, column):
+				self.grid.add(column, target.row, name)
+				target.set_column(column)
+				self.update_width(column)
+				if debug: print 'Test passed! %s on %d' % (target.name[:7], target.column)
+				break
+
+			self.grid.remove(column, target.row)
+			column += 1
+		return
+
+	# This checks whether the target row overlaps with any arrow between
+	# the upper node on the column and its parents
+	def upper_check (self, target, column):
+
+		upper = self.grid.upper(column, target.row)
+		if not upper: return True
+		parents = self.db.at(upper).parent
+		if len(parents) == 0: return True
+		lowest = max([self.db.at(e).row for e in parents])
+		return lowest <= target.row
+
+	# This checks whether the row of the following node on column overlaps
+	# with any arrow between the target and its parents
+	def lower_check (self, target, column):
+
+		lower = self.grid.lower(column, target.row)
+		if not lower: return True
+		if len(target.parent) == 0: return True
+		lowest = max([self.db.at(e).row for e in target.parent])
+		return lowest <= self.db.at(lower).row
+
+	def find_column_for_parents (self, name, debug):
+
+		target = self.db.at(name)
+
+		# Parents are processed in row order, from lower to upper
+		target.parent.sort(key=lambda e: self.db.at(e).row, reverse=True)
+
+		for parent in [self.db.at(e) for e in target.parent]:
+
+			# If a parent has already a column, just push its border
+			if parent.has_column():
+				parent.set_border(target.column)
+				if debug: print 'Pushing border (%s) to (%d)' % (parent.name[:7], parent.border)
+				continue
+
+			column = self.db.select_starting_column(parent.child)
+			while 1:
+				self.grid.add(column, parent.row, 'MARKER')
+
+				if self.upper_check(parent, column) and self.lower_check(parent, column):
+					self.grid.add(column, parent.row, parent.name)
+					parent.set_column(column)
+					self.update_width(column)
+					if debug: print 'Both tests passed! %s on %d' % (parent.name[:7], column)
+					break
+
+				self.grid.remove(column, parent.row)
+				column += 1
+		return
+
+	def column_unroll (self, debug):
+
+		if debug: print '-- Column Unroll --'
 
 		self.width = -1
+		self.grid = Grid()
 
-		visit = order.LeftmostFirst()
+		# The visit starts for the named heads
+		visit = order.ColumnOrder()
 		visit.push(self.head)
 
 		while visit.has_more():
 
 			name = visit.pop()
-			commit = self.node[name]
-			if d1 or d2: print '  Visiting %s' % name[:7]
+			target = self.db.at(name)
+			
+			# No node is processed more than once
+			if target.done: continue
 
-			if commit.done: continue
+			if debug: print '  Visiting %s' % name[:7]
 
-			visit.push(self.skip_if_done(commit.parent))
+			# If a node is a named head and has not yet a column assigned, it
+			# must look for a valid column on its own
+			if target.name in self.head and not target.has_column():
+				self.find_column_for_head (name, debug)
 
-			commit.column = self.select_column(commit, d2)
-			commit.done = 1
+			# The node assigns a column to each of its parents, in order,
+			# ensuring each starts off on a valid position
+			self.find_column_for_parents (name, debug)
+
+			# Parents are added to the visit, then the node is done
+			visit.push(self.db.skip_if_done(target.parent))
+			target.done = 1
+
+		del self.grid
 
 	def print_graph (self, debug):
 		
 		if debug: print '-- Print Graph --'
 
-		t = layout.Layout(self.max_width + 1, self.node, debug)
-		h = hunter.MessageHunter()
+		t = layout.Layout(self.width + 1, self.db, debug)
 
 		name = self.first
 
 		while name:
 
-			commit = self.node[name]
-			if not commit:
+			node = self.db.at(name)
+			if not node:
 				print "No Commit for name %s" % name[:7]
 				break
 
 			if debug: print "\nP %s" % name[:7]
 			
-			t.compute_layout(commit)
+			t.compute_layout(node)
 
-			message = h.describe(name)
+			try:
+				print '\x1b[m%s\x1b[m %s' % (t.draw_transition(), node.message[0])
+				for i in node.message[1:]:
+					print '\x1b[m%s\x1b[m %s' % (t.draw_padding(), i)
+			except IOError as error: return
 
-			print '%s\x1b[m %s' % (t.draw_transition(), message[0])
-			for i in message[1:-1]:
-			#for i in message[1:]:
-				print '%s\x1b[m %s' % (t.draw_padding(), i)
-
-			name = commit.bottom
+			name = node.bottom
 
 	def tell_the_story(self):
 
 		self.head = hunter.HeadHunter(self.o, self.o.d(1)).hunt()
-		self.node = hunter.HistoryHunter(self.head, self.o.d(2)).hunt()
+		self.db = hunter.HistoryHunter(self.head, self.o, self.o.d(2)).hunt()
 
 		self.bind_children(self.o.d(4))
-		self.clear()
+		self.db.clear()
 		self.row_unroll(self.o.d(8))
-		self.clear()
-		self.column_unroll(self.o.d(16), self.o.d(32))
-
-		self.print_graph(self.o.d(64))
+		self.db.clear()
+		self.column_unroll(self.o.d(16))
+		self.print_graph(self.o.d(32))
 
 		return
 
