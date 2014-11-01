@@ -4,6 +4,11 @@ git-historian
 Alternative layout for git log --graph, inspired by
 [this GIST thread](https://gist.github.com/datagrok/4221767).
 
+Dependencies
+------------
+
+ - bintrees 2.0.1
+
 Concept
 -------
 
