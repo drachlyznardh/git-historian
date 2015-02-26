@@ -15,6 +15,14 @@ class NodeDB:
 		for node in self.store.values():
 			node.done = 0
 
+	def drop_missing_refs (self):
+		for node in self.store.values():
+			verified = []
+			for name in node.parent:
+				if name in self.store:
+					verified.append(name)
+			node.parent = verified
+
 	def skip_if_done (self, names):
 		result = []
 		for name in names:
