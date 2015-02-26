@@ -144,13 +144,17 @@ class HistoryHunter:
 		else:
 			self.pretty = r'''--pretty=%H %P#%C(yellow)%h%C(auto)%d%Creset %s %C(bold red)%ar%Cblue %an'''
 
-	def hunt (self):
+	def hunt (self, size_limit):
 
 		nodes = db.NodeDB()
 
 		# Looking for commit's and parents' names…
 		cmdlist = ['git', 'log', '--pretty="%H %P"']
 		cmdlist = ['git', 'log', self.pretty]
+
+		# Optional limit to the size of the history
+		if size_limit:
+			cmdlist.append('-n%d' % size_limit)
 
 		# … starting from know heads only
 		cmdlist.extend(self.target)
