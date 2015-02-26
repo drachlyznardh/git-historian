@@ -20,6 +20,7 @@ branches follow in alphabetical order.
 
 ### Options
 
+- -n<N>, --limit=<N>            : queires `git log` for up to N commits
 - -p<format>, --pretty=<format> : format string, passed to `git log`
 - -a, --all, --all-heads        : display all branches in refs/head/*
 
