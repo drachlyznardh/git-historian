@@ -151,6 +151,7 @@ class HistoryHunter:
 		# Looking for commit's and parents' names…
 		cmdlist = ['git', 'log', '--pretty="%H %P"']
 		cmdlist = ['git', 'log', self.pretty]
+		cmdlist.append('-n%d' % 500)
 
 		# … starting from know heads only
 		cmdlist.extend(self.target)
