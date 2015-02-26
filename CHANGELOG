@@ -1,4 +1,9 @@
 
+Release 0.0-e – 2015/02/26
+=========================
+
+Added support for limited history size with -nN
+
 Release 0.0-d – 2014/11/01
 =========================
 

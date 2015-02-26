@@ -16,12 +16,15 @@ class Option:
 		self.head = []
 
 		self.pretty = None
+		self.size_limit = False
 
 	def print_version(self):
 		print "Git-Historian %s (C) 2014 Ivan Simonini" % VERSION
 
 	def print_help(self):
 		print "Usage: %s [options] heads…" % sys.argv[0]
+		print
+		print ' -n, --limit : size limit'
 		print
 		print ' -p, --pretty : format options'
 		print
@@ -38,10 +41,10 @@ class Option:
 	def parse (self):
 
 		try:
-			optlist, args = getopt.gnu_getopt(sys.argv[1:], 'ahvDd:p:',
+			optlist, args = getopt.gnu_getopt(sys.argv[1:], 'ahvDd:n:p:',
 				['help', 'verbose', 'version',
 				'all', 'all-heads',
-				'pretty',
+				'limit', 'pretty',
 				'debug', 'all-debug'])
 		except getopt.GetoptError as err:
 			print str(err)
@@ -60,6 +63,8 @@ class Option:
 				self.all_debug = 1
 			elif key in ('-d', '--debug'):
 				self.debug += int(value)
+			elif key in ('-n', '--limit'):
+				self.size_limit = int(value)
 			elif key in ('-p', '--pretty'):
 				self.pretty = value
 			elif key == '--version':
