@@ -81,8 +81,7 @@ class Historian:
 				continue
 
 			for i in commit.parent:
-				try: self.db.at(i).add_child(name)
-				except: commit.parent.remove(i)
+				self.db.at(i).add_child(name)
 
 			visit.push(self.db.skip_if_done(commit.parent))
 

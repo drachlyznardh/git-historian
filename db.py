@@ -9,9 +9,7 @@ class NodeDB:
 		self.store[node.name] = node
 
 	def at (self, name):
-		if name in self.store:
-			return self.store[name]
-		raise('Unknown Node')
+		return self.store[name]
 
 	def clear (self):
 		for node in self.store.values():
