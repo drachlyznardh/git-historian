@@ -301,7 +301,7 @@ class Historian:
 	def tell_the_story(self):
 
 		self.head = hunter.HeadHunter(self.o, self.o.d(1)).hunt()
-		self.db = hunter.HistoryHunter(self.head, self.o, self.o.d(2)).hunt()
+		self.db = hunter.HistoryHunter(self.head, self.o, self.o.d(2)).hunt(self.o.size_limit)
 
 		self.db.drop_missing_refs()
 		self.bind_children(self.o.d(4))
