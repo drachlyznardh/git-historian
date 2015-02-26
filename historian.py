@@ -304,6 +304,7 @@ class Historian:
 		self.head = hunter.HeadHunter(self.o, self.o.d(1)).hunt()
 		self.db = hunter.HistoryHunter(self.head, self.o, self.o.d(2)).hunt()
 
+		self.db.drop_missing_refs()
 		self.bind_children(self.o.d(4))
 		self.db.clear()
 		self.row_unroll(self.o.d(8))
