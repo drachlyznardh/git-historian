@@ -82,7 +82,7 @@ class Historian:
 
 			for i in commit.parent:
 				try: self.db.at(i).add_child(name)
-				except: pass # Parent was cut due to size concern
+				except: commit.parent.remove(i)
 
 			visit.push(self.db.skip_if_done(commit.parent))
 
