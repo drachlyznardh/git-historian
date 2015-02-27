@@ -62,6 +62,16 @@ class Historian:
 	def update_width (self, value):
 		self.width = max(self.width, value)
 
+	# Due to excessively restricting size limit, some heads may not appear at
+	# all in the database. These heads are removed from the list
+	def drop_missing_heads (self):
+
+		available = []
+		for name in self.head:
+			if name in self.db.store:
+				available.append(name)
+		self.head = available
+
 	def bind_children (self, debug):
 
 		if debug: print '-- Binding Children --'
@@ -300,10 +310,15 @@ class Historian:
 
 	def tell_the_story(self):
 
+		# Hunting for history
 		self.head = hunter.HeadHunter(self.o, self.o.d(1)).hunt()
 		self.db = hunter.HistoryHunter(self.head, self.o, self.o.d(2)).hunt(self.o.size_limit)
 
+		# Cleaning database from missing refs
 		self.db.drop_missing_refs()
+		self.drop_missing_heads()
+
+		# Graph unrolling
 		self.bind_children(self.o.d(4))
 		self.db.clear()
 		self.row_unroll(self.o.d(8))
