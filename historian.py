@@ -62,6 +62,13 @@ class Historian:
 	def update_width (self, value):
 		self.width = max(self.width, value)
 
+	def drop_missing_heads (self):
+		available = []
+		for name in self.head:
+			if name in self.db.store:
+				available.append(name)
+		self.head = available
+
 	def bind_children (self, debug):
 
 		if debug: print '-- Binding Children --'
@@ -304,6 +311,7 @@ class Historian:
 		self.db = hunter.HistoryHunter(self.head, self.o, self.o.d(2)).hunt(self.o.size_limit)
 
 		self.db.drop_missing_refs()
+		self.drop_missing_heads()
 		self.bind_children(self.o.d(4))
 		self.db.clear()
 		self.row_unroll(self.o.d(8))
