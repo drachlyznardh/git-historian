@@ -121,15 +121,25 @@ class HeadHunter:
 
 	def order_heads (self):
 
+		found = set()
+		result = []
+
 		for name in self.name:
 			for e in self.head:
 				if name in e[1]:
 					self.head.remove(e)
 					self.ohead.append(e[0])
+					if e[0] not in found:
+						found.add(e[0])
+						result.append(e[0])
 
-		if not self.all_heads: return
+		if not self.all_heads:
+			self.ohead.extend(result)
+			return
 
-		self.ohead.extend([e[0] for e in self.head])
+		seen = set()
+		f = seen.add
+		self.ohead.extend([e[0] for e in self.head if not (e[0] in seen or f(e[0]))])
 
 class HistoryHunter:
 
