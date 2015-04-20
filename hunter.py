@@ -137,7 +137,7 @@ class HeadHunter:
 					self.head.remove(e)
 					self.ohead.append(e[0])
 					if e[0] not in seen:
-						found.add(e[0])
+						seen.add(e[0])
 						self.ohead.append(e[0])
 
 class HistoryHunter:
