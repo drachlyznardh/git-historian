@@ -1,4 +1,9 @@
 
+Release 0.0-g – 2015/04/20
+=========================
+
+Fixed weird bug when two heads share the same commit.
+
 Release 0.0-f – 2015/02/27
 =========================
 

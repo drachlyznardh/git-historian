@@ -1,15 +1,13 @@
 # Main module for Git-Historian
 # -*- encoding: utf-8 -*-
 
+import bintrees
+
 import option
 import hunter
 import order
 
 import layout
-
-VERSION="0.0-d"
-
-import bintrees
 
 class Grid:
 
