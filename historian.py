@@ -7,8 +7,6 @@ import order
 
 import layout
 
-VERSION="0.0-d"
-
 import bintrees
 
 class Grid:
