@@ -142,8 +142,7 @@ class HeadHunter:
 
 		for name in self.name:
 			for e in self.head:
-				if name == e[1]:
-				#if name in e[1]:
+				if self.match(name, e[1]):
 					self.head.remove(e)
 					self.ohead.append(e[0])
 					if e[0] not in seen:
