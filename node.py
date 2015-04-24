@@ -9,6 +9,8 @@ class Node:
 		self.parent = []
 		self.child = []
 
+		self.message = None
+
 		self.column = -1
 		self.border = -1
 		self.row = -1
