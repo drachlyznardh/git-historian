@@ -10,6 +10,12 @@ import json
 import node
 import db
 
+def _exact_match (one, two):
+	return one == two
+
+def _prefix_match (one, two):
+	return one in two
+
 class HeadHunter:
 
 	def __init__ (self, o, debug):
@@ -23,6 +29,9 @@ class HeadHunter:
 
 		self.all_heads = o.all_heads
 		self.args = o.args
+
+		if o.match: self.match = _exact_match
+		else: self.match = _prefix_match
 
 	def hunt (self):
 
@@ -133,7 +142,8 @@ class HeadHunter:
 
 		for name in self.name:
 			for e in self.head:
-				if name in e[1]:
+				if name == e[1]:
+				#if name in e[1]:
 					self.head.remove(e)
 					self.ohead.append(e[0])
 					if e[0] not in seen:
