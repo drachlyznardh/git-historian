@@ -16,11 +16,24 @@ class NodeDB:
 			node.done = 0
 
 	def drop_missing_refs (self):
+
 		for node in self.store.values():
+
+			size = len(node.parent)
 			verified = []
-			for name in node.parent:
+
+			if size == 0: continue
+
+			elif size == 1:
+				name = node.parent[0]
 				if name in self.store:
 					verified.append(name)
+
+			else:
+				for name in node.parent:
+					if name in self.store:
+						verified.append(name)
+
 			node.parent = verified
 
 	def skip_if_done (self, names):
