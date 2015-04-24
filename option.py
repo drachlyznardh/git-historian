@@ -28,8 +28,8 @@ class Option:
 	def print_help(self):
 		print "Usage: %s [options] heads…" % sys.argv[0]
 		print
+		print ' -a, --all, --all-heads : consider all refnames'
 		print ' -n, --limit : size limit'
-		print
 		print ' -p, --pretty : format options'
 		print
 		print ' --prefix, --prefix-match   : arguments match refnames by prefix'
