@@ -23,7 +23,6 @@ class NodeDB:
 		for node in self.store.values():
 
 			size = len(node.parent)
-			verified = []
 
 			if size == 0: continue
 
@@ -34,16 +33,11 @@ class NodeDB:
 
 			else:
 				for name in node.parent:
-					if name in self.store:
-						verified.append(name)
-					else:
+					if name not in self.store:
 						fake = Node()
 						fake.name = name
 						fake.message = ['[…]']
 						self.add_node(fake)
-						verified.append(name)
-
-				node.parent = verified
 
 	def skip_if_done (self, names):
 		result = []
