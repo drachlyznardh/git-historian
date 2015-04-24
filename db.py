@@ -1,4 +1,7 @@
 # Database module for Git-Historian
+# encoding: utf-8
+
+from node import Node
 
 class NodeDB:
 
@@ -16,12 +19,25 @@ class NodeDB:
 			node.done = 0
 
 	def drop_missing_refs (self):
+
 		for node in self.store.values():
-			verified = []
-			for name in node.parent:
-				if name in self.store:
-					verified.append(name)
-			node.parent = verified
+
+			size = len(node.parent)
+
+			if size == 0: continue
+
+			elif size == 1:
+
+				if node.parent[0] not in self.store:
+					node.parent.pop(0)
+
+			else:
+				for name in node.parent:
+					if name not in self.store:
+						fake = Node()
+						fake.name = name
+						fake.message = ['[…]']
+						self.add_node(fake)
 
 	def skip_if_done (self, names):
 		result = []
