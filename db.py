@@ -25,16 +25,16 @@ class NodeDB:
 			if size == 0: continue
 
 			elif size == 1:
-				name = node.parent[0]
-				if name in self.store:
-					verified.append(name)
+
+				if node.parent[0] not in self.store:
+					node.parent.pop(0)
 
 			else:
 				for name in node.parent:
 					if name in self.store:
 						verified.append(name)
 
-			node.parent = verified
+				node.parent = verified
 
 	def skip_if_done (self, names):
 		result = []
