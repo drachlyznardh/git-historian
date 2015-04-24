@@ -1,4 +1,7 @@
 # Database module for Git-Historian
+# encoding: utf-8
+
+from node import Node
 
 class NodeDB:
 
@@ -32,6 +35,12 @@ class NodeDB:
 			else:
 				for name in node.parent:
 					if name in self.store:
+						verified.append(name)
+					else:
+						fake = Node()
+						fake.name = name
+						fake.message = ['[…]']
+						self.add_node(fake)
 						verified.append(name)
 
 				node.parent = verified
