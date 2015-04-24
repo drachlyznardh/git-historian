@@ -32,6 +32,9 @@ class Option:
 		print
 		print ' -p, --pretty : format options'
 		print
+		print ' --prefix, --prefix-match   : arguments match refnames by prefix'
+		print ' -x, --exact, --exact-match : arguments must match refnames exactly'
+		print
 		print ' -D, --all-debug : print all kinds of debug messages'
 		print ' -d N, --debug N : add N to the debug counter'
 		print
