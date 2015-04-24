@@ -45,11 +45,12 @@ class Option:
 	def parse (self):
 
 		try:
-			optlist, args = getopt.gnu_getopt(sys.argv[1:], 'ahvDd:n:p:',
+			optlist, args = getopt.gnu_getopt(sys.argv[1:], 'ahvDd:n:p:x',
 				['help', 'verbose', 'version',
 				'all', 'all-heads',
 				'limit', 'pretty',
-				'debug', 'all-debug'])
+				'debug', 'all-debug',
+				'--exact', '--exact-match', '--prefix', '--prefix-match'])
 		except getopt.GetoptError as err:
 			print str(err)
 			self.print_help()
@@ -71,6 +72,10 @@ class Option:
 				self.size_limit = int(value)
 			elif key in ('-p', '--pretty'):
 				self.pretty = value
+			elif key in ('-x', '--exact', '--exact-match'):
+				self.match = True
+			elif key in ('--prefix', '--prefix-match'):
+				self.match = False
 			elif key == '--version':
 				self.print_version()
 				sys.exit(0)
