@@ -1,4 +1,10 @@
 
+Release 0.0-i – 2015/04/24
+=========================
+
+Arguments can match refnames exactly (with -x, --exact, --exact-match) or by
+prefix (default or with --prefix, --prefix-match).
+
 Release 0.0-k – 2015/04/24
 =========================
 
