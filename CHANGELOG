@@ -1,4 +1,16 @@
 
+Release 0.0-k – 2015/04/24
+=========================
+
+Since history size could be cut to N, some merge nodes would lose (some of)
+their children; the disappearence of the second last child made the father node
+look like a normal point in the chain, instead of a proper merge.
+
+Now, missing nodes that could originate such situations have placeholders with no
+content message (they appear as […] in the graph). This unfortunately allows the
+history graph to grow beyhond the specified N; I don't this would be a huge
+problem, but we'll see.
+
 Release 0.0-h – 2015/04/20
 =========================
 
