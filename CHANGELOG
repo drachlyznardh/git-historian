@@ -1,4 +1,16 @@
 
+Release 0.0-h – 2015/04/20
+=========================
+
+Once again, I can test the usage for two minutes or half an hour, but the only
+problem will show up only after I release the udpate. Fixing release 0.0-g. I'll
+probably run out of characters soon enough…
+
+Release 0.0-g – 2015/04/20
+=========================
+
+Fixed weird bug when two heads share the same commit.
+
 Release 0.0-f – 2015/02/27
 =========================
 
