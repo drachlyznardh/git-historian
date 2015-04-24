@@ -18,6 +18,7 @@ class Option:
 
 		self.pretty = None
 		self.size_limit = False
+		self.match = False
 
 		version_file = os.path.join(os.path.dirname(__file__), 'VERSION')
 		self.version = open(version_file, 'r').read().strip()
@@ -28,9 +29,12 @@ class Option:
 	def print_help(self):
 		print "Usage: %s [options] heads…" % sys.argv[0]
 		print
+		print ' -a, --all, --all-heads : consider all refnames'
 		print ' -n, --limit : size limit'
-		print
 		print ' -p, --pretty : format options'
+		print
+		print ' --prefix, --prefix-match   : arguments match refnames by prefix'
+		print ' -x, --exact, --exact-match : arguments must match refnames exactly'
 		print
 		print ' -D, --all-debug : print all kinds of debug messages'
 		print ' -d N, --debug N : add N to the debug counter'
@@ -45,11 +49,12 @@ class Option:
 	def parse (self):
 
 		try:
-			optlist, args = getopt.gnu_getopt(sys.argv[1:], 'ahvDd:n:p:',
+			optlist, args = getopt.gnu_getopt(sys.argv[1:], 'ahvDd:n:p:x',
 				['help', 'verbose', 'version',
 				'all', 'all-heads',
 				'limit', 'pretty',
-				'debug', 'all-debug'])
+				'debug', 'all-debug',
+				'--exact', '--exact-match', '--prefix', '--prefix-match'])
 		except getopt.GetoptError as err:
 			print str(err)
 			self.print_help()
@@ -71,6 +76,10 @@ class Option:
 				self.size_limit = int(value)
 			elif key in ('-p', '--pretty'):
 				self.pretty = value
+			elif key in ('-x', '--exact', '--exact-match'):
+				self.match = True
+			elif key in ('--prefix', '--prefix-match'):
+				self.match = False
 			elif key == '--version':
 				self.print_version()
 				sys.exit(0)
