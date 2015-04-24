@@ -18,6 +18,7 @@ class Option:
 
 		self.pretty = None
 		self.size_limit = False
+		self.match = False
 
 		version_file = os.path.join(os.path.dirname(__file__), 'VERSION')
 		self.version = open(version_file, 'r').read().strip()
