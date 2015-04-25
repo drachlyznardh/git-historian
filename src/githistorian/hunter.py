@@ -54,17 +54,19 @@ class HeadHunter:
 
 	def hunt (self):
 
+		need_order = len(self.order)
+
 		if self.debug:
 			print('  HeadHunter.Order (%s)' % ', '.join(self.order))
 
-		if len(self.order) or self.all_heads: self.load_heads()
+		if need_order or self.all_heads: self.load_heads()
 		else: self.load_HEAD()
 
 		if self.debug:
 			print('  HeadHunter.Head(%s)' % ', '.join([e[0][:7] for e in self.head]))
 
 		if self.all_heads: self.ohead = _get_all_heads(self.head)
-		elif len(self.order): self.ohead = _get_selected_heads(self.match, self.head, self.order)
+		elif need_order: self.ohead = _get_selected_heads(self.match, self.head, self.order)
 
 		if self.debug:
 			print('  HeadHunter.Head(%s)' % ', '.join([e[:7] for e in self.ohead]))
