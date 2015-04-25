@@ -66,6 +66,7 @@ class HeadHunter:
 			if not token: continue
 
 			self.ohead.append(token.group(1))
+			return
 
 	def load_heads (self):
 
