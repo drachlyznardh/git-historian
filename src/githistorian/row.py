@@ -48,11 +48,11 @@ class Row:
 
 		# Binding previous and current nodes together
 		target.top = self.previous
-		self.db.at(previous).bottom = name
+		self.db.at(self.previous).bottom = name
 
 		# Bumping the row number another time
-		row += 1
-		target.row = row
+		self.row += 1
+		target.row = self.row
 
 		# This node is now the last
 		target.bottom = None
