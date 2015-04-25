@@ -186,6 +186,6 @@ def tell_the_story():
 	db.clear()
 	first = _row_unroll(opt.d(8), heads, db)
 	db.clear()
-	width = Column(db, heads).column_unroll(opt.d(16))
+	width = Column(db, heads).unroll(opt.d(16))
 	_print_graph(opt.d(32), db, first, width)
 

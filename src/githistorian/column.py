@@ -126,7 +126,7 @@ class Column:
 				column += 1
 		return
 
-	def column_unroll (self, debug):
+	def unroll (self, debug):
 
 		if debug: print '-- Column Unroll --'
 
