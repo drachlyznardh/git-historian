@@ -38,8 +38,8 @@ class HeadHunter:
 		if self.debug:
 			print('  HeadHunter.Order (%s)' % ', '.join(self.order))
 
-		if len(self.order) == 0 and not self.all_heads: self.load_HEAD()
-		else: self.load_heads()
+		if len(self.order) or self.all_heads: self.load_heads()
+		else: self.load_HEAD()
 
 		if self.debug:
 			print('  HeadHunter.Head(%s)' % ', '.join([e[0][:7] for e in self.head]))
