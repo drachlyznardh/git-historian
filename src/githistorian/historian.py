@@ -345,11 +345,7 @@ def tell_the_story():
 	_bind_children(opt.d(4), heads, db)
 	db.clear()
 	first = _row_unroll(opt.d(8), heads, db)
-	#self.row_unroll(self.o.d(8))
 	db.clear()
-
 	width = Historian(opt, db, heads).column_unroll(opt.d(16))
-	#self.column_unroll(self.o.d(16))
 	_print_graph(opt.d(32), db, first, width)
-	#self.print_graph(self.o.d(32))
 
