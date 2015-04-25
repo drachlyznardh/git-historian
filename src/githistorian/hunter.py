@@ -75,6 +75,7 @@ class HeadHunter:
 
 		# Looking for heads, i.e. active branches
 		cmdlist = ['git', 'show-ref']
+		if self.all_tags: cmdlist.append('--tags')
 
 		# Print the command line request
 		if self.debug: print('  Now invoking %s' % cmdlist)
