@@ -119,3 +119,6 @@ class Row:
 
 		return self.first
 
+def unroll (db, heads, debug):
+
+	return Row(db, heads).unroll(debug)

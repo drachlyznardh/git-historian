@@ -5,7 +5,7 @@ from .option import parse_cmd_args
 from .hunter import HeadHunter, HistoryHunter
 from .order import LeftmostFirst
 
-from .row import Row
+from .row import unroll as row_unroll
 from .column import Column
 from .layout import Layout
 
@@ -86,7 +86,8 @@ def tell_the_story():
 	# Graph unrolling
 	_bind_children(opt.d(4), heads, db)
 	db.clear()
-	first= Row(db, heads).unroll(opt.d(8))
+	#first= Row(db, heads).unroll(opt.d(8))
+	first = row_unroll(db, heads, opt.d(8))
 	db.clear()
 	width = Column(db, heads).unroll(opt.d(16))
 	_print_graph(opt.d(32), db, first, width)
