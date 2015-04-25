@@ -26,26 +26,6 @@ class Option:
 	def print_version(self):
 		print "Git-Historian %s (C) 2014 Ivan Simonini" % self.version
 
-	def print_help(self):
-		print "Usage: %s [options] heads…" % sys.argv[0]
-		print
-		print ' -a, --all, --all-heads : consider all refnames'
-		print ' -n, --limit : size limit'
-		print ' -p, --pretty : format options'
-		print
-		print ' --prefix, --prefix-match   : arguments match refnames by prefix'
-		print ' -x, --exact, --exact-match : arguments must match refnames exactly'
-		print
-		print ' -D, --all-debug : print all kinds of debug messages'
-		print ' -d N, --debug N : add N to the debug counter'
-		print
-		print 'debug  1 : show heads'
-		print 'debug  2 : show data loading'
-		print 'debug  4 : show bindings'
-		print 'debug  8 : show vertical unroll'
-		print 'debug 16 : show column assignments'
-		print 'debug 32 : show layout construction'
-
 	def parse (self):
 
 		try:
@@ -88,6 +68,27 @@ class Option:
 	
 	def d (self, value):
 		return self.all_debug or self.debug / value % 2
+
+def _print_help ():
+
+	print "Usage: %s [options] heads…" % sys.argv[0]
+	print
+	print ' -a, --all, --all-heads : consider all refnames'
+	print ' -n, --limit : size limit'
+	print ' -p, --pretty : format options'
+	print
+	print ' --prefix, --prefix-match   : arguments match refnames by prefix'
+	print ' -x, --exact, --exact-match : arguments must match refnames exactly'
+	print
+	print ' -D, --all-debug : print all kinds of debug messages'
+	print ' -d N, --debug N : add N to the debug counter'
+	print
+	print 'debug  1 : show heads'
+	print 'debug  2 : show data loading'
+	print 'debug  4 : show bindings'
+	print 'debug  8 : show vertical unroll'
+	print 'debug 16 : show column assignments'
+	print 'debug 32 : show layout construction'
 
 def parse_cmd_args():
 
