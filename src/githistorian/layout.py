@@ -25,10 +25,7 @@ class Layout:
 
 	def put_char(self, name, transition, padding):
 		
-		if isinstance(name, basestring):
-			father = self.commit[name]
-			color = 31 + father.column % 6
-		elif isinstance(name, int):
+		if isinstance(name, int):
 			color = 31 + name % 6
 		else:
 			print 'WTF is %s' % name
