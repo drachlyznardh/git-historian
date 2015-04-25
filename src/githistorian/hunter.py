@@ -123,27 +123,6 @@ class HeadHunter:
 			# Save result in order and by name
 			self.head.append((name_n_ref.group(1), name_n_ref.group(2)))
 
-	def order_heads (self):
-
-		if self.all_heads:
-
-			seen = set()
-			f = seen.add
-			self.ohead.extend([e[0] for e in self.head if not (e[0] in seen or f(e[0]))])
-
-			return
-
-		seen = set()
-
-		for name in self.order:
-			for e in self.head:
-				if self.match(name, e[1]):
-					self.head.remove(e)
-					self.ohead.append(e[0])
-					if e[0] not in seen:
-						seen.add(e[0])
-						self.ohead.append(e[0])
-
 class HistoryHunter:
 
 	def __init__ (self, target, options, debug = 0):
