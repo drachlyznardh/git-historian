@@ -106,29 +106,31 @@ def parse_cmd_args():
 		self.print_help()
 		sys.exit(2)
 
+	o = Option()
+
 	for key, value in optlist:
 		if key in ('-h', '--help'):
-			self.print_help()
+			o.print_help()
 			sys.exit(0)
 		elif key in ('-v', '--verbose'):
-			self.verbose = 1
+			o.verbose = 1
 		elif key in ('-a', '--all', '--all-heads'):
-			self.all_heads = 1
+			o.all_heads = 1
 		elif key in ('-D', '--all-debug'):
-			self.all_debug = 1
+			o.all_debug = 1
 		elif key in ('-d', '--debug'):
-			self.debug += int(value)
+			o.debug += int(value)
 		elif key in ('-n', '--limit'):
-			self.size_limit = int(value)
+			o.size_limit = int(value)
 		elif key in ('-p', '--pretty'):
-			self.pretty = value
+			o.pretty = value
 		elif key in ('-x', '--exact', '--exact-match'):
-			self.match = True
+			o.match = True
 		elif key in ('--prefix', '--prefix-match'):
-			self.match = False
+			o.match = False
 		elif key == '--version':
-			self.print_version()
+			o.print_version()
 			sys.exit(0)
 
-	self.args = args
+	o.args = args
 
