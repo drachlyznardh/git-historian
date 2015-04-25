@@ -1,14 +1,12 @@
 # Headhunter module for Git-Historian
 # -*- encoding: utf-8 -*-
 
-from subprocess import check_output
-from subprocess import CalledProcessError
+from subprocess import check_output, CalledProcessError
 import re
 import sys
 import json
 
-import node
-import db
+from .node import Node, NodeDB
 
 def _exact_match (one, two):
 	return one == two
@@ -164,7 +162,7 @@ class HistoryHunter:
 
 	def hunt (self, size_limit):
 
-		nodes = db.NodeDB()
+		nodes = NodeDB()
 
 		# Looking for commit's and parents' names…
 		cmdlist = ['git', 'log', '--pretty="%H %P"']
@@ -199,7 +197,7 @@ class HistoryHunter:
 
 				# Store node in map if any, then create new one
 				if current: nodes.add_node(current)
-				current = node.Node()
+				current = Node()
 
 				# Split line over the sharp character
 				token = line.split('#', 1)

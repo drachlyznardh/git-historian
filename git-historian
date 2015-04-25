@@ -1,6 +1,0 @@
-#!/usr/bin/python
-
-import historian
-
-historian.Historian().tell_the_story()
-
