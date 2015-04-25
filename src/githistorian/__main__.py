@@ -1,4 +1,4 @@
 # encoding: utf-8
-from .historian import Historian
+from .historian import tell_the_story
 
-Historian().tell_the_story()
+tell_the_story()

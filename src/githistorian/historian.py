@@ -3,7 +3,7 @@
 
 import bintrees
 
-from .option import Option
+from .option import parse_cmd_args
 from .hunter import HeadHunter, HistoryHunter
 from .order import LeftmostFirst, ColumnOrder, RowOrder
 
@@ -326,3 +326,6 @@ class Historian:
 
 		return
 
+def tell_the_story():
+
+	opt = parse_cmd_args()
