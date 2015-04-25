@@ -27,7 +27,8 @@ class HeadHunter:
 
 		self.cname = []
 
-		self.all_heads = o.all_heads
+		self.all_heads = o.heads
+		self.all_tags = o.tags
 
 		if o.match: self.match = _exact_match
 		else: self.match = _prefix_match
