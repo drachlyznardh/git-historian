@@ -15,8 +15,9 @@ class Option:
 		self.debug = 0
 		self.all_debug = 0
 
-		self.all_heads = 0
-		self.head = []
+		self.heads = False
+		self.tags = False
+		self.order = []
 
 		self.pretty = None
 		self.size_limit = False
