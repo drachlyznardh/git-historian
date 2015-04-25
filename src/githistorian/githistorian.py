@@ -3,8 +3,9 @@
 
 from .option import parse_cmd_args
 from .hunter import HeadHunter, HistoryHunter
-from .order import LeftmostFirst, RowOrder
+from .order import LeftmostFirst
 
+from .row import Row
 from .column import Column
 from .layout import Layout
 
@@ -41,85 +42,6 @@ def _bind_children (debug, heads, db):
 		visit.push(db.skip_if_done(commit.parent))
 
 		commit.done = 1
-
-def _row_unroll (debug, heads, db):
-
-	if debug: print '-- Row Unroll --'
-
-	# Visit starts with all the heads
-	visit = RowOrder()
-	visit.push(heads)
-
-	# Reference to previous node, to build the chain
-	previous = None
-
-	# Starting over the first row
-	row = -1
-
-	# The first node
-	first = None
-
-	while visit.has_more():
-
-		name = visit.pop()
-		target = db.at(name)
-
-		if debug:
-			print 'Visiting %s %s' % (name[:7], visit.show())
-
-		# Even if done, a node can drop down in the chain after its
-		# last-calling child
-		if target.done:
-
-			# No need to drop down beyond the last element
-			if previous == target.name: continue
-
-			# Binding top and bottom nodes together
-			if target.top:
-				db.at(target.top).bottom = target.bottom
-			db.at(target.bottom).top = target.top
-
-			# Binding previous and current nodes together
-			target.top = previous
-			db.at(previous).bottom = name
-
-			# Bumping the row number another time
-			row += 1
-			target.row = row
-
-			# This node is now the last
-			target.bottom = None
-
-			# Recording current node as the next previous
-			previous = name
-			continue
-
-		# No node can appear before any of its children
-		children = db.skip_if_done(target.child)
-		if len(children): continue
-
-		# Bind this node with the previous, if any, or…
-		if previous:
-			target.top = previous
-			db.at(previous).bottom = name
-
-		# … record this node as the first in the chain
-		else: first = name
-
-		# Bumping the row number
-		row += 1
-		target.row = row
-
-		# Add parents to the visit
-		visit.push(db.skip_if_done(target.parent))
-
-		# The current node is the next previous
-		previous = name
-
-		# The current node is done
-		target.done = 1
-
-	return first
 
 def _print_graph (debug, db, first, width):
 
@@ -184,7 +106,8 @@ def tell_the_story():
 	# Graph unrolling
 	_bind_children(opt.d(4), heads, db)
 	db.clear()
-	first = _row_unroll(opt.d(8), heads, db)
+	#first = _row_unroll(opt.d(8), heads, db)
+	first= Row(db, heads).unroll(opt.d(8))
 	db.clear()
 	width = Column(db, heads).unroll(opt.d(16))
 	_print_graph(opt.d(32), db, first, width)
