@@ -1,6 +1,6 @@
 # encoding: utf-8
 
-class RowOrder:
+class VisitOrder:
 
 	def __init__ (self):
 		self.content = []
@@ -92,7 +92,7 @@ class Row:
 		if debug: print '-- Row Unroll --'
 
 		# Visit starts with all the heads
-		self.visit = RowOrder()
+		self.visit = VisitOrder()
 		self.visit.push(self.heads)
 
 		# Reference to previous node, to build the chain
