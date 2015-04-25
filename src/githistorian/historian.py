@@ -279,32 +279,32 @@ class Historian:
 
 		del self.grid
 
-	def print_graph (self, debug):
-		
-		if debug: print '-- Print Graph --'
+def _print_graph (debug, db, first, width):
 
-		t = Layout(self.width + 1, self.db, debug)
+	if debug: print '-- Print Graph --'
 
-		name = self.first
+	t = Layout(width + 1, db, debug)
 
-		while name:
+	name = first
 
-			node = self.db.at(name)
-			if not node:
-				print "No Commit for name %s" % name[:7]
-				break
+	while name:
 
-			if debug: print "\nP %s" % name[:7]
-			
-			t.compute_layout(node)
+		node = db.at(name)
+		if not node:
+			print "No Commit for name %s" % name[:7]
+			break
 
-			try:
-				print '\x1b[m%s\x1b[m %s' % (t.draw_transition(), node.message[0])
-				for i in node.message[1:]:
-					print '\x1b[m%s\x1b[m %s' % (t.draw_padding(), i)
-			except IOError as error: return
+		if debug: print "\nP %s" % name[:7]
 
-			name = node.bottom
+		t.compute_layout(node)
+
+		try:
+			print '\x1b[m%s\x1b[m %s' % (t.draw_transition(), node.message[0])
+			for i in node.message[1:]:
+				print '\x1b[m%s\x1b[m %s' % (t.draw_padding(), i)
+		except IOError as error: return
+
+		name = node.bottom
 
 	def tell_the_story(self):
 
@@ -339,14 +339,15 @@ def tell_the_story():
 	db.drop_missing_refs()
 	heads = _drop_missing_heads(heads, db)
 
-	h = Historian(opt)
-
 	# Graph unrolling
 	_bind_children(opt.d(4), heads, db)
 	db.clear()
 	first = _row_unroll(opt.d(8), heads, db)
 	#self.row_unroll(self.o.d(8))
 	db.clear()
-	self.column_unroll(self.o.d(16))
-	self.print_graph(self.o.d(32))
+
+	width = Historian(opt, db).column_unroll(opt.d(16))
+	#self.column_unroll(self.o.d(16))
+	_print_graph(opt.d(32), db, first, width)
+	#self.print_graph(self.o.d(32))
 
