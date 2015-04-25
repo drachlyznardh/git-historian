@@ -47,7 +47,7 @@ def _print_graph (debug, db, first, width):
 
 	if debug: print '-- Print Graph --'
 
-	t = Layout(width + 1, db, debug)
+	t = Layout(width + 1, debug)
 
 	name = first
 
