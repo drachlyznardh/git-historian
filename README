@@ -1,4 +1,4 @@
-git-historian
+githistorian
 =============
 
 Alternative layout for git log --graph, inspired by
@@ -12,7 +12,7 @@ Dependencies
 Usage
 -----
 
-git-historian [options] [args]
+githistorian [options] [args]
 
 When no arg is given, HEAD is implyed; when one or more args are
 provided, they are displayed in order. If -a is also provided, all other
