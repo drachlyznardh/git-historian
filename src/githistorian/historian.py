@@ -1,11 +1,9 @@
 # Main module for Git-Historian
 # -*- encoding: utf-8 -*-
 
-import bintrees
-
 from .option import parse_cmd_args
 from .hunter import HeadHunter, HistoryHunter
-from .order import LeftmostFirst, ColumnOrder, RowOrder
+from .order import LeftmostFirst, RowOrder
 
 from .column import Column
 from .layout import Layout

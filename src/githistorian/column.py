@@ -2,7 +2,7 @@
 
 import bintrees
 
-from .order import LeftmostFirst, ColumnOrder, RowOrder
+from .order import ColumnOrder
 
 class Grid:
 
