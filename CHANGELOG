@@ -1,4 +1,10 @@
 
+Release 0.0-j – 2014/04/25
+==========================
+
+Renaming the project githistorian with no dash, so that in can be imported and
+loaded as a Python module. Structural fixes.
+
 Release 0.0-i – 2015/04/24
 =========================
 

@@ -1,7 +1,53 @@
-# Database module for Git-Historian
-# encoding: utf-8
+# Node module for Git-Historian
+# -*- encoding: utf-8 -*-
 
-from node import Node
+class Node:
+
+	def __init__ (self):
+
+		self.name = None
+		self.parent = []
+		self.child = []
+
+		self.message = None
+		self.done = 0
+
+		self.column = -1
+		self.border = -1
+		self.row = -1
+
+		self.top = None    # Previous commit by line
+		self.bottom = None # Next commit by line
+		self.left = None   # Previous commit by column
+		self.right = None  # Next commit by line
+
+	def add_child (self, name):
+		if name not in self.child:
+			self.child.append(name)
+
+	def has_column (self):
+		return self.column >= 0
+
+	def set_column (self, value):
+		self.column = value
+		self.set_border(value)
+
+	def set_border (self, value):
+		self.border = max(self.border, value)
+
+	def get_indent (self):
+		return ' ' * 3 * self.column
+
+	def to_oneline(self):
+		data = (self.column, self.row, self.get_indent(), self.name[:7])
+		return '(%2d, %2d)%s • \x1b[33m%s\x1b[m' % data
+
+	def to_string(self):
+		indent = ' ' * 2 * self.column
+		str = "%s  Name {%s}" % (indent, self.name)
+		for i in self.parent: str += "\n%sParent {%s}" % (indent, i)
+		for i in self.child:  str += "\n%s Child {%s}" % (indent, i)
+		return str
 
 class NodeDB:
 
@@ -79,3 +125,4 @@ class NodeDB:
 			if target.has_column():
 				selection.append(target.column)
 		return min(selection)
+
