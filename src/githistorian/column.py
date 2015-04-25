@@ -162,3 +162,6 @@ class Column:
 
 		return self.width
 
+def unroll (db, heads, debug):
+
+	return Column(db, heads).unroll(debug)

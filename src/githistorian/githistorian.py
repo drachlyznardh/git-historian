@@ -6,7 +6,7 @@ from .hunter import HeadHunter, HistoryHunter
 from .order import LeftmostFirst
 
 from .row import unroll as row_unroll
-from .column import Column
+from .column import unroll as column_unroll
 from .layout import Layout
 
 # Due to excessively restricting size limit, some heads may not appear at
@@ -89,6 +89,7 @@ def tell_the_story():
 	#first= Row(db, heads).unroll(opt.d(8))
 	first = row_unroll(db, heads, opt.d(8))
 	db.clear()
-	width = Column(db, heads).unroll(opt.d(16))
+	#width = Column(db, heads).unroll(opt.d(16))
+	width = column_unroll(db, heads, opt.d(16))
 	_print_graph(opt.d(32), db, first, width)
 
