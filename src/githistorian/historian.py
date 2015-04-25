@@ -145,7 +145,7 @@ def _row_unroll (debug, heads, db):
 		target.row = row
 
 		# Add parents to the visit
-		visit.push(self.db.skip_if_done(target.parent))
+		visit.push(db.skip_if_done(target.parent))
 
 		# The current node is the next previous
 		previous = name
@@ -157,7 +157,7 @@ def _row_unroll (debug, heads, db):
 
 class Historian:
 
-	def __init__ (self, opt):
+	def __init__ (self, opt, db, heads):
 
 		self.verbose = 0
 
@@ -165,6 +165,8 @@ class Historian:
 		self.width = -1
 
 		self.o = opt
+		self.db = db
+		self.heads = heads
 
 	def update_width (self, value):
 		self.width = max(self.width, value)
@@ -175,7 +177,7 @@ class Historian:
 		target = self.db.at(name)
 
 		# Start at the immediate right of previous head
-		previous = self.head[self.head.index(name) - 1]
+		previous = self.heads[self.heads.index(name) - 1]
 		column = self.db.at(previous).column + 1
 		if debug: print '  %s, Starting from column %d' % (name[:7], column)
 
@@ -252,7 +254,7 @@ class Historian:
 
 		# The visit starts for the named heads
 		visit = ColumnOrder()
-		visit.push(self.head)
+		visit.push(self.heads)
 
 		while visit.has_more():
 
@@ -266,7 +268,7 @@ class Historian:
 
 			# If a node is a named head and has not yet a column assigned, it
 			# must look for a valid column on its own
-			if target.name in self.head and not target.has_column():
+			if target.name in self.heads and not target.has_column():
 				self.find_column_for_head (name, debug)
 
 			# The node assigns a column to each of its parents, in order,
@@ -277,7 +279,7 @@ class Historian:
 			visit.push(self.db.skip_if_done(target.parent))
 			target.done = 1
 
-		del self.grid
+		return self.width
 
 def _print_graph (debug, db, first, width):
 
@@ -346,7 +348,7 @@ def tell_the_story():
 	#self.row_unroll(self.o.d(8))
 	db.clear()
 
-	width = Historian(opt, db).column_unroll(opt.d(16))
+	width = Historian(opt, db, heads).column_unroll(opt.d(16))
 	#self.column_unroll(self.o.d(16))
 	_print_graph(opt.d(32), db, first, width)
 	#self.print_graph(self.o.d(32))
