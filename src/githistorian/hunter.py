@@ -55,7 +55,7 @@ class HeadHunter:
 
 		output = check_output(cmdlist)
 
-		exp = re.compile(r'''(.*) HEAD''')
+		exp = re.compile(r'^(.*) HEAD$')
 
 		for line in output.split('\n'):
 
@@ -91,7 +91,7 @@ class HeadHunter:
 			if len(line) == 0: continue
 
 			# Matching name and name
-			name_n_ref = re.compile(r'''(.*) refs\/.*\/(.*)''').match(line)
+			name_n_ref = re.compile(r'^(.*) refs\/.*\/(.*)$').match(line)
 
 			# Broken ref: display message and skip line
 			if not name_n_ref:
