@@ -23,46 +23,6 @@ class Option:
 		version_file = os.path.join(os.path.dirname(__file__), 'VERSION')
 		self.version = open(version_file, 'r').read().strip()
 
-	def parse (self):
-
-		try:
-			optlist, args = getopt.gnu_getopt(sys.argv[1:], 'ahvDd:n:p:x',
-				['help', 'verbose', 'version',
-				'all', 'all-heads',
-				'limit', 'pretty',
-				'debug', 'all-debug',
-				'--exact', '--exact-match', '--prefix', '--prefix-match'])
-		except getopt.GetoptError as err:
-			print str(err)
-			self.print_help()
-			sys.exit(2)
-
-		for key, value in optlist:
-			if key in ('-h', '--help'):
-				self.print_help()
-				sys.exit(0)
-			elif key in ('-v', '--verbose'):
-				self.verbose = 1
-			elif key in ('-a', '--all', '--all-heads'):
-				self.all_heads = 1
-			elif key in ('-D', '--all-debug'):
-				self.all_debug = 1
-			elif key in ('-d', '--debug'):
-				self.debug += int(value)
-			elif key in ('-n', '--limit'):
-				self.size_limit = int(value)
-			elif key in ('-p', '--pretty'):
-				self.pretty = value
-			elif key in ('-x', '--exact', '--exact-match'):
-				self.match = True
-			elif key in ('--prefix', '--prefix-match'):
-				self.match = False
-			elif key == '--version':
-				self.print_version()
-				sys.exit(0)
-
-		self.args = args
-	
 	def d (self, value):
 		return self.all_debug or self.debug / value % 2
 
