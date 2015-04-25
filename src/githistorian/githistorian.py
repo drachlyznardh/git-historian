@@ -86,10 +86,8 @@ def tell_the_story():
 	# Graph unrolling
 	_bind_children(opt.d(4), heads, db)
 	db.clear()
-	#first= Row(db, heads).unroll(opt.d(8))
 	first = row_unroll(db, heads, opt.d(8))
 	db.clear()
-	#width = Column(db, heads).unroll(opt.d(16))
 	width = column_unroll(db, heads, opt.d(16))
 	_print_graph(opt.d(32), db, first, width)
 
