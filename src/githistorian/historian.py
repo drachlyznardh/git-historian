@@ -330,3 +330,20 @@ def tell_the_story():
 
 	opt = parse_cmd_args()
 	if not opt: return
+
+	# Hunting for history
+	heads = HeadHunter(opt, opt.d(1)).hunt()
+	db = HistoryHunter(heads, opt, opt.d(2)).hunt(opt.size_limit)
+
+	# Cleaning database from missing refs
+	db.drop_missing_refs()
+	self.drop_missing_heads()
+
+	# Graph unrolling
+	self.bind_children(self.o.d(4))
+	self.db.clear()
+	self.row_unroll(self.o.d(8))
+	self.db.clear()
+	self.column_unroll(self.o.d(16))
+	self.print_graph(self.o.d(32))
+
