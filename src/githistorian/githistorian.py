@@ -1,6 +1,8 @@
 # Main module for Git-Historian
 # -*- encoding: utf-8 -*-
 
+from __future__ import print_function
+
 from .option import parse_cmd_args
 from .hunter import HeadHunter, HistoryHunter
 from .order import LeftmostFirst
@@ -20,7 +22,7 @@ def _drop_missing_heads (heads, db):
 
 def _bind_children (debug, heads, db):
 
-	if debug: print '-- Binding Children --'
+	if debug: print('-- Binding Children --')
 
 	visit = LeftmostFirst()
 	visit.push(heads)
@@ -30,10 +32,10 @@ def _bind_children (debug, heads, db):
 		name = visit.pop()
 		commit = db.at(name)
 
-		if debug: print '  Visiting %s' % name[:7]
+		if debug: print('  Visiting %s' % name[:7])
 
 		if commit.done:
-			if debug: print '  %s is done, skipping…' % name[:7]
+			if debug: print('  %s is done, skipping…' % name[:7])
 			continue
 
 		for i in commit.parent:
@@ -45,7 +47,7 @@ def _bind_children (debug, heads, db):
 
 def _print_graph (debug, db, first, width):
 
-	if debug: print '-- Print Graph --'
+	if debug: print('-- Print Graph --')
 
 	t = Layout(width + 1, debug)
 
@@ -55,18 +57,16 @@ def _print_graph (debug, db, first, width):
 
 		node = db.at(name)
 		if not node:
-			print "No Commit for name %s" % name[:7]
+			print("No Commit for name %s" % name[:7])
 			break
 
-		if debug: print "\nP %s" % name[:7]
+		if debug: print("\nP %s" % name[:7])
 
 		t.compute_layout(node)
 
-		#try:
-		print '\x1b[m%s\x1b[m %s' % (t.draw_transition(), node.message[0])
+		print('\x1b[m%s\x1b[m %s' % (t.draw_transition(), node.message[0]))
 		for i in node.message[1:]:
-			print '\x1b[m%s\x1b[m %s' % (t.draw_padding(), i)
-		#except IOError as error: return
+			print('\x1b[m%s\x1b[m %s' % (t.draw_padding(), i))
 
 		name = node.bottom
 

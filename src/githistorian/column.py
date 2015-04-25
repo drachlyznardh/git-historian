@@ -1,5 +1,6 @@
 # encoding: utf-8
 
+from __future__ import print_function
 import bintrees
 
 class VisitOrder:
@@ -17,7 +18,7 @@ class VisitOrder:
 			return
 
 		if not isinstance(arg, list):
-			print 'WTF is %s?' % arg
+			print('WTF is %s?' % arg)
 			return
 
 		if len(arg) == 0: return
@@ -81,13 +82,13 @@ class Column:
 
 	def find_column_for_head (self, name, debug):
 
-		if debug: print '%s has to find its own column!!!' % name [:7]
+		if debug: print('%s has to find its own column!!!' % name [:7])
 		target = self.db.at(name)
 
 		# Start at the immediate right of previous head
 		previous = self.heads[self.heads.index(name) - 1]
 		column = self.db.at(previous).column + 1
-		if debug: print '  %s, Starting from column %d' % (name[:7], column)
+		if debug: print('  %s, Starting from column %d' % (name[:7], column))
 
 		while 1:
 			self.grid.add(column, target.row, 'MARKER')
@@ -95,7 +96,7 @@ class Column:
 				self.grid.add(column, target.row, name)
 				target.set_column(column)
 				self.update_width(column)
-				if debug: print 'Test passed! %s on %d' % (target.name[:7], target.column)
+				if debug: print('Test passed! %s on %d' % (target.name[:7], target.column))
 				break
 
 			self.grid.remove(column, target.row)
@@ -135,7 +136,7 @@ class Column:
 			# If a parent has already a column, just push its border
 			if parent.has_column():
 				parent.set_border(target.column)
-				if debug: print 'Pushing border (%s) to (%d)' % (parent.name[:7], parent.border)
+				if debug: print('Pushing border (%s) to (%d)' % (parent.name[:7], parent.border))
 				continue
 
 			column = self.db.select_starting_column(parent.child)
@@ -146,7 +147,7 @@ class Column:
 					self.grid.add(column, parent.row, parent.name)
 					parent.set_column(column)
 					self.update_width(column)
-					if debug: print 'Both tests passed! %s on %d' % (parent.name[:7], column)
+					if debug: print('Both tests passed! %s on %d' % (parent.name[:7], column))
 					break
 
 				self.grid.remove(column, parent.row)
@@ -155,7 +156,7 @@ class Column:
 
 	def unroll (self, debug):
 
-		if debug: print '-- Column Unroll --'
+		if debug: print('-- Column Unroll --')
 
 		self.width = -1
 		self.grid = Grid()
@@ -172,7 +173,7 @@ class Column:
 			# No node is processed more than once
 			if target.done: continue
 
-			if debug: print '  Visiting %s' % name[:7]
+			if debug: print('  Visiting %s' % name[:7])
 
 			# If a node is a named head and has not yet a column assigned, it
 			# must look for a valid column on its own

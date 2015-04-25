@@ -1,5 +1,7 @@
 # encoding: utf-8
 
+from __future__ import print_function
+
 class VisitOrder:
 
 	def __init__ (self):
@@ -15,7 +17,7 @@ class VisitOrder:
 			return
 
 		if not isinstance(arg, list):
-			print 'WTF is %s?' % arg
+			print('WTF is %s?' % arg)
 			return
 
 		if len(arg) == 0: return
@@ -89,7 +91,7 @@ class Row:
 
 	def unroll (self, debug):
 
-		if debug: print '-- Row Unroll --'
+		if debug: print('-- Row Unroll --')
 
 		# Visit starts with all the heads
 		self.order = VisitOrder()
@@ -110,7 +112,7 @@ class Row:
 			target = self.db.at(name)
 
 			if debug:
-				print 'Visiting %s %s' % (name[:7], self.order.show())
+				print('Visiting %s %s' % (name[:7], self.order.show()))
 
 			# Even if done, a node can drop down in the chain after its
 			# last-calling child

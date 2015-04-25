@@ -1,5 +1,7 @@
 # Order module for Git-Historian
 
+from __future__ import print_function
+
 class LeftmostFirst:
 
 	def __init__ (self):
@@ -13,7 +15,7 @@ class LeftmostFirst:
 			return
 
 		if not isinstance(arg, list):
-			print 'WTF is %s?' % arg
+			print('WTF is %s?' % arg)
 			return
 
 		if len(arg) == 0: return

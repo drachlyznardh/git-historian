@@ -1,6 +1,7 @@
 # Headhunter module for Git-Historian
 # -*- encoding: utf-8 -*-
 
+from __future__ import print_function
 from subprocess import check_output, CalledProcessError
 import re
 import sys
@@ -37,17 +38,17 @@ class HeadHunter:
 		self.load_args()
 
 		if self.debug:
-			print '  HeadHunter.Name (%s)' % ', '.join(self.name)
+			print('  HeadHunter.Name (%s)' % ', '.join(self.name))
 
 		self.load_heads()
 
 		if self.debug:
-			print '  HeadHunter.Head(%s)' % ', '.join([e[0][:7] for e in self.head])
+			print('  HeadHunter.Head(%s)' % ', '.join([e[0][:7] for e in self.head]))
 
 		self.order_heads()
 
 		if self.debug:
-			print '  HeadHunter.Head(%s)' % ', '.join([e[:7] for e in self.ohead])
+			print('  HeadHunter.Head(%s)' % ', '.join([e[:7] for e in self.ohead]))
 
 		return self.ohead
 
@@ -72,7 +73,7 @@ class HeadHunter:
 
 		try: output = check_output(cmdlist)
 		except CalledProcessError as error:
-			print 'Command `%s` returned %d' % (' '.join(cmdlist), error.returncode)
+			print('Command `%s` returned %d' % (' '.join(cmdlist), error.returncode))
 			sys.exit(1)
 			return
 
@@ -97,17 +98,17 @@ class HeadHunter:
 		cmdlist = ['git', 'show-ref']
 
 		# Print the command line request
-		if self.debug: print '  Now invoking %s' % cmdlist
+		if self.debug: print('  Now invoking %s' % cmdlist)
 
 		# Invoke Git
 		try: git_output = check_output(cmdlist)
 		except CalledProcessError as error:
-			print 'Command `%s` returned %d' % (' '.join(cmdlist), error.returncode)
+			print('Command `%s` returned %d' % (' '.join(cmdlist), error.returncode))
 			sys.exit(1)
 			return
 
 		# Print the output
-		if self.debug: print git_output
+		if self.debug: print(git_output)
 
 		# Parsing Git response
 		for line in git_output.split('\n'):
@@ -120,7 +121,7 @@ class HeadHunter:
 
 			# Broken ref: display message and skip line
 			if not name_n_ref:
-				print 'No match for (%s)' % line
+				print('No match for (%s)' % line)
 				continue
 
 			# Save result in order and by name
@@ -176,13 +177,13 @@ class HistoryHunter:
 		cmdlist.extend(self.target)
 
 		# Print the request
-		if self.debug: print cmdlist
+		if self.debug: print(cmdlist)
 
 		# Invoking Git
 		git_history_dump = check_output(cmdlist)
 
 		# Print the output
-		if self.debug: print git_history_dump
+		if self.debug: print(git_history_dump)
 
 		# Ref for current node
 		current = None
@@ -215,6 +216,6 @@ class HistoryHunter:
 		nodes.add_node(current)
 
 		# Showing results
-		if self.debug: print nodes
+		if self.debug: print(nodes)
 		return nodes
 
