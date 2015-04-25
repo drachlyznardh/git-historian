@@ -1,6 +1,8 @@
 # Layout module for Git-Historian
 # -*- encoding: utf-8 -*-
 
+from __future__ import print_function
+
 class Column:
 
 	def __init__ (self, color, transition, padding):
@@ -10,7 +12,7 @@ class Column:
 
 class Layout:
 
-	def __init__ (self, size, commit, debug):
+	def __init__ (self, size, debug):
 		
 		self.size = size
 		self.debug = debug
@@ -21,20 +23,11 @@ class Layout:
 
 	def plot_track (self):
 		for track in self.track.values():
-			print track
+			print(track)
 
 	def put_char(self, name, transition, padding):
-		
-		if isinstance(name, basestring):
-			father = self.commit[name]
-			color = 31 + father.column % 6
-		elif isinstance(name, int):
-			color = 31 + name % 6
-		else:
-			print 'WTF is %s' % name
-			color = 39
-
-		self.layout.append(Column(color, transition, padding))
+		column = Column(31 + name % 6, transition, padding)
+		self.layout.append(column)
 
 	def compute_even_column(self, index, target):
 		
@@ -131,7 +124,7 @@ class Layout:
 
 		if self.debug:
 			self.plot_track()
-			print target.child
+			print(target.child)
 
 		if self.size:
 			self.compute_even_column(0, target)
