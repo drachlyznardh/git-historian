@@ -53,11 +53,7 @@ class HeadHunter:
 
 		cmdlist = 'git show-ref --heads --head'.split()
 
-		try: output = check_output(cmdlist)
-		except CalledProcessError as error:
-			print('Command `%s` returned %d' % (' '.join(cmdlist), error.returncode))
-			sys.exit(1)
-			return
+		output = check_output(cmdlist)
 
 		exp = re.compile(r'''(.*) HEAD''')
 
