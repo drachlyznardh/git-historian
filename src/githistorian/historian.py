@@ -42,6 +42,15 @@ class Grid:
 			return value
 		except KeyError: return None
 
+# Due to excessively restricting size limit, some heads may not appear at
+# all in the database. These heads are removed from the list
+def _drop_missing_heads (heads, db):
+	available = []
+	for name in heads:
+		if name in db.store:
+			available.append(name)
+	return available
+
 class Historian:
 
 	def __init__ (self):
@@ -59,16 +68,6 @@ class Historian:
 
 	def update_width (self, value):
 		self.width = max(self.width, value)
-
-	# Due to excessively restricting size limit, some heads may not appear at
-	# all in the database. These heads are removed from the list
-	def drop_missing_heads (self):
-
-		available = []
-		for name in self.head:
-			if name in self.db.store:
-				available.append(name)
-		self.head = available
 
 	def bind_children (self, debug):
 
@@ -337,7 +336,7 @@ def tell_the_story():
 
 	# Cleaning database from missing refs
 	db.drop_missing_refs()
-	self.drop_missing_heads()
+	heads = _drop_missing_heads(heads, db)
 
 	# Graph unrolling
 	self.bind_children(self.o.d(4))
