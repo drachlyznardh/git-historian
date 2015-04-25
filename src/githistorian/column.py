@@ -2,7 +2,34 @@
 
 import bintrees
 
-from .order import ColumnOrder
+class VisitOrder:
+
+	def __init__ (self):
+		self.content = []
+
+	def has_more (self):
+		return len(self.content)
+
+	def push (self, arg):
+
+		if isinstance(arg, basestring):
+			self.content.append(arg)
+			return
+
+		if not isinstance(arg, list):
+			print 'WTF is %s?' % arg
+			return
+
+		if len(arg) == 0: return
+
+		self.content.extend(arg)
+
+	def pop (self):
+		try: return self.content.pop(0)
+		except: return None
+
+	def show (self):
+		return '    [%s]' % ', '.join([e[:7] for e in self.content])
 
 class Grid:
 
@@ -134,7 +161,7 @@ class Column:
 		self.grid = Grid()
 
 		# The visit starts for the named heads
-		visit = ColumnOrder()
+		visit = VisitOrder()
 		visit.push(self.heads)
 
 		while visit.has_more():
