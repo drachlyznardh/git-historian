@@ -39,6 +39,8 @@ def _print_help ():
 	print(' --prefix, --prefix-match   : arguments match refnames by prefix')
 	print(' -x, --exact, --exact-match : arguments must match refnames exactly')
 	print()
+	print(' -f<name>, --file<name> : load preferences from <name> instead of default .githistorian')
+	print()
 	print(' -D, --all-debug : print(all kinds of debug messages')
 	print(' -d N, --debug N : add N to the debug counter')
 	print()
@@ -54,12 +56,13 @@ def _print_version (o):
 
 def parse_cmd_args ():
 
-	sopts = 'ahvDd:n:p:x'
+	sopts = 'ahvDd:n:p:xf:'
 	lopts = ['help', 'verbose', 'version',
 			'all', 'all-heads',
 			'limit', 'pretty',
 			'debug', 'all-debug',
-			'--exact', '--exact-match', '--prefix', '--prefix-match']
+			'--exact', '--exact-match', '--prefix', '--prefix-match',
+			'--file']
 
 	try:
 		optlist, args = getopt.gnu_getopt(sys.argv[1:], sopts, lopts)
@@ -68,6 +71,7 @@ def parse_cmd_args ():
 		raise(err)
 
 	o = Option()
+	filename = '.githistorian'
 
 	for key, value in optlist:
 		if key in ('-h', '--help'):
@@ -92,6 +96,8 @@ def parse_cmd_args ():
 		elif key == '--version':
 			_print_version(o)
 			return False
+		elif key in ('-f', '--file'):
+			filename = value
 
 	o.args = args
 	return o
