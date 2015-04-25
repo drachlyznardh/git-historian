@@ -10,7 +10,7 @@ class Column:
 
 class Layout:
 
-	def __init__ (self, size, commit, debug):
+	def __init__ (self, size, debug):
 		
 		self.size = size
 		self.debug = debug
