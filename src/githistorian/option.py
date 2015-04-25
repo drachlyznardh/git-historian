@@ -56,9 +56,9 @@ def _print_version (o):
 
 def parse_cmd_args ():
 
-	sopts = 'ahvDd:n:p:xf:'
+	sopts = 'athvDd:n:p:xf:'
 	lopts = ['help', 'verbose', 'version',
-			'all', 'heads',
+			'all', 'heads', 'tags',
 			'limit', 'pretty',
 			'debug', 'all-debug',
 			'exact', 'exact-match', 'prefix', 'prefix-match',
@@ -79,8 +79,10 @@ def parse_cmd_args ():
 			return False
 		elif key in ('-v', '--verbose'):
 			o.verbose = 1
-		elif key in ('-a', '--all', '--all-heads'):
-			o.all_heads = 1
+		elif key in ('-a', '--all', '--heads'):
+			o.heads = True
+		elif key in ('-t', '--tags'):
+			o.tags = True
 		elif key in ('-D', '--all-debug'):
 			o.all_debug = 1
 		elif key in ('-d', '--debug'):
