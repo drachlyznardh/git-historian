@@ -12,7 +12,7 @@ Dependencies
 Usage
 -----
 
-githistorian [options] [args]
+<command> [options] [args]
 
 When no arg is given, HEAD is implyed; when one or more args are
 provided, they are displayed in order. If -a is also provided, all other
@@ -23,6 +23,19 @@ branches follow in alphabetical order.
 - -n<N>, --limit=<N>            : queires `git log` for up to N commits
 - -p<format>, --pretty=<format> : format string, passed to `git log`
 - -a, --all, --all-heads        : display all branches in refs/head/*
+
+Invocation
+----------
+
+Since 0.0-j, githistorian is a proper Python module, this it can be invoked as
+
+		python -m githistorian
+
+once it is installed on your system. You can test it before installation by
+
+		PYTHONPATH=src python -m githistorian
+
+or by simply calling make in this directory.
 
 Concept
 -------
