@@ -51,14 +51,36 @@ def _drop_missing_heads (heads, db):
 			available.append(name)
 	return available
 
+def _bind_children (debug, heads, db):
+
+	if debug: print '-- Binding Children --'
+
+	visit = LeftmostFirst()
+	visit.push(heads)
+
+	while visit.has_more():
+
+		name = visit.pop()
+		commit = db.at(name)
+
+		if debug: print '  Visiting %s' % name[:7]
+
+		if commit.done:
+			if debug: print '  %s is done, skipping…' % name[:7]
+			continue
+
+		for i in commit.parent:
+			db.at(i).add_child(name)
+
+		visit.push(db.skip_if_done(commit.parent))
+
+		commit.done = 1
+
 class Historian:
 
 	def __init__ (self, opt):
 
 		self.verbose = 0
-
-		self.head = []
-		self.db = None
 
 		self.first = None
 		self.width = -1
@@ -67,31 +89,6 @@ class Historian:
 
 	def update_width (self, value):
 		self.width = max(self.width, value)
-
-	def bind_children (self, debug):
-
-		if debug: print '-- Binding Children --'
-
-		visit = LeftmostFirst()
-		visit.push(self.head)
-
-		while visit.has_more():
-
-			name = visit.pop()
-			commit = self.db.at(name)
-
-			if debug: print '  Visiting %s' % name[:7]
-
-			if commit.done:
-				if debug: print '  %s is done, skipping…' % name[:7]
-				continue
-
-			for i in commit.parent:
-				self.db.at(i).add_child(name)
-
-			visit.push(self.db.skip_if_done(commit.parent))
-
-			commit.done = 1
 
 	def row_unroll (self, debug):
 
@@ -340,10 +337,10 @@ def tell_the_story():
 	h = Historian(opt)
 
 	# Graph unrolling
-	self.bind_children(self.o.d(4))
-	self.db.clear()
+	_bind_children(opt.d(4), heads, db)
+	db.clear()
 	self.row_unroll(self.o.d(8))
-	self.db.clear()
+	db.clear()
 	self.column_unroll(self.o.d(16))
 	self.print_graph(self.o.d(32))
 
