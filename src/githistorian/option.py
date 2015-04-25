@@ -23,9 +23,6 @@ class Option:
 		version_file = os.path.join(os.path.dirname(__file__), 'VERSION')
 		self.version = open(version_file, 'r').read().strip()
 
-	def print_version(self):
-		print "Git-Historian %s (C) 2014 Ivan Simonini" % self.version
-
 	def parse (self):
 
 		try:
@@ -90,7 +87,10 @@ def _print_help ():
 	print 'debug 16 : show column assignments'
 	print 'debug 32 : show layout construction'
 
-def parse_cmd_args():
+def _print_version (o):
+	print "Git-Historian %s (C) 2014 Ivan Simonini" % o.version
+
+def parse_cmd_args ():
 
 	sopts = 'ahvDd:n:p:x'
 	lopts = ['help', 'verbose', 'version',
@@ -109,8 +109,8 @@ def parse_cmd_args():
 
 	for key, value in optlist:
 		if key in ('-h', '--help'):
-			o.print_help()
-			sys.exit(0)
+			_print_help()
+			return False
 		elif key in ('-v', '--verbose'):
 			o.verbose = 1
 		elif key in ('-a', '--all', '--all-heads'):
@@ -128,8 +128,9 @@ def parse_cmd_args():
 		elif key in ('--prefix', '--prefix-match'):
 			o.match = False
 		elif key == '--version':
-			o.print_version()
-			sys.exit(0)
+			_print_version(o)
+			return False
 
 	o.args = args
+	return o
 

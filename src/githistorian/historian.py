@@ -329,3 +329,4 @@ class Historian:
 def tell_the_story():
 
 	opt = parse_cmd_args()
+	if not opt: return
