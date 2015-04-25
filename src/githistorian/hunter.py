@@ -38,7 +38,8 @@ class HeadHunter:
 		if self.debug:
 			print('  HeadHunter.Order (%s)' % ', '.join(self.order))
 
-		self.load_heads()
+		if len(self.order) == 0 and not self.all_heads: self.load_HEAD()
+		else: self.load_heads()
 
 		if self.debug:
 			print('  HeadHunter.Head(%s)' % ', '.join([e[0][:7] for e in self.head]))
@@ -69,10 +70,6 @@ class HeadHunter:
 			return
 
 	def load_heads (self):
-
-		if len(self.order) == 0 and not self.all_heads:
-			self.load_HEAD()
-			return
 
 		# Looking for heads, i.e. active branches
 		cmdlist = ['git', 'show-ref']
