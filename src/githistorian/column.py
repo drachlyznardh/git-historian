@@ -160,13 +160,13 @@ class Column:
 		self.width = -1
 		self.grid = Grid()
 
-		# The visit starts for the named heads
-		visit = VisitOrder()
-		visit.push(self.heads)
+		# The order starts for the named heads
+		order = VisitOrder()
+		order.push(self.heads)
 
-		while visit.has_more():
+		while order.has_more():
 
-			name = visit.pop()
+			name = order.pop()
 			target = self.db.at(name)
 			
 			# No node is processed more than once
@@ -183,12 +183,11 @@ class Column:
 			# ensuring each starts off on a valid position
 			self.find_column_for_parents (name, debug)
 
-			# Parents are added to the visit, then the node is done
-			visit.push(self.db.skip_if_done(target.parent))
+			# Parents are added to the order, then the node is done
+			order.push(self.db.skip_if_done(target.parent))
 			target.done = 1
 
 		return self.width
 
 def unroll (db, heads, debug):
-
 	return Column(db, heads).unroll(debug)

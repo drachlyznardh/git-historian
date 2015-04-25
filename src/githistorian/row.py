@@ -78,8 +78,8 @@ class Row:
 		self.row += 1
 		target.row = self.row
 
-		# Add parents to the visit
-		self.visit.push(self.db.skip_if_done(target.parent))
+		# Add parents to the order
+		self.order.push(self.db.skip_if_done(target.parent))
 
 		# The current node is the next previous
 		self.previous = name
@@ -92,8 +92,8 @@ class Row:
 		if debug: print '-- Row Unroll --'
 
 		# Visit starts with all the heads
-		self.visit = VisitOrder()
-		self.visit.push(self.heads)
+		self.order = VisitOrder()
+		self.order.push(self.heads)
 
 		# Reference to previous node, to build the chain
 		self.previous = None
@@ -104,13 +104,13 @@ class Row:
 		# The first node
 		self.first = None
 
-		while self.visit.has_more():
+		while self.order.has_more():
 
-			name = self.visit.pop()
+			name = self.order.pop()
 			target = self.db.at(name)
 
 			if debug:
-				print 'Visiting %s %s' % (name[:7], self.visit.show())
+				print 'Visiting %s %s' % (name[:7], self.order.show())
 
 			# Even if done, a node can drop down in the chain after its
 			# last-calling child
@@ -120,5 +120,5 @@ class Row:
 		return self.first
 
 def unroll (db, heads, debug):
-
 	return Row(db, heads).unroll(debug)
+
