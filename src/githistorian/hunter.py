@@ -20,6 +20,20 @@ def _get_all_heads (heads):
 	f = seen.add
 	return [e[0] for e in heads if not (e[0] in seen or f(e[0]))]
 
+def _get_selected_heads (f, heads, order):
+
+	seen = set()
+	g = seen.add
+	result = []
+
+	for name in order:
+		for e in heads:
+			if f(name, e[1]):
+				heads.remove(e)
+				result.append(e[0])
+
+	return [e for e in result if not (e in seen or g(e))]
+
 class HeadHunter:
 
 	def __init__ (self, o, debug):
