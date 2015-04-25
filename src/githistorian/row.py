@@ -14,32 +14,32 @@ class Row:
 		if debug: print '-- Row Unroll --'
 
 		# Visit starts with all the heads
-		visit = RowOrder()
-		visit.push(self.heads)
+		self.visit = RowOrder()
+		self.visit.push(self.heads)
 
 		# Reference to previous node, to build the chain
-		previous = None
+		self.previous = None
 
 		# Starting over the first row
-		row = -1
+		self.row = -1
 
 		# The first node
-		first = None
+		self.first = None
 
-		while visit.has_more():
+		while self.visit.has_more():
 
-			name = visit.pop()
+			name = self.visit.pop()
 			target = self.db.at(name)
 
 			if debug:
-				print 'Visiting %s %s' % (name[:7], visit.show())
+				print 'Visiting %s %s' % (name[:7], self.visit.show())
 
 			# Even if done, a node can drop down in the chain after its
 			# last-calling child
 			if target.done:
 
 				# No need to drop down beyond the last element
-				if previous == target.name: continue
+				if self.previous == target.name: continue
 
 				# Binding top and bottom nodes together
 				if target.top:
@@ -47,7 +47,7 @@ class Row:
 				self.db.at(target.bottom).top = target.top
 
 				# Binding previous and current nodes together
-				target.top = previous
+				target.top = self.previous
 				self.db.at(previous).bottom = name
 
 				# Bumping the row number another time
@@ -58,7 +58,7 @@ class Row:
 				target.bottom = None
 
 				# Recording current node as the next previous
-				previous = name
+				self.previous = name
 				continue
 
 			# No node can appear before any of its children
@@ -66,25 +66,25 @@ class Row:
 			if len(children): continue
 
 			# Bind this node with the previous, if any, or…
-			if previous:
-				target.top = previous
-				self.db.at(previous).bottom = name
+			if self.previous:
+				target.top = self.previous
+				self.db.at(self.previous).bottom = name
 
 			# … record this node as the first in the chain
-			else: first = name
+			else: self.first = name
 
 			# Bumping the row number
-			row += 1
-			target.row = row
+			self.row += 1
+			target.row = self.row
 
 			# Add parents to the visit
-			visit.push(self.db.skip_if_done(target.parent))
+			self.visit.push(self.db.skip_if_done(target.parent))
 
 			# The current node is the next previous
-			previous = name
+			self.previous = name
 
 			# The current node is done
 			target.done = 1
 
-		return first
+		return self.first
 
