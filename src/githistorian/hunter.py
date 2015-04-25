@@ -2,7 +2,7 @@
 # -*- encoding: utf-8 -*-
 
 from __future__ import print_function
-from subprocess import check_output, CalledProcessError
+from subprocess import check_output
 import re
 import sys
 import json
@@ -101,11 +101,7 @@ class HeadHunter:
 		if self.debug: print('  Now invoking %s' % cmdlist)
 
 		# Invoke Git
-		try: git_output = check_output(cmdlist)
-		except CalledProcessError as error:
-			print('Command `%s` returned %d' % (' '.join(cmdlist), error.returncode))
-			sys.exit(1)
-			return
+		git_output = check_output(cmdlist)
 
 		# Print the output
 		if self.debug: print(git_output)
