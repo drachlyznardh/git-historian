@@ -102,9 +102,8 @@ def parse_cmd_args():
 	try:
 		optlist, args = getopt.gnu_getopt(sys.argv[1:], sopts, lopts)
 	except getopt.GetoptError as err:
-		print str(err)
-		self.print_help()
-		sys.exit(2)
+		_print_help()
+		raise(err)
 
 	o = Option()
 
