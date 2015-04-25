@@ -101,8 +101,8 @@ def parse_cmd_args ():
 
 	if os.path.exists(filename):
 		o.order = eval(open(filename, 'r').read())
-	else: o.order = []
+		o.order.extend(args)
+	else: o.order = args
 
-	o.args = args
 	return o
 
