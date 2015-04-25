@@ -32,7 +32,7 @@ def _print_help ():
 
 	print('Usage: %s [options] heads…' % sys.argv[0])
 	print()
-	print(' -a, --all, --all-heads : consider all refnames')
+	print(' -a, --all, --heads : consider all refnames')
 	print(' -n, --limit : size limit')
 	print(' -p, --pretty : format options')
 	print()
@@ -58,11 +58,11 @@ def parse_cmd_args ():
 
 	sopts = 'ahvDd:n:p:xf:'
 	lopts = ['help', 'verbose', 'version',
-			'all', 'all-heads',
+			'all', 'heads',
 			'limit', 'pretty',
 			'debug', 'all-debug',
-			'--exact', '--exact-match', '--prefix', '--prefix-match',
-			'--file']
+			'exact', 'exact-match', 'prefix', 'prefix-match',
+			'file']
 
 	try:
 		optlist, args = getopt.gnu_getopt(sys.argv[1:], sopts, lopts)
