@@ -91,13 +91,15 @@ class Option:
 
 def parse_cmd_args():
 
-	try:
-		optlist, args = getopt.gnu_getopt(sys.argv[1:], 'ahvDd:n:p:x',
-			['help', 'verbose', 'version',
+	sopts = 'ahvDd:n:p:x'
+	lopts = ['help', 'verbose', 'version',
 			'all', 'all-heads',
 			'limit', 'pretty',
 			'debug', 'all-debug',
-			'--exact', '--exact-match', '--prefix', '--prefix-match'])
+			'--exact', '--exact-match', '--prefix', '--prefix-match']
+
+	try:
+		optlist, args = getopt.gnu_getopt(sys.argv[1:], sopts, lopts)
 	except getopt.GetoptError as err:
 		print str(err)
 		self.print_help()
