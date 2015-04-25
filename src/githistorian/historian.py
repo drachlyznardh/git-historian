@@ -157,14 +157,13 @@ def _row_unroll (debug, heads, db):
 
 class Historian:
 
-	def __init__ (self, opt, db, heads):
+	def __init__ (self, db, heads):
 
 		self.verbose = 0
 
 		self.first = None
 		self.width = -1
 
-		self.o = opt
 		self.db = db
 		self.heads = heads
 
@@ -346,6 +345,6 @@ def tell_the_story():
 	db.clear()
 	first = _row_unroll(opt.d(8), heads, db)
 	db.clear()
-	width = Historian(opt, db, heads).column_unroll(opt.d(16))
+	width = Historian(db, heads).column_unroll(opt.d(16))
 	_print_graph(opt.d(32), db, first, width)
 
