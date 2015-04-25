@@ -24,14 +24,8 @@ class Layout:
 			print track
 
 	def put_char(self, name, transition, padding):
-		
-		if isinstance(name, int):
-			color = 31 + name % 6
-		else:
-			print 'WTF is %s' % name
-			color = 39
-
-		self.layout.append(Column(color, transition, padding))
+		column = Column(31 + name % 6, transition, padding)
+		self.layout.append(column)
 
 	def compute_even_column(self, index, target):
 		
