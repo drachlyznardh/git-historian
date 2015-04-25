@@ -15,6 +15,11 @@ def _exact_match (one, two):
 def _prefix_match (one, two):
 	return one in two
 
+def _get_all_heads (heads):
+	seen = set()
+	f = seen.add
+	return [e[0] for e in heads if not (e[0] in seen or f(e[0]))]
+
 class HeadHunter:
 
 	def __init__ (self, o, debug):
