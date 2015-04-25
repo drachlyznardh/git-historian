@@ -23,22 +23,19 @@ class HeadHunter:
 		self.ohead = []
 		self.debug = debug
 
-		self.name = []
+		self.order = o.order
+
 		self.cname = []
 
 		self.all_heads = o.all_heads
-		self.args = o.args
 
 		if o.match: self.match = _exact_match
 		else: self.match = _prefix_match
 
 	def hunt (self):
 
-		self.load_configfile('.git-historian')
-		self.load_args()
-
 		if self.debug:
-			print('  HeadHunter.Name (%s)' % ', '.join(self.name))
+			print('  HeadHunter.Order (%s)' % ', '.join(self.order))
 
 		self.load_heads()
 
@@ -51,21 +48,6 @@ class HeadHunter:
 			print('  HeadHunter.Head(%s)' % ', '.join([e[:7] for e in self.ohead]))
 
 		return self.ohead
-
-	def load_configfile (self, target_file):
-
-		try: f = open(target_file, 'r')
-		except IOError as e: return
-
-		self.cname = json.load(f)
-
-	def load_args (self):
-
-		if len(self.args) == 0:
-			self.name.extend(self.cname)
-			return
-
-		self.name.extend(self.args)
 
 	def load_HEAD (self):
 
@@ -90,7 +72,7 @@ class HeadHunter:
 
 	def load_heads (self):
 
-		if len(self.name) == 0 and not self.all_heads:
+		if len(self.order) == 0 and not self.all_heads:
 			self.load_HEAD()
 			return
 
@@ -135,7 +117,7 @@ class HeadHunter:
 
 		seen = set()
 
-		for name in self.name:
+		for name in self.order:
 			for e in self.head:
 				if self.match(name, e[1]):
 					self.head.remove(e)
