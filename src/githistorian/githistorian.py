@@ -70,26 +70,6 @@ def _print_graph (debug, db, first, width):
 
 		name = node.bottom
 
-	def tell_the_story(self):
-
-		# Hunting for history
-		self.head = HeadHunter(self.o, self.o.d(1)).hunt()
-		self.db = HistoryHunter(self.head, self.o, self.o.d(2)).hunt(self.o.size_limit)
-
-		# Cleaning database from missing refs
-		self.db.drop_missing_refs()
-		self.drop_missing_heads()
-
-		# Graph unrolling
-		self.bind_children(self.o.d(4))
-		self.db.clear()
-		self.row_unroll(self.o.d(8))
-		self.db.clear()
-		self.column_unroll(self.o.d(16))
-		self.print_graph(self.o.d(32))
-
-		return
-
 def tell_the_story():
 
 	opt = parse_cmd_args()
@@ -106,7 +86,6 @@ def tell_the_story():
 	# Graph unrolling
 	_bind_children(opt.d(4), heads, db)
 	db.clear()
-	#first = _row_unroll(opt.d(8), heads, db)
 	first= Row(db, heads).unroll(opt.d(8))
 	db.clear()
 	width = Column(db, heads).unroll(opt.d(16))
