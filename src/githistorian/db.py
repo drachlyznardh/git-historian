@@ -1,7 +1,7 @@
 # Database module for Git-Historian
 # encoding: utf-8
 
-from node import Node
+from .node import Node
 
 class NodeDB:
 

@@ -3,11 +3,11 @@
 
 import bintrees
 
-import option
-import hunter
-import order
+from .option import Option
+from .hunter import HeadHunter, HistoryHunter
+from .order import LeftmostFirst, ColumnOrder, RowOrder
 
-import layout
+from .layout import Layout
 
 class Grid:
 
@@ -54,7 +54,7 @@ class Historian:
 		self.first = None
 		self.width = -1
 
-		self.o = option.Option()
+		self.o = Option()
 		self.o.parse()
 
 	def update_width (self, value):
@@ -74,7 +74,7 @@ class Historian:
 
 		if debug: print '-- Binding Children --'
 
-		visit = order.LeftmostFirst()
+		visit = LeftmostFirst()
 		visit.push(self.head)
 
 		while visit.has_more():
@@ -100,7 +100,7 @@ class Historian:
 		if debug: print '-- Row Unroll --'
 
 		# Visit starts with all the heads
-		visit = order.RowOrder()
+		visit = RowOrder()
 		visit.push(self.head)
 
 		# Reference to previous node, to build the chain
@@ -251,7 +251,7 @@ class Historian:
 		self.grid = Grid()
 
 		# The visit starts for the named heads
-		visit = order.ColumnOrder()
+		visit = ColumnOrder()
 		visit.push(self.head)
 
 		while visit.has_more():
@@ -283,7 +283,7 @@ class Historian:
 		
 		if debug: print '-- Print Graph --'
 
-		t = layout.Layout(self.width + 1, self.db, debug)
+		t = Layout(self.width + 1, self.db, debug)
 
 		name = self.first
 
@@ -309,8 +309,8 @@ class Historian:
 	def tell_the_story(self):
 
 		# Hunting for history
-		self.head = hunter.HeadHunter(self.o, self.o.d(1)).hunt()
-		self.db = hunter.HistoryHunter(self.head, self.o, self.o.d(2)).hunt(self.o.size_limit)
+		self.head = HeadHunter(self.o, self.o.d(1)).hunt()
+		self.db = HistoryHunter(self.head, self.o, self.o.d(2)).hunt(self.o.size_limit)
 
 		# Cleaning database from missing refs
 		self.db.drop_missing_refs()
