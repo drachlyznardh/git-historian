@@ -99,6 +99,10 @@ def parse_cmd_args ():
 		elif key in ('-f', '--file'):
 			filename = value
 
+	if os.path.exists(filename):
+		o.order = eval(open(filename, 'r').read())
+	else: o.order = []
+
 	o.args = args
 	return o
 
