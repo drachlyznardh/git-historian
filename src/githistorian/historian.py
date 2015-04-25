@@ -53,7 +53,7 @@ def _drop_missing_heads (heads, db):
 
 class Historian:
 
-	def __init__ (self):
+	def __init__ (self, opt):
 
 		self.verbose = 0
 
@@ -63,8 +63,7 @@ class Historian:
 		self.first = None
 		self.width = -1
 
-		self.o = Option()
-		self.o.parse()
+		self.o = opt
 
 	def update_width (self, value):
 		self.width = max(self.width, value)
@@ -337,6 +336,8 @@ def tell_the_story():
 	# Cleaning database from missing refs
 	db.drop_missing_refs()
 	heads = _drop_missing_heads(heads, db)
+
+	h = Historian(opt)
 
 	# Graph unrolling
 	self.bind_children(self.o.d(4))
