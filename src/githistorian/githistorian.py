@@ -62,11 +62,11 @@ def _print_graph (debug, db, first, width):
 
 		t.compute_layout(node)
 
-		try:
-			print '\x1b[m%s\x1b[m %s' % (t.draw_transition(), node.message[0])
-			for i in node.message[1:]:
-				print '\x1b[m%s\x1b[m %s' % (t.draw_padding(), i)
-		except IOError as error: return
+		#try:
+		print '\x1b[m%s\x1b[m %s' % (t.draw_transition(), node.message[0])
+		for i in node.message[1:]:
+			print '\x1b[m%s\x1b[m %s' % (t.draw_padding(), i)
+		#except IOError as error: return
 
 		name = node.bottom
 
