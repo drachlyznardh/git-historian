@@ -63,7 +63,8 @@ class HeadHunter:
 		if self.debug:
 			print('  HeadHunter.Head(%s)' % ', '.join([e[0][:7] for e in self.head]))
 
-		self.order_heads()
+		if self.all_heads: self.ohead = _get_all_heads(self.head)
+		elif len(self.order): self.ohead = _get_selected_heads(self.match, self.head, self.order)
 
 		if self.debug:
 			print('  HeadHunter.Head(%s)' % ', '.join([e[:7] for e in self.ohead]))
