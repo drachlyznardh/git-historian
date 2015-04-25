@@ -1,14 +1,12 @@
 # Headhunter module for Git-Historian
 # -*- encoding: utf-8 -*-
 
-from subprocess import check_output
-from subprocess import CalledProcessError
+from subprocess import check_output, CalledProcessError
 import re
 import sys
 import json
 
-from .node import Node
-from .db import NodeDB
+from .node import Node, NodeDB
 
 def _exact_match (one, two):
 	return one == two
