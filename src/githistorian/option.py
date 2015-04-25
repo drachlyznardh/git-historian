@@ -1,6 +1,8 @@
 # Option module for Git-Historian
 # encoding: utf-8
 
+from __future__ import print_function
+
 import sys
 import os
 import getopt
@@ -28,27 +30,27 @@ class Option:
 
 def _print_help ():
 
-	print "Usage: %s [options] heads…" % sys.argv[0]
-	print
-	print ' -a, --all, --all-heads : consider all refnames'
-	print ' -n, --limit : size limit'
-	print ' -p, --pretty : format options'
-	print
-	print ' --prefix, --prefix-match   : arguments match refnames by prefix'
-	print ' -x, --exact, --exact-match : arguments must match refnames exactly'
-	print
-	print ' -D, --all-debug : print all kinds of debug messages'
-	print ' -d N, --debug N : add N to the debug counter'
-	print
-	print 'debug  1 : show heads'
-	print 'debug  2 : show data loading'
-	print 'debug  4 : show bindings'
-	print 'debug  8 : show vertical unroll'
-	print 'debug 16 : show column assignments'
-	print 'debug 32 : show layout construction'
+	print('Usage: %s [options] heads…' % sys.argv[0])
+	print()
+	print(' -a, --all, --all-heads : consider all refnames')
+	print(' -n, --limit : size limit')
+	print(' -p, --pretty : format options')
+	print()
+	print(' --prefix, --prefix-match   : arguments match refnames by prefix')
+	print(' -x, --exact, --exact-match : arguments must match refnames exactly')
+	print()
+	print(' -D, --all-debug : print(all kinds of debug messages')
+	print(' -d N, --debug N : add N to the debug counter')
+	print()
+	print('debug  1 : show heads')
+	print('debug  2 : show data loading')
+	print('debug  4 : show bindings')
+	print('debug  8 : show vertical unroll')
+	print('debug 16 : show column assignments')
+	print('debug 32 : show layout construction')
 
 def _print_version (o):
-	print "Git-Historian %s © 2014-2015 Ivan Simonini" % o.version
+	print("Git-Historian %s © 2014-2015 Ivan Simonini" % o.version)
 
 def parse_cmd_args ():
 
