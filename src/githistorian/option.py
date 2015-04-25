@@ -1,5 +1,5 @@
 # Option module for Git-Historian
-# -*- encoding: utf-8 -*-
+# encoding: utf-8
 
 import sys
 import os
@@ -88,7 +88,7 @@ def _print_help ():
 	print 'debug 32 : show layout construction'
 
 def _print_version (o):
-	print "Git-Historian %s (C) 2014 Ivan Simonini" % o.version
+	print "Git-Historian %s © 2014-2015 Ivan Simonini" % o.version
 
 def parse_cmd_args ():
 
