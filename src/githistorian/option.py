@@ -17,6 +17,7 @@ class Option:
 
 		self.heads = False
 		self.tags = False
+		self.remotes = False
 		self.order = []
 
 		self.pretty = None
@@ -57,9 +58,9 @@ def _print_version (o):
 
 def parse_cmd_args ():
 
-	sopts = 'athvDd:n:p:xf:'
+	sopts = 'atrhvDd:n:p:xf:'
 	lopts = ['help', 'verbose', 'version',
-			'all', 'heads', 'tags',
+			'all', 'heads', 'tags', 'remotes',
 			'limit', 'pretty',
 			'debug', 'all-debug',
 			'exact', 'exact-match', 'prefix', 'prefix-match',
@@ -84,6 +85,8 @@ def parse_cmd_args ():
 			o.heads = True
 		elif key in ('-t', '--tags'):
 			o.tags = True
+		elif key in ('-r', '--remotes'):
+			o.remotes = True
 		elif key in ('-D', '--all-debug'):
 			o.all_debug = 1
 		elif key in ('-d', '--debug'):

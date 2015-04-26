@@ -71,7 +71,8 @@ def _load_heads (opt, debug):
 	collected = []
 
 	# Looking for heads, i.e. active branches
-	cmdlist = ['git', 'show-ref', '--heads']
+	cmdlist = ['git', 'show-ref']
+	if not opt.remotes: cmdlist.append('--heads')
 	if opt.tags: cmdlist.append('--tags')
 
 	# Print the command line request
