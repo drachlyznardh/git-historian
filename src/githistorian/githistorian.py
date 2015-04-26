@@ -80,7 +80,7 @@ def tell_the_story():
 	if not opt: return
 
 	# Hunting for history
-	targets = head_hunt(opt, opt.d(1))
+	targets = head_hunt(opt)
 	roots, history = history_hunt(opt, targets, opt.limit)
 
 	if opt.verbose:
