@@ -27,6 +27,13 @@ target is assigned its own column, in the specified order
 - -r, --remotes                 : appends all remote branches to the target list
 - -f<name>, --file<name>        : loads preferences from <name>
 
+Preferences
+-----------
+
+All the options but -f,--file can be stored in the preference file
+.githistorian, on one or more lines. Options and targets will not take
+precedence on those specified by command line.
+
 Invocation
 ----------
 
