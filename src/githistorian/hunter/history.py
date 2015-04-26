@@ -14,15 +14,11 @@ def _select_pretty (value):
 
 def _get_history_dump (opt, debug, heads, limit):
 
-	pretty = _select_pretty(opt.pretty)
-
 	# Looking for commit's and parents' names…
-	cmdlist = ['git', 'log', '--pretty="%H %P"']
-	cmdlist = ['git', 'log', pretty]
+	cmdlist = ['git', 'log', _select_pretty(opt.pretty)]
 
 	# Optional limit to the size of the history
-	if limit:
-		cmdlist.append('-n%d' % limit)
+	if limit: cmdlist.append('-n%d' % limit)
 
 	# … starting from know heads only
 	cmdlist.extend(heads)
@@ -31,8 +27,7 @@ def _get_history_dump (opt, debug, heads, limit):
 	if debug: print(cmdlist)
 
 	# Invoking Git
-	git_history_dump = check_output(cmdlist)
-	return git_history_dump
+	return check_output(cmdlist)
 
 def hunt (opt, debug, heads, limit):
 
