@@ -3,8 +3,10 @@
 
 from __future__ import print_function
 
+from .hunter.head import hunt as head_hunt
+from .hunter.history import hunt as history_hunt
+
 from .option import parse_cmd_args
-from .hunter import HeadHunter, HistoryHunter
 from .order import LeftmostFirst
 
 from .row import unroll as row_unroll
@@ -64,9 +66,11 @@ def _print_graph (debug, db, first, width):
 
 		t.compute_layout(node)
 
-		print('\x1b[m%s\x1b[m %s' % (t.draw_transition(), node.message[0]))
-		for i in node.message[1:]:
-			print('\x1b[m%s\x1b[m %s' % (t.draw_padding(), i))
+		try:
+			print('\x1b[m%s\x1b[m %s' % (t.draw_transition(), node.message[0]))
+			for i in node.message[1:]:
+				print('\x1b[m%s\x1b[m %s' % (t.draw_padding(), i))
+		except: pass
 
 		name = node.bottom
 
@@ -76,18 +80,18 @@ def tell_the_story():
 	if not opt: return
 
 	# Hunting for history
-	heads = HeadHunter(opt, opt.d(1)).hunt()
-	db = HistoryHunter(heads, opt, opt.d(2)).hunt(opt.size_limit)
+	heads = head_hunt(opt, opt.d(1))
+	history = history_hunt(opt, heads, opt.limit)
 
 	# Cleaning database from missing refs
-	db.drop_missing_refs()
-	heads = _drop_missing_heads(heads, db)
+	history.drop_missing_refs()
+	heads = _drop_missing_heads(heads, history)
 
 	# Graph unrolling
-	_bind_children(opt.d(4), heads, db)
-	db.clear()
-	first = row_unroll(db, heads, opt.d(8))
-	db.clear()
-	width = column_unroll(db, heads, opt.d(16))
-	_print_graph(opt.d(32), db, first, width)
+	_bind_children(opt.d(4), heads, history)
+	history.clear()
+	first = row_unroll(history, heads, opt.d(8))
+	history.clear()
+	width = column_unroll(history, heads, opt.d(16))
+	_print_graph(opt.d(32), history, first, width)
 

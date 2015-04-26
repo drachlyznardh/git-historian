@@ -15,11 +15,13 @@ class Option:
 		self.debug = 0
 		self.all_debug = 0
 
-		self.all_heads = 0
-		self.head = []
+		self.heads = False
+		self.tags = False
+		self.remotes = False
+		self.order = []
 
-		self.pretty = None
-		self.size_limit = False
+		self.pretty = False
+		self.limit = False
 		self.match = False
 
 		version_file = os.path.join(os.path.dirname(__file__), 'VERSION')
@@ -30,14 +32,19 @@ class Option:
 
 def _print_help ():
 
-	print('Usage: %s [options] heads…' % sys.argv[0])
+	print('Usage: %s [options] targets…' % sys.argv[0])
 	print()
-	print(' -a, --all, --all-heads : consider all refnames')
-	print(' -n, --limit : size limit')
-	print(' -p, --pretty : format options')
+	print(' -a, --all, --heads : adds all heads to targets')
+	print(' -t, --tags         : adds all tags to targets')
+	print(' -r, --remotes      : adds all remote branches to targets')
+	print()
+	print(' -n<N>, --limit<N>  : cuts history to N commits')
+	print(' -p<P>, --pretty<P> : uses P as the pretty format for messages')
 	print()
 	print(' --prefix, --prefix-match   : arguments match refnames by prefix')
 	print(' -x, --exact, --exact-match : arguments must match refnames exactly')
+	print()
+	print(' -f<name>, --file<name> : load preferences from <name> instead of default .githistorian')
 	print()
 	print(' -D, --all-debug : print(all kinds of debug messages')
 	print(' -d N, --debug N : add N to the debug counter')
@@ -54,12 +61,13 @@ def _print_version (o):
 
 def parse_cmd_args ():
 
-	sopts = 'ahvDd:n:p:x'
+	sopts = 'atrhvDd:n:p:xf:'
 	lopts = ['help', 'verbose', 'version',
-			'all', 'all-heads',
+			'all', 'heads', 'tags', 'remotes',
 			'limit', 'pretty',
 			'debug', 'all-debug',
-			'--exact', '--exact-match', '--prefix', '--prefix-match']
+			'exact', 'exact-match', 'prefix', 'prefix-match',
+			'file']
 
 	try:
 		optlist, args = getopt.gnu_getopt(sys.argv[1:], sopts, lopts)
@@ -68,6 +76,7 @@ def parse_cmd_args ():
 		raise(err)
 
 	o = Option()
+	filename = '.githistorian'
 
 	for key, value in optlist:
 		if key in ('-h', '--help'):
@@ -75,14 +84,18 @@ def parse_cmd_args ():
 			return False
 		elif key in ('-v', '--verbose'):
 			o.verbose = 1
-		elif key in ('-a', '--all', '--all-heads'):
-			o.all_heads = 1
+		elif key in ('-a', '--all', '--heads'):
+			o.heads = True
+		elif key in ('-t', '--tags'):
+			o.tags = True
+		elif key in ('-r', '--remotes'):
+			o.remotes = True
 		elif key in ('-D', '--all-debug'):
 			o.all_debug = 1
 		elif key in ('-d', '--debug'):
 			o.debug += int(value)
 		elif key in ('-n', '--limit'):
-			o.size_limit = int(value)
+			o.limit = int(value)
 		elif key in ('-p', '--pretty'):
 			o.pretty = value
 		elif key in ('-x', '--exact', '--exact-match'):
@@ -92,7 +105,20 @@ def parse_cmd_args ():
 		elif key == '--version':
 			_print_version(o)
 			return False
+		elif key in ('-f', '--file'):
+			filename = value
 
-	o.args = args
+	if os.path.exists(filename):
+		d = eval(open(filename, 'r').read())
+	else: d = {}
+
+	if 'order' in d:
+		o.order = d['order']
+		o.order.extend(args)
+	else: o.order = args
+
+	if 'pretty' in d and not o.pretty:
+		o.pretty =  d['pretty']
+
 	return o
 
