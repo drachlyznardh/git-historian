@@ -107,6 +107,12 @@ At the end of its row, each commit is resented with its equivalent `git show -s
 --pretty='<format>' ` output. You can specify the format string with options `-p,
 --pretty`, otherwise my own default will be used instead.
 
+Due to the cut at N commits, some merge commits may loose some children. To
+prevent the drawing from missing these relation, cut commits are replaced with
+placeholders. These fake nodes do not have children, they do not display a
+message and they have no label. A special '[…]' marker appears beside their
+bullet.
+
 Testing
 -------
 
