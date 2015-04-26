@@ -1,4 +1,3 @@
-# Node module for Git-Historian
 # -*- encoding: utf-8 -*-
 
 class Node:
