@@ -32,11 +32,14 @@ class Option:
 
 def _print_help ():
 
-	print('Usage: %s [options] heads…' % sys.argv[0])
+	print('Usage: %s [options] targets…' % sys.argv[0])
 	print()
-	print(' -a, --all, --heads : consider all refnames')
-	print(' -n, --limit : size limit')
-	print(' -p, --pretty : format options')
+	print(' -a, --all, --heads : adds all heads to targets')
+	print(' -t, --tags         : adds all tags to targets')
+	print(' -r, --remotes      : adds all remote branches to targets')
+	print()
+	print(' -n<N>, --limit<N>  : cuts history to N commits')
+	print(' -p<P>, --pretty<P> : uses P as the pretty format for messages')
 	print()
 	print(' --prefix, --prefix-match   : arguments match refnames by prefix')
 	print(' -x, --exact, --exact-match : arguments must match refnames exactly')
