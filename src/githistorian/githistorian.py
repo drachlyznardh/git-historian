@@ -3,7 +3,7 @@
 
 from __future__ import print_function
 
-from .hunter.head import Hunter as HeadHunter
+from .hunter.head import hunt as head_hunt
 from .hunter.hunter import HistoryHunter
 
 from .option import parse_cmd_args
@@ -80,7 +80,8 @@ def tell_the_story():
 	if not opt: return
 
 	# Hunting for history
-	heads = HeadHunter(opt, opt.d(1)).hunt()
+	#heads = HeadHunter(opt, opt.d(1)).hunt()
+	heads = head_hunt(opt, opt.d(1))
 	db = HistoryHunter(heads, opt, opt.d(2)).hunt(opt.size_limit)
 
 	# Cleaning database from missing refs

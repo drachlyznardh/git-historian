@@ -29,87 +29,90 @@ def _get_selected_heads (f, heads, order):
 
 	return [e for e in result if not (e in seen or g(e))]
 
-class Hunter:
+def __init__ (self, o, debug):
 
-	def __init__ (self, o, debug):
+	collected = []
+	selected = []
+	self.debug = debug
 
-		self.collected_heads = []
-		self.selected_heads = []
-		self.debug = debug
+	self.order = o.order
 
-		self.order = o.order
+	self.all_heads = o.heads
+	self.all_tags = o.tags
 
-		self.all_heads = o.heads
-		self.all_tags = o.tags
+	if o.match: self.match = _exact_match
+	else: self.match = _prefix_match
 
-		if o.match: self.match = _exact_match
-		else: self.match = _prefix_match
+def hunt (opt, debug):
 
-	def hunt (self):
+	need_order = len(opt.order)
+	if opt.match: match = _exact_match
+	else: match = _prefix_match
 
-		need_order = len(self.order)
+	if debug:
+		print('  HeadHunter.Order (%s)' % ', '.join(order))
 
-		if self.debug:
-			print('  HeadHunter.Order (%s)' % ', '.join(self.order))
+	if need_order or opt.heads:
+		collected = _load_heads(opt, debug)
+		if opt.heads: selected = _get_all_heads(collected)
+		else: selected = _get_selected_heads(match, collected, opt.order)
+	else: selected = _load_HEAD()
 
-		if need_order or self.all_heads:
-			self.load_heads()
-			if self.all_heads: self.selected_heads = _get_all_heads(self.collected_heads)
-			else: self.selected_heads = _get_selected_heads(self.match, self.collected_heads, self.order)
-		else: self.load_HEAD()
+	if debug:
+		print('  HeadHunter.Head(%s)' % ', '.join([e[:7] for e in selected]))
 
-		if self.debug:
-			print('  HeadHunter.Head(%s)' % ', '.join([e[:7] for e in self.selected_heads]))
+	return selected
 
-		return self.selected_heads
+def _load_HEAD ():
 
-	def load_HEAD (self):
+	cmdlist = 'git show-ref --heads --head'.split()
 
-		cmdlist = 'git show-ref --heads --head'.split()
+	output = check_output(cmdlist)
 
-		output = check_output(cmdlist)
+	exp = re.compile(r'^(.*) HEAD$')
 
-		exp = re.compile(r'^(.*) HEAD$')
+	for line in output.split('\n'):
 
-		for line in output.split('\n'):
+		if len(line) == 0: continue
 
-			if len(line) == 0: continue
+		token = exp.match(line)
+		if not token: continue
 
-			token = exp.match(line)
-			if not token: continue
+		return token.group(1)
 
-			self.selected_heads.append(token.group(1))
-			return
+def _load_heads (opt, debug):
 
-	def load_heads (self):
+	collected = []
 
-		# Looking for heads, i.e. active branches
-		cmdlist = ['git', 'show-ref']
-		if self.all_tags: cmdlist.append('--tags')
+	# Looking for heads, i.e. active branches
+	cmdlist = ['git', 'show-ref']
+	if opt.tags: cmdlist.append('--tags')
 
-		# Print the command line request
-		if self.debug: print('  Now invoking %s' % cmdlist)
+	# Print the command line request
+	if debug: print('  Now invoking %s' % cmdlist)
 
-		# Invoke Git
-		git_output = check_output(cmdlist)
+	# Invoke Git
+	git_output = check_output(cmdlist)
 
-		# Print the output
-		if self.debug: print(git_output)
+	# Print the output
+	if debug: print(git_output)
 
-		# Parsing Git response
-		for line in git_output.split('\n'):
+	# Parsing Git response
+	for line in git_output.split('\n'):
 
-			# Skipping empty lines (the last one should be empty)
-			if len(line) == 0: continue
+		# Skipping empty lines (the last one should be empty)
+		if len(line) == 0: continue
 
-			# Matching name and name
-			name_n_ref = re.compile(r'^(.*) refs\/.*\/(.*)$').match(line)
+		# Matching name and name
+		name_n_ref = re.compile(r'^(.*) refs\/.*\/(.*)$').match(line)
 
-			# Broken ref: display message and skip line
-			if not name_n_ref:
-				print('No match for (%s)' % line)
-				continue
+		# Broken ref: display message and skip line
+		if not name_n_ref:
+			print('No match for (%s)' % line)
+			continue
 
-			# Save result in order and by name
-			self.collected_heads.append((name_n_ref.group(1), name_n_ref.group(2)))
+		# Save result in order and by name
+		collected.append((name_n_ref.group(1), name_n_ref.group(2)))
+
+	return collected
 
