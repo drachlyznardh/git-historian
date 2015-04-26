@@ -6,9 +6,7 @@ from .row import unroll as row_unroll
 from .column import unroll as column_unroll
 from .layout import Layout
 
-def _bind_children (debug, heads, db):
-
-	if debug: print('-- Binding Children --')
+def _bind_children (heads, db):
 
 	visit = LeftmostFirst()
 	visit.push(heads)
@@ -18,11 +16,7 @@ def _bind_children (debug, heads, db):
 		name = visit.pop()
 		commit = db.at(name)
 
-		if debug: print('  Visiting %s' % name[:7])
-
-		if commit.done:
-			if debug: print('  %s is done, skipping…' % name[:7])
-			continue
+		if commit.done: continue
 
 		for i in commit.parent:
 			db.at(i).add_child(name)
@@ -48,7 +42,7 @@ def _print_graph (db, first, width):
 
 def deploy (opt, roots, history):
 
-	_bind_children(opt.d(4), roots, history)
+	_bind_children(roots, history)
 	history.clear()
 	first = row_unroll(history, roots, opt.d(8))
 	history.clear()
