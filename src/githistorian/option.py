@@ -11,8 +11,6 @@ class Option:
 	def __init__ (self):
 
 		self.verbose = 0
-		self.debug = 0
-		self.all_debug = 0
 
 		self.heads   = False
 		self.tags    = False
@@ -25,9 +23,6 @@ class Option:
 
 		version_file = os.path.join(os.path.dirname(__file__), 'VERSION')
 		self.version = open(version_file, 'r').read().strip()
-
-	def d (self, value):
-		return self.all_debug or self.debug / value % 2
 
 def _print_help ():
 
@@ -44,27 +39,16 @@ def _print_help ():
 	print(' -x, --exact, --exact-match : arguments must match refnames exactly')
 	print()
 	print(' -f<name>, --file<name> : load preferences from <name> instead of default .githistorian')
-	print()
-	print(' -D, --all-debug : print(all kinds of debug messages')
-	print(' -d N, --debug N : add N to the debug counter')
-	print()
-	print('debug  1 : show heads')
-	print('debug  2 : show data loading')
-	print('debug  4 : show bindings')
-	print('debug  8 : show vertical unroll')
-	print('debug 16 : show column assignments')
-	print('debug 32 : show layout construction')
 
 def _print_version (o):
 	print("Git-Historian %s © 2014-2015 Ivan Simonini" % o.version)
 
 def parse ():
 
-	sopts = 'atrhvDd:n:p:xf:'
+	sopts = 'atrhvn:p:xf:'
 	lopts = ['help', 'verbose', 'version',
 			'all', 'heads', 'tags', 'remotes',
 			'limit', 'pretty',
-			'debug', 'all-debug',
 			'exact', 'exact-match', 'prefix', 'prefix-match',
 			'file']
 
@@ -89,10 +73,6 @@ def parse ():
 			o.tags = True
 		elif key in ('-r', '--remotes'):
 			o.remotes = True
-		elif key in ('-D', '--all-debug'):
-			o.all_debug = 1
-		elif key in ('-d', '--debug'):
-			o.debug += int(value)
 		elif key in ('-n', '--limit'):
 			o.limit = int(value)
 		elif key in ('-p', '--pretty'):
