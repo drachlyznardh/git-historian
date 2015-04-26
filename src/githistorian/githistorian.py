@@ -81,17 +81,17 @@ def tell_the_story():
 
 	# Hunting for history
 	heads = head_hunt(opt, opt.d(1))
-	db = HistoryHunter(heads, opt, opt.d(2)).hunt(opt.size_limit)
+	history = HistoryHunter(heads, opt, opt.d(2)).hunt(opt.size_limit)
 
 	# Cleaning database from missing refs
-	db.drop_missing_refs()
-	heads = _drop_missing_heads(heads, db)
+	history.drop_missing_refs()
+	heads = _drop_missing_heads(heads, history)
 
 	# Graph unrolling
-	_bind_children(opt.d(4), heads, db)
-	db.clear()
-	first = row_unroll(db, heads, opt.d(8))
-	db.clear()
-	width = column_unroll(db, heads, opt.d(16))
-	_print_graph(opt.d(32), db, first, width)
+	_bind_children(opt.d(4), heads, history)
+	history.clear()
+	first = row_unroll(history, heads, opt.d(8))
+	history.clear()
+	width = column_unroll(history, heads, opt.d(16))
+	_print_graph(opt.d(32), history, first, width)
 
