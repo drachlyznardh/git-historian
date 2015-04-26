@@ -10,6 +10,9 @@ check:
 build:
 	@python setup.py build
 
+dist:
+	@python setup.py sdist
+
 install:
 	@python setup.py install
 

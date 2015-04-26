@@ -1,4 +1,10 @@
 
+Release 0.1.0-0 – 2014/04/26
+==========================
+
+Huge refactoring of the whole project. More configuration, more options, less
+debugging mess, better performance.
+
 Release 0.0-j – 2014/04/25
 ==========================
 

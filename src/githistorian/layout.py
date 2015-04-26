@@ -1,4 +1,3 @@
-# Layout module for Git-Historian
 # -*- encoding: utf-8 -*-
 
 class Column:
@@ -10,31 +9,14 @@ class Column:
 
 class Layout:
 
-	def __init__ (self, size, commit, debug):
-		
+	def __init__ (self, size):
 		self.size = size
-		self.debug = debug
-
 		self.layout = []
-
 		self.track = {i:set() for i in xrange(-1, size)}
 
-	def plot_track (self):
-		for track in self.track.values():
-			print track
-
 	def put_char(self, name, transition, padding):
-		
-		if isinstance(name, basestring):
-			father = self.commit[name]
-			color = 31 + father.column % 6
-		elif isinstance(name, int):
-			color = 31 + name % 6
-		else:
-			print 'WTF is %s' % name
-			color = 39
-
-		self.layout.append(Column(color, transition, padding))
+		column = Column(31 + name % 6, transition, padding)
+		self.layout.append(column)
 
 	def compute_even_column(self, index, target):
 		
@@ -49,10 +31,9 @@ class Layout:
 				if e in target.parent: continue
 				overlap.append(e)
 
-			if len(overlap):
-				transition = '╳' # \u2573
-			else:
-				transition = '•' # \u2022
+			if len(overlap): transition = '╳' # \u2573
+			else: transition = '•' # \u2022
+
 			self.put_char(target.column, transition, padding)
 			return
 
@@ -129,12 +110,8 @@ class Layout:
 
 		self.layout = []
 
-		if self.debug:
-			self.plot_track()
-			print target.child
+		if self.size: self.compute_even_column(0, target)
 
-		if self.size:
-			self.compute_even_column(0, target)
 		for i in xrange(1, self.size):
 			self.compute_odd_column(i, target)
 			self.compute_even_column(i, target)
@@ -144,6 +121,8 @@ class Layout:
 
 		for name in target.parent:
 			self.track[target.column].add(name)
+
+		return self.draw_transition(), self.draw_padding()
 
 	def draw_padding (self):
 
