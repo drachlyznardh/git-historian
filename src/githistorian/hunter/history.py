@@ -12,10 +12,9 @@ def _select_pretty (value):
 	if value: return r'--pretty=%H %P#' + value
 	return r'--pretty=%H %P#%C(yellow)%h%C(auto)%d%Creset %s %C(bold red)%ar%Cblue %an'
 
-def hunt (opt, debug, heads, limit):
+def _get_history_dump (opt, debug, heads, limit):
 
 	pretty = _select_pretty(opt.pretty)
-	history = NodeDB()
 
 	# Looking for commit's and parents' names…
 	cmdlist = ['git', 'log', '--pretty="%H %P"']
@@ -33,6 +32,12 @@ def hunt (opt, debug, heads, limit):
 
 	# Invoking Git
 	git_history_dump = check_output(cmdlist)
+	return git_history_dump
+
+def hunt (opt, debug, heads, limit):
+
+	history = NodeDB()
+	git_history_dump = _get_history_dump(opt, debug, heads, limit)
 
 	# Print the output
 	if debug: print(git_history_dump)
