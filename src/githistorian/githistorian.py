@@ -80,7 +80,6 @@ def tell_the_story():
 	if not opt: return
 
 	# Hunting for history
-	#heads = HeadHunter(opt, opt.d(1)).hunt()
 	heads = head_hunt(opt, opt.d(1))
 	db = HistoryHunter(heads, opt, opt.d(2)).hunt(opt.size_limit)
 
