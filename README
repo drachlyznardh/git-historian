@@ -30,9 +30,9 @@ target is assigned its own column, in the specified order
 Preferences
 -----------
 
-All the options but -f,--file can be stored in the preference file
-.githistorian, on one or more lines. Options and targets will not take
-precedence on those specified by command line.
+Preferences are loaded from the .githistorian file (or from the file specified
+by -f,--file) if present. This file can contain options and arguments, one per
+line. Command line arguments override those written on file.
 
 Invocation
 ----------
