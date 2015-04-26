@@ -29,26 +29,6 @@ def _get_selected_heads (f, heads, order):
 
 	return [e for e in result if not (e in seen or g(e))]
 
-def hunt (opt, debug):
-
-	need_order = len(opt.order)
-	if opt.match: match = _exact_match
-	else: match = _prefix_match
-
-	if debug:
-		print('  HeadHunter.Order (%s)' % ', '.join(order))
-
-	if need_order or opt.heads:
-		collected = _load_heads(opt, debug)
-		if opt.heads: selected = _get_all_heads(collected)
-		else: selected = _get_selected_heads(match, collected, opt.order)
-	else: selected = _load_HEAD()
-
-	if debug:
-		print('  HeadHunter.Head(%s)' % ', '.join([e[:7] for e in selected]))
-
-	return selected
-
 def _load_HEAD ():
 
 	cmdlist = 'git show-ref --heads --head'.split()
@@ -102,4 +82,24 @@ def _load_heads (opt, debug):
 		collected.append((name_n_ref.group(1), name_n_ref.group(2)))
 
 	return collected
+
+def hunt (opt, debug):
+
+	need_order = len(opt.order)
+	if opt.match: match = _exact_match
+	else: match = _prefix_match
+
+	if debug:
+		print('  HeadHunter.Order (%s)' % ', '.join(order))
+
+	if need_order or opt.heads:
+		collected = _load_heads(opt, debug)
+		if opt.heads: selected = _get_all_heads(collected)
+		else: selected = _get_selected_heads(match, collected, opt.order)
+	else: selected = _load_HEAD()
+
+	if debug:
+		print('  HeadHunter.Head(%s)' % ', '.join([e[:7] for e in selected]))
+
+	return selected
 
