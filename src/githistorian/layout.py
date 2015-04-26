@@ -138,6 +138,8 @@ class Layout:
 		for name in target.parent:
 			self.track[target.column].add(name)
 
+		return self.draw_transition(), self.draw_padding()
+
 	def draw_padding (self):
 
 		padding = ''
