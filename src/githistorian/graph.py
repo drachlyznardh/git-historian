@@ -43,14 +43,14 @@ def _bind_children (heads, db):
 
 		commit.done = 1
 
-def _print_graph (db, first, width):
+def _print_graph (history, first, width):
 
 	t = Layout(width + 1)
 	name = first
 
 	while name:
 
-		node = db.at(name)
+		node = history.at(name)
 		transition, padding = t.compute_layout(node)
 
 		print('\x1b[m%s\x1b[m %s' % (transition, node.message[0]))
