@@ -50,11 +50,9 @@ def _print_graph (debug, db, first, width):
 
 		transition, padding = t.compute_layout(node)
 
-		try:
-			print('\x1b[m%s\x1b[m %s' % (transition, node.message[0]))
-			for i in node.message[1:]:
-				print('\x1b[m%s\x1b[m %s' % (padding, i))
-		except: pass
+		print('\x1b[m%s\x1b[m %s' % (transition, node.message[0]))
+		for i in node.message[1:]:
+			print('\x1b[m%s\x1b[m %s' % (padding, i))
 
 		name = node.bottom
 
