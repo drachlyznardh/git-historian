@@ -12,11 +12,8 @@ class Column:
 class Layout:
 
 	def __init__ (self, size):
-		
 		self.size = size
-
 		self.layout = []
-
 		self.track = {i:set() for i in xrange(-1, size)}
 
 	def plot_track (self):
@@ -40,10 +37,9 @@ class Layout:
 				if e in target.parent: continue
 				overlap.append(e)
 
-			if len(overlap):
-				transition = '╳' # \u2573
-			else:
-				transition = '•' # \u2022
+			if len(overlap): transition = '╳' # \u2573
+			else: transition = '•' # \u2022
+
 			self.put_char(target.column, transition, padding)
 			return
 
@@ -120,8 +116,8 @@ class Layout:
 
 		self.layout = []
 
-		if self.size:
-			self.compute_even_column(0, target)
+		if self.size: self.compute_even_column(0, target)
+
 		for i in xrange(1, self.size):
 			self.compute_odd_column(i, target)
 			self.compute_even_column(i, target)
