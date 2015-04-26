@@ -95,6 +95,8 @@ def _parse(args, sopts, lopts):
 		elif key in ('-f', '--file'):
 			filename = value
 
+	option.order = args
+
 	return option, filename
 
 def parse ():
