@@ -29,20 +29,6 @@ def _get_selected_heads (f, heads, order):
 
 	return [e for e in result if not (e in seen or g(e))]
 
-def __init__ (self, o, debug):
-
-	collected = []
-	selected = []
-	self.debug = debug
-
-	self.order = o.order
-
-	self.all_heads = o.heads
-	self.all_tags = o.tags
-
-	if o.match: self.match = _exact_match
-	else: self.match = _prefix_match
-
 def hunt (opt, debug):
 
 	need_order = len(opt.order)
