@@ -14,13 +14,11 @@ def _select_pretty (value):
 
 # Invokes git-log with optional size limit to collect commits, their relation
 # with others and the custom messages
-def _get_history_dump (opt, debug, heads, limit):
+def _get_history_dump (opt, heads, limit):
 
 	cmdlist = ['git', 'log', _select_pretty(opt.pretty)]
 	if limit: cmdlist.append('-n%d' % limit)
 	cmdlist.extend(heads)
-
-	if debug: print(cmdlist)
 
 	return check_output(cmdlist)
 
