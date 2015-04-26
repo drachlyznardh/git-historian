@@ -20,7 +20,7 @@ class Option:
 		self.remotes = False
 		self.order = []
 
-		self.pretty = None
+		self.pretty = False
 		self.limit = False
 		self.match = False
 
@@ -109,9 +109,16 @@ def parse_cmd_args ():
 			filename = value
 
 	if os.path.exists(filename):
-		o.order = eval(open(filename, 'r').read())
+		d = eval(open(filename, 'r').read())
+	else: d = {}
+
+	if 'order' in d:
+		o.order = d['order']
 		o.order.extend(args)
 	else: o.order = args
+
+	if 'pretty' in d and not o.pretty:
+		o.pretty =  d['pretty']
 
 	return o
 

@@ -1,1 +1,4 @@
-['master', 'devel', 'ongoing']
+{
+	'order':['master', 'devel', 'ongoing'],
+	'pretty':r'%C(yellow)%h%C(auto)%d%Creset %s %C(bold red)%ar%Cblue %an'
+}
