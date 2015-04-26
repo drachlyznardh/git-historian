@@ -32,7 +32,8 @@ class Option:
 		self.remotes |= other.remotes
 		self.order.extend(other.order)
 
-		self.pretty |= other.pretty
+		if other.pretty: self.pretty = other.pretty
+
 		self.limit  |= other.limit
 		self.match  |= other.match
 
