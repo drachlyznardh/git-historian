@@ -21,7 +21,7 @@ class Option:
 		self.order = []
 
 		self.pretty = None
-		self.size_limit = False
+		self.limit = False
 		self.match = False
 
 		version_file = os.path.join(os.path.dirname(__file__), 'VERSION')
@@ -92,7 +92,7 @@ def parse_cmd_args ():
 		elif key in ('-d', '--debug'):
 			o.debug += int(value)
 		elif key in ('-n', '--limit'):
-			o.size_limit = int(value)
+			o.limit = int(value)
 		elif key in ('-p', '--pretty'):
 			o.pretty = value
 		elif key in ('-x', '--exact', '--exact-match'):

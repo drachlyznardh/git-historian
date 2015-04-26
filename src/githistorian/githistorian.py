@@ -4,7 +4,7 @@
 from __future__ import print_function
 
 from .hunter.head import hunt as head_hunt
-from .hunter.hunter import HistoryHunter
+from .hunter.history import hunt as history_hunt
 
 from .option import parse_cmd_args
 from .order import LeftmostFirst
@@ -81,7 +81,7 @@ def tell_the_story():
 
 	# Hunting for history
 	heads = head_hunt(opt, opt.d(1))
-	history = HistoryHunter(heads, opt, opt.d(2)).hunt(opt.size_limit)
+	history = history_hunt(opt, opt.d(2), heads, opt.limit)
 
 	# Cleaning database from missing refs
 	history.drop_missing_refs()

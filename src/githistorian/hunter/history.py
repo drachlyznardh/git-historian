@@ -80,3 +80,5 @@ class HistoryHunter:
 		if self.debug: print(nodes)
 		return nodes
 
+def hunt (opt, debug, heads, limit):
+	return HistoryHunter(heads, opt, debug).hunt(limit)
