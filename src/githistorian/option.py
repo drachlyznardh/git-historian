@@ -23,6 +23,22 @@ class Option:
 		version_file = os.path.join(os.path.dirname(__file__), 'VERSION')
 		self.version = open(version_file, 'r').read().strip()
 
+	def override (self, other):
+
+		self.verbose |= other.verbose
+
+		self.heads   |= other.heads
+		self.tags    |= other.tags
+		self.remotes |= other.remotes
+		self.order.extend(other.order)
+
+		if other.pretty: self.pretty = other.pretty
+
+		self.limit  |= other.limit
+		self.match  |= other.match
+
+		return self
+
 def _print_help ():
 
 	print('Usage: %s [options] targets…' % sys.argv[0])
@@ -42,61 +58,65 @@ def _print_help ():
 def _print_version (o):
 	print("Git-Historian %s © 2014-2015 Ivan Simonini" % o.version)
 
-def parse ():
+def _parse(args, sopts, lopts):
 
-	sopts = 'atrhvn:p:xf:'
-	lopts = ['help', 'verbose', 'version',
-			'all', 'heads', 'tags', 'remotes',
-			'limit', 'pretty',
-			'exact', 'exact-match', 'prefix', 'prefix-match',
-			'file']
+	option = Option()
+	filename = '.githistorian'
 
 	try:
-		optlist, args = getopt.gnu_getopt(sys.argv[1:], sopts, lopts)
+		optlist, args = getopt.gnu_getopt(args, sopts, lopts)
 	except getopt.GetoptError as err:
 		_print_help()
-		raise(err)
-
-	o = Option()
-	filename = '.githistorian'
+		return False
 
 	for key, value in optlist:
 		if key in ('-h', '--help'):
 			_print_help()
-			return False
+			return False, False
 		elif key in ('-v', '--verbose'):
-			o.verbose = 1
+			option.verbose = 1
 		elif key in ('-a', '--all', '--heads'):
-			o.heads = True
+			option.heads = True
 		elif key in ('-t', '--tags'):
-			o.tags = True
+			option.tags = True
 		elif key in ('-r', '--remotes'):
-			o.remotes = True
+			option.remotes = True
 		elif key in ('-n', '--limit'):
-			o.limit = int(value)
+			option.limit = int(value)
 		elif key in ('-p', '--pretty'):
-			o.pretty = value
+			option.pretty = value
 		elif key in ('-x', '--exact', '--exact-match'):
-			o.match = True
+			option.match = True
 		elif key in ('--prefix', '--prefix-match'):
-			o.match = False
+			option.match = False
 		elif key == '--version':
-			_print_version(o)
-			return False
+			_print_version(option)
+			return False, False
 		elif key in ('-f', '--file'):
 			filename = value
 
-	if os.path.exists(filename):
-		d = eval(open(filename, 'r').read())
-	else: d = {}
+	option.order = args
 
-	if 'order' in d:
-		o.order = d['order']
-		o.order.extend(args)
-	else: o.order = args
+	return option, filename
 
-	if 'pretty' in d and not o.pretty:
-		o.pretty =  d['pretty']
+def parse ():
 
-	return o
+	sopts = 'atrhvn:p:x'
+	lopts = ['help', 'verbose', 'version',
+			'all', 'heads', 'tags', 'remotes',
+			'limit=', 'pretty=',
+			'exact', 'exact-match', 'prefix', 'prefix-match']
+
+	option, filename = _parse(sys.argv[1:], sopts+'f:', lopts+['file'])
+	if not option: return False
+
+	if filename and os.path.exists(filename):
+		token = []
+		for line in open(filename, 'r').readlines():
+			token.append(line.strip())
+
+		doption, dfile = _parse(token, sopts, lopts)
+	else: doption = Option()
+
+	return doption.override(option)
 
