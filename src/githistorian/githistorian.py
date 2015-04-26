@@ -65,6 +65,15 @@ def _print_graph (debug, db, first, width):
 
 		name = node.bottom
 
+def _deploy_graph (opt, roots, history):
+
+	_bind_children(opt.d(4), roots, history)
+	history.clear()
+	first = row_unroll(history, roots, opt.d(8))
+	history.clear()
+	width = column_unroll(history, roots, opt.d(16))
+	_print_graph(opt.d(32), history, first, width)
+
 def tell_the_story():
 
 	opt = parse_cmd_args()
@@ -75,10 +84,4 @@ def tell_the_story():
 	roots, history = history_hunt(opt, targets, opt.limit)
 
 	# Graph unrolling
-	_bind_children(opt.d(4), roots, history)
-	history.clear()
-	first = row_unroll(history, roots, opt.d(8))
-	history.clear()
-	width = column_unroll(history, roots, opt.d(16))
-	_print_graph(opt.d(32), history, first, width)
-
+	_deploy_graph(opt, roots, history)
