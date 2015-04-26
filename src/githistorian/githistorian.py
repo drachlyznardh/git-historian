@@ -80,18 +80,18 @@ def tell_the_story():
 	if not opt: return
 
 	# Hunting for history
-	heads = head_hunt(opt, opt.d(1))
-	history = history_hunt(opt, heads, opt.limit)
+	targets = head_hunt(opt, opt.d(1))
+	history = history_hunt(opt, targets, opt.limit)
 
 	# Cleaning database from missing refs
 	history.drop_missing_refs()
-	heads = _drop_missing_heads(heads, history)
+	roots = _drop_missing_heads(targets, history)
 
 	# Graph unrolling
-	_bind_children(opt.d(4), heads, history)
+	_bind_children(opt.d(4), roots, history)
 	history.clear()
-	first = row_unroll(history, heads, opt.d(8))
+	first = row_unroll(history, roots, opt.d(8))
 	history.clear()
-	width = column_unroll(history, heads, opt.d(16))
+	width = column_unroll(history, roots, opt.d(16))
 	_print_graph(opt.d(32), history, first, width)
 
