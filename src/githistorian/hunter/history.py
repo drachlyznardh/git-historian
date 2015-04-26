@@ -2,9 +2,6 @@
 
 from __future__ import print_function
 from subprocess import check_output
-import re
-import sys
-import json
 
 from ..node import Node, NodeDB
 
