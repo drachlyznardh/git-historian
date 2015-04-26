@@ -39,8 +39,6 @@ class Hunter:
 
 		self.order = o.order
 
-		self.cname = []
-
 		self.all_heads = o.heads
 		self.all_tags = o.tags
 
