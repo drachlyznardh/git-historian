@@ -23,6 +23,19 @@ class Option:
 		version_file = os.path.join(os.path.dirname(__file__), 'VERSION')
 		self.version = open(version_file, 'r').read().strip()
 
+	def override (self, other):
+
+		self.verbose |= other.verbose
+
+		self.heads   |= other.heads
+		self.tags    |= other.tags
+		self.remotes |= other.remotes
+		self.order.extend(other.order)
+
+		self.pretty |= other.pretty
+		self.limit  |= other.limit
+		self.match  |= other.match
+
 def _print_help ():
 
 	print('Usage: %s [options] targets…' % sys.argv[0])
@@ -83,12 +96,25 @@ def _parse(args, sopts, lopts):
 
 def parse ():
 
-	sopts = 'atrhvn:p:xf:'
+	sopts = 'atrhvn:p:x'
 	lopts = ['help', 'verbose', 'version',
 			'all', 'heads', 'tags', 'remotes',
 			'limit', 'pretty',
-			'exact', 'exact-match', 'prefix', 'prefix-match',
-			'file']
+			'exact', 'exact-match', 'prefix', 'prefix-match']
+
+	option, filename = _parse(sys.argv[1:], sopts+'f:', lopts+['file'])
+	if not option: return False
+
+	if filename and os.path.exists(filename):
+		token = []
+		for line in open(filename, 'r').readlines():
+			token.extend(line.strip().split())
+
+		doption, dfile = _parse(token, sopts, lopts)
+	else: doption = Option()
+
+	return doption.override(option)
+		
 
 	try:
 		optlist, args = getopt.gnu_getopt(sys.argv[1:], sopts, lopts)
