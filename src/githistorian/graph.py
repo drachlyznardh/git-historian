@@ -12,14 +12,6 @@ class VisitOrder:
 
 	def push (self, arg):
 
-		if isinstance(arg, basestring):
-			self.content.insert(0, arg)
-			return
-
-		if not isinstance(arg, list):
-			print('WTF is %s?' % arg)
-			return
-
 		if len(arg) == 0: return
 
 		for e in reversed(arg):
