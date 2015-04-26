@@ -24,3 +24,4 @@ def tell_the_story():
 
 	# Graph unrolling
 	deploy_graph(opt, roots, history)
+
