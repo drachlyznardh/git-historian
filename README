@@ -12,17 +12,20 @@ Dependencies
 Usage
 -----
 
-<command> [options] [args]
+<command> [options] [target…]
 
-When no arg is given, HEAD is implyed; when one or more args are
-provided, they are displayed in order. If -a is also provided, all other
-branches follow in alphabetical order.
+Displays the targets history. If no target is given, HEAD is selected. Each
+target is assigned its own column, in the specified order
 
 ### Options
 
-- -n<N>, --limit=<N>            : queires `git log` for up to N commits
-- -p<format>, --pretty=<format> : format string, passed to `git log`
-- -a, --all, --all-heads        : display all branches in refs/head/*
+- -v, --verbose                 : prints some stats before showing history
+- -n<N>, --limit=<N>            : cuts the history at N commits
+- -p<format>, --pretty=<format> : format string, passed to `git log --pretty`
+- -a, --all, --heads            : appends all local branches to the target list
+- -t, --tags                    : appends all tags to the target list
+- -r, --remotes                 : appends all remote branches to the target list
+- -f<name>, --file<name>        : loads preferences from <name>
 
 Invocation
 ----------
