@@ -60,7 +60,7 @@ def _print_version (o):
 def _parse(args, sopts, lopts):
 
 	option = Option()
-	filename = False
+	filename = '.githistorian'
 
 	try:
 		optlist, args = getopt.gnu_getopt(sys.argv[1:], sopts, lopts)
