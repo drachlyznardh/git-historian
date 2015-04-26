@@ -52,6 +52,11 @@ class NodeDB:
 
 	def __init__ (self):
 		self.store = {}
+		self.fake = 0
+
+	def stats (self):
+		size = len(self.store)
+		return size, size - self.fake, self.fake
 
 	def add_node (self, node):
 		self.store[node.name] = node
@@ -83,6 +88,7 @@ class NodeDB:
 						fake.name = name
 						fake.message = ['[…]']
 						self.add_node(fake)
+						self.fake += 1
 
 	# Due to excessively restricting size limit, some heads may not appear at
 	# all in the database. These heads are removed from the list

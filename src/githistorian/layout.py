@@ -1,7 +1,5 @@
 # -*- encoding: utf-8 -*-
 
-from __future__ import print_function
-
 class Column:
 
 	def __init__ (self, color, transition, padding):
@@ -15,10 +13,6 @@ class Layout:
 		self.size = size
 		self.layout = []
 		self.track = {i:set() for i in xrange(-1, size)}
-
-	def plot_track (self):
-		for track in self.track.values():
-			print(track)
 
 	def put_char(self, name, transition, padding):
 		column = Column(31 + name % 6, transition, padding)
