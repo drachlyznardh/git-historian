@@ -13,15 +13,6 @@ from .row import unroll as row_unroll
 from .column import unroll as column_unroll
 from .layout import Layout
 
-# Due to excessively restricting size limit, some heads may not appear at
-# all in the database. These heads are removed from the list
-def _drop_missing_heads (heads, db):
-	available = []
-	for name in heads:
-		if name in db.store:
-			available.append(name)
-	return available
-
 def _bind_children (debug, heads, db):
 
 	if debug: print('-- Binding Children --')
@@ -81,9 +72,7 @@ def tell_the_story():
 
 	# Hunting for history
 	targets = head_hunt(opt, opt.d(1))
-	history = history_hunt(opt, targets, opt.limit)
-
-	roots = _drop_missing_heads(targets, history)
+	roots, history = history_hunt(opt, targets, opt.limit)
 
 	# Graph unrolling
 	_bind_children(opt.d(4), roots, history)

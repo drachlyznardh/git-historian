@@ -85,6 +85,15 @@ class NodeDB:
 						fake.message = ['[…]']
 						self.add_node(fake)
 
+	# Due to excessively restricting size limit, some heads may not appear at
+	# all in the database. These heads are removed from the list
+	def drop_missing_heads (self, heads):
+		available = []
+		for name in heads:
+			if name in self.store:
+				available.append(name)
+		return available
+
 	def skip_if_done (self, names):
 		result = []
 		for name in names:

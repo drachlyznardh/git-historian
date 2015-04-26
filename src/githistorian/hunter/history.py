@@ -55,5 +55,8 @@ def hunt (opt, heads, limit):
 	# Cleaning database from missing refs
 	history.drop_missing_refs()
 
-	return history
+	# Cleaning root list from missing heads
+	roots = history.drop_missing_heads(heads)
+
+	return roots, history
 
