@@ -63,7 +63,7 @@ def _parse(args, sopts, lopts):
 	filename = '.githistorian'
 
 	try:
-		optlist, args = getopt.gnu_getopt(sys.argv[1:], sopts, lopts)
+		optlist, args = getopt.gnu_getopt(args, sopts, lopts)
 	except getopt.GetoptError as err:
 		_print_help()
 		return False
