@@ -83,8 +83,6 @@ def tell_the_story():
 	targets = head_hunt(opt, opt.d(1))
 	history = history_hunt(opt, targets, opt.limit)
 
-	# Cleaning database from missing refs
-	history.drop_missing_refs()
 	roots = _drop_missing_heads(targets, history)
 
 	# Graph unrolling

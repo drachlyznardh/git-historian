@@ -51,5 +51,9 @@ def hunt (opt, heads, limit):
 
 	# Store the last node
 	history.add_node(current)
+
+	# Cleaning database from missing refs
+	history.drop_missing_refs()
+
 	return history
 
