@@ -60,9 +60,6 @@ class Hunter:
 			else: self.ohead = _get_selected_heads(self.match, self.head, self.order)
 		else: self.load_HEAD()
 
-		#if self.debug:
-		#	print('  HeadHunter.Head(%s)' % ', '.join([e[0][:7] for e in self.head]))
-
 		if self.debug:
 			print('  HeadHunter.Head(%s)' % ', '.join([e[:7] for e in self.ohead]))
 
