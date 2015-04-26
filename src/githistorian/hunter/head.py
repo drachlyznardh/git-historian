@@ -33,8 +33,8 @@ class Hunter:
 
 	def __init__ (self, o, debug):
 
-		self.head = []
-		self.ohead = []
+		self.collected_heads = []
+		self.selected_heads = []
 		self.debug = debug
 
 		self.order = o.order
@@ -56,14 +56,14 @@ class Hunter:
 
 		if need_order or self.all_heads:
 			self.load_heads()
-			if self.all_heads: self.ohead = _get_all_heads(self.head)
-			else: self.ohead = _get_selected_heads(self.match, self.head, self.order)
+			if self.all_heads: self.selected_heads = _get_all_heads(self.collected_heads)
+			else: self.selected_heads = _get_selected_heads(self.match, self.collected_heads, self.order)
 		else: self.load_HEAD()
 
 		if self.debug:
-			print('  HeadHunter.Head(%s)' % ', '.join([e[:7] for e in self.ohead]))
+			print('  HeadHunter.Head(%s)' % ', '.join([e[:7] for e in self.selected_heads]))
 
-		return self.ohead
+		return self.selected_heads
 
 	def load_HEAD (self):
 
@@ -80,7 +80,7 @@ class Hunter:
 			token = exp.match(line)
 			if not token: continue
 
-			self.ohead.append(token.group(1))
+			self.selected_heads.append(token.group(1))
 			return
 
 	def load_heads (self):
@@ -113,5 +113,5 @@ class Hunter:
 				continue
 
 			# Save result in order and by name
-			self.head.append((name_n_ref.group(1), name_n_ref.group(2)))
+			self.collected_heads.append((name_n_ref.group(1), name_n_ref.group(2)))
 
