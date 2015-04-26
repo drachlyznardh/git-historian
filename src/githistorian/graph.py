@@ -1,6 +1,10 @@
 # encoding: utf-8
 from __future__ import print_function
 
+# Silencing BROKEN PIPE errors
+from signal import signal, SIGPIPE, SIG_DFL
+signal(SIGPIPE, SIG_DFL)
+
 from .row import unroll as row_unroll
 from .column import unroll as column_unroll
 from .layout import Layout
