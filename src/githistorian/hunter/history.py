@@ -5,6 +5,8 @@ from subprocess import check_output
 
 from ..node import Node, NodeDB
 
+# Apply user specified pretty format or the default with no preference is
+# supplied
 def _select_pretty (value):
 	if value: return r'--pretty=%H %P#' + value
 	return r'--pretty=%H %P#%C(yellow)%h%C(auto)%d%Creset %s %C(bold red)%ar%Cblue %an'
