@@ -59,7 +59,7 @@ def _print_help ():
 def _print_version (o):
 	print("Git-Historian %s © 2014-2015 Ivan Simonini" % o.version)
 
-def parse_cmd_args ():
+def parse ():
 
 	sopts = 'atrhvDd:n:p:xf:'
 	lopts = ['help', 'verbose', 'version',

@@ -5,8 +5,8 @@ from __future__ import print_function
 
 from .hunter.head import hunt as head_hunt
 from .hunter.history import hunt as history_hunt
+from .option import parse as parse_cmd_args
 
-from .option import parse_cmd_args
 from .order import LeftmostFirst
 
 from .row import unroll as row_unroll
