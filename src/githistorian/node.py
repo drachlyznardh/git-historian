@@ -54,6 +54,10 @@ class NodeDB:
 		self.store = {}
 		self.fake = 0
 
+	def stats (self):
+		size = len(self.store)
+		return size, size - self.fake, self.fake
+
 	def add_node (self, node):
 		self.store[node.name] = node
 

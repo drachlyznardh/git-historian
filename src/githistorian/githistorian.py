@@ -20,6 +20,8 @@ def tell_the_story():
 		print('Targets order   %s' % opt.order)
 		print('Targets found   %s' % targets)
 		print('Roots displayed %s' % roots)
+		lines, commits, omitted = history.stats()
+		print('Loaded %d commits, %d omitted' % (commits, omitted))
 
 	# Graph unrolling
 	deploy_graph(opt, roots, history)
