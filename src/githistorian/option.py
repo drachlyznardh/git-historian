@@ -102,7 +102,7 @@ def parse ():
 	sopts = 'atrhvn:p:x'
 	lopts = ['help', 'verbose', 'version',
 			'all', 'heads', 'tags', 'remotes',
-			'limit', 'pretty',
+			'limit=', 'pretty=',
 			'exact', 'exact-match', 'prefix', 'prefix-match']
 
 	option, filename = _parse(sys.argv[1:], sopts+'f:', lopts+['file'])
