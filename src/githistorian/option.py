@@ -42,6 +42,45 @@ def _print_help ():
 def _print_version (o):
 	print("Git-Historian %s © 2014-2015 Ivan Simonini" % o.version)
 
+def _parse(args, sopts, lopts):
+
+	option = Option()
+	filename = False
+
+	try:
+		optlist, args = getopt.gnu_getopt(sys.argv[1:], sopts, lopts)
+	except getopt.GetoptError as err:
+		_print_help()
+		return False
+
+	for key, value in optlist:
+		if key in ('-h', '--help'):
+			_print_help()
+			return False, False
+		elif key in ('-v', '--verbose'):
+			option.verbose = 1
+		elif key in ('-a', '--all', '--heads'):
+			option.heads = True
+		elif key in ('-t', '--tags'):
+			option.tags = True
+		elif key in ('-r', '--remotes'):
+			option.remotes = True
+		elif key in ('-n', '--limit'):
+			option.limit = int(value)
+		elif key in ('-p', '--pretty'):
+			option.pretty = value
+		elif key in ('-x', '--exact', '--exact-match'):
+			option.match = True
+		elif key in ('--prefix', '--prefix-match'):
+			option.match = False
+		elif key == '--version':
+			_print_version(option)
+			return False, False
+		elif key in ('-f', '--file'):
+			filename = value
+
+	return filename, option
+
 def parse ():
 
 	sopts = 'atrhvn:p:xf:'
