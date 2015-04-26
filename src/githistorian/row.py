@@ -89,9 +89,7 @@ class Row:
 		# The current node is done
 		target.done = 1
 
-	def unroll (self, debug):
-
-		if debug: print('-- Row Unroll --')
+	def unroll (self):
 
 		# Visit starts with all the heads
 		self.order = VisitOrder()
@@ -111,9 +109,6 @@ class Row:
 			name = self.order.pop()
 			target = self.db.at(name)
 
-			if debug:
-				print('Visiting %s %s' % (name[:7], self.order.show()))
-
 			# Even if done, a node can drop down in the chain after its
 			# last-calling child
 			if target.done: self.if_done(name, target)
@@ -121,6 +116,6 @@ class Row:
 
 		return self.first
 
-def unroll (db, heads, debug):
-	return Row(db, heads).unroll(debug)
+def unroll (db, heads):
+	return Row(db, heads).unroll()
 
