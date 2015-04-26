@@ -36,6 +36,8 @@ class Option:
 		self.limit  |= other.limit
 		self.match  |= other.match
 
+		return self
+
 def _print_help ():
 
 	print('Usage: %s [options] targets…' % sys.argv[0])
@@ -92,7 +94,7 @@ def _parse(args, sopts, lopts):
 		elif key in ('-f', '--file'):
 			filename = value
 
-	return filename, option
+	return option, filename
 
 def parse ():
 
