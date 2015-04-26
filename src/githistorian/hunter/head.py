@@ -78,7 +78,7 @@ def _load_HEAD ():
 		token = exp.match(line)
 		if not token: continue
 
-		return token.group(1)
+		return [token.group(1)]
 
 def _load_heads (opt, debug):
 
