@@ -67,26 +67,26 @@ class Grid:
 
 class Column:
 
-	def __init__ (self, db, heads):
+	def __init__ (self, heads, history):
 
 		self.verbose = 0
 
 		self.first = None
 		self.width = -1
 
-		self.db = db
 		self.heads = heads
+		self.history = history
 
 	def update_width (self, value):
 		self.width = max(self.width, value)
 
 	def find_column_for_head (self, name):
 
-		target = self.db.at(name)
+		target = self.history.at(name)
 
 		# Start at the immediate right of previous head
 		previous = self.heads[self.heads.index(name) - 1]
-		column = self.db.at(previous).column + 1
+		column = self.history.at(previous).column + 1
 
 		while 1:
 			self.grid.add(column, target.row, 'MARKER')
@@ -106,9 +106,9 @@ class Column:
 
 		upper = self.grid.upper(column, target.row)
 		if not upper: return True
-		parents = self.db.at(upper).parent
+		parents = self.history.at(upper).parent
 		if len(parents) == 0: return True
-		lowest = max([self.db.at(e).row for e in parents])
+		lowest = max([self.history.at(e).row for e in parents])
 		return lowest <= target.row
 
 	# This checks whether the row of the following node on column overlaps
@@ -118,24 +118,24 @@ class Column:
 		lower = self.grid.lower(column, target.row)
 		if not lower: return True
 		if len(target.parent) == 0: return True
-		lowest = max([self.db.at(e).row for e in target.parent])
-		return lowest <= self.db.at(lower).row
+		lowest = max([self.history.at(e).row for e in target.parent])
+		return lowest <= self.history.at(lower).row
 
 	def find_column_for_parents (self, name):
 
-		target = self.db.at(name)
+		target = self.history.at(name)
 
 		# Parents are processed in row order, from lower to upper
-		target.parent.sort(key=lambda e: self.db.at(e).row, reverse=True)
+		target.parent.sort(key=lambda e: self.history.at(e).row, reverse=True)
 
-		for parent in [self.db.at(e) for e in target.parent]:
+		for parent in [self.history.at(e) for e in target.parent]:
 
 			# If a parent has already a column, just push its border
 			if parent.has_column():
 				parent.set_border(target.column)
 				continue
 
-			column = self.db.select_starting_column(parent.child)
+			column = self.history.select_starting_column(parent.child)
 			while 1:
 				self.grid.add(column, parent.row, 'MARKER')
 
@@ -161,7 +161,7 @@ class Column:
 		while order.has_more():
 
 			name = order.pop()
-			target = self.db.at(name)
+			target = self.history.at(name)
 			
 			# No node is processed more than once
 			if target.done: continue
@@ -176,10 +176,10 @@ class Column:
 			self.find_column_for_parents (name)
 
 			# Parents are added to the order, then the node is done
-			order.push(self.db.skip_if_done(target.parent))
+			order.push(self.history.skip_if_done(target.parent))
 			target.done = 1
 
 		return self.width
 
-def unroll (db, heads):
-	return Column(db, heads).unroll()
+def unroll (heads, history):
+	return Column(heads, history).unroll()

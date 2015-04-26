@@ -62,8 +62,8 @@ def deploy (opt, roots, history):
 
 	_bind_children(roots, history)
 	history.clear()
-	first = row_unroll(history, roots)
+	first = row_unroll(roots, history)
 	history.clear()
-	width = column_unroll(history, roots)
+	width = column_unroll(roots, history)
 	_print_graph(history, first, width)
 
