@@ -111,7 +111,7 @@ def parse ():
 	if filename and os.path.exists(filename):
 		token = []
 		for line in open(filename, 'r').readlines():
-			token.extend(line.strip().split())
+			token.append(line.strip())
 
 		doption, dfile = _parse(token, sopts, lopts)
 	else: doption = Option()
