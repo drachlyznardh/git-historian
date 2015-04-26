@@ -4,7 +4,7 @@ from .row import unroll as row_unroll
 from .column import unroll as column_unroll
 from .layout import Layout
 
-class LeftmostFirst:
+class VisitOrder:
 
 	def __init__ (self):
 
@@ -40,12 +40,12 @@ class LeftmostFirst:
 
 def _bind_children (heads, db):
 
-	visit = LeftmostFirst()
-	visit.push(heads)
+	order = VisitOrder()
+	order.push(heads)
 
-	while visit.has_more():
+	while order.has_more():
 
-		name = visit.pop()
+		name = order.pop()
 		commit = db.at(name)
 
 		if commit.done: continue
@@ -53,7 +53,7 @@ def _bind_children (heads, db):
 		for i in commit.parent:
 			db.at(i).add_child(name)
 
-		visit.push(db.skip_if_done(commit.parent))
+		order.push(db.skip_if_done(commit.parent))
 
 		commit.done = 1
 
