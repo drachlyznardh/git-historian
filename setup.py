@@ -6,6 +6,7 @@ setup(
 	url='https://github.com/drachlyznardh/githistorian',
 	author='Ivan Simonini',
 	author_email='drachlyznardh@gmail.com',
-	package_dir={'githistorian':'src/githistorian'},
-	packages=['githistorian']
+	package_dir={'githistorian':'src/githistorian',
+		'githistorian.hunter':'src/githistorian/hunter'},
+	packages=['githistorian', 'githistorian.hunter']
 )

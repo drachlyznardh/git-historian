@@ -7,7 +7,7 @@ import re
 import sys
 import json
 
-from .node import Node, NodeDB
+from ..node import Node, NodeDB
 
 def _exact_match (one, two):
 	return one == two
