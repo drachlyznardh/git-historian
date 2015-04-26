@@ -52,9 +52,5 @@ def hunt (opt, debug, heads, limit):
 
 	# Store the last node
 	history.add_node(current)
-
-	# Showing results
-	if debug: print(history)
 	return history
 
-	return HistoryHunter(heads, opt, debug).hunt(limit)
