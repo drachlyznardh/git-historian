@@ -55,7 +55,7 @@ def parse ():
 		optlist, args = getopt.gnu_getopt(sys.argv[1:], sopts, lopts)
 	except getopt.GetoptError as err:
 		_print_help()
-		raise(err)
+		return False
 
 	o = Option()
 	filename = '.githistorian'
