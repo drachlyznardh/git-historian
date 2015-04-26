@@ -25,16 +25,9 @@ def _get_history_dump (opt, heads, limit):
 def hunt (opt, debug, heads, limit):
 
 	history = NodeDB()
-	git_history_dump = _get_history_dump(opt, debug, heads, limit)
-
-	# Print the output
-	if debug: print(git_history_dump)
-
-	# Ref for current node
 	current = None
 
-	# Parsing Git response
-	for line in git_history_dump.split('\n'):
+	for line in _get_history_dump(opt, heads, limit).split('\n'):
 
 		# Skipping empty lines (the last one should be empty)
 		if len(line) == 0: continue
