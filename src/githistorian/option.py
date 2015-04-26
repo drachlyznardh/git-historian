@@ -1,4 +1,3 @@
-# Option module for Git-Historian
 # encoding: utf-8
 
 from __future__ import print_function
@@ -15,14 +14,14 @@ class Option:
 		self.debug = 0
 		self.all_debug = 0
 
-		self.heads = False
-		self.tags = False
+		self.heads   = False
+		self.tags    = False
 		self.remotes = False
-		self.order = []
+		self.order   = []
 
 		self.pretty = False
-		self.limit = False
-		self.match = False
+		self.limit  = False
+		self.match  = False
 
 		version_file = os.path.join(os.path.dirname(__file__), 'VERSION')
 		self.version = open(version_file, 'r').read().strip()
@@ -59,7 +58,7 @@ def _print_help ():
 def _print_version (o):
 	print("Git-Historian %s © 2014-2015 Ivan Simonini" % o.version)
 
-def parse_cmd_args ():
+def parse ():
 
 	sopts = 'atrhvDd:n:p:xf:'
 	lopts = ['help', 'verbose', 'version',

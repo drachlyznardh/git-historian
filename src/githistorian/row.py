@@ -11,17 +11,7 @@ class VisitOrder:
 		return len(self.content)
 
 	def push (self, arg):
-
-		if isinstance(arg, basestring):
-			self.content.append(arg)
-			return
-
-		if not isinstance(arg, list):
-			print('WTF is %s?' % arg)
-			return
-
 		if len(arg) == 0: return
-
 		self.content.extend(reversed(arg))
 
 	def pop (self):
@@ -33,10 +23,9 @@ class VisitOrder:
 
 class Row:
 
-	def __init__ (self, db, heads):
-
-		self.db = db
+	def __init__ (self, heads, history):
 		self.heads = heads
+		self.history = history
 
 	def if_done (self, name, target):
 
@@ -45,12 +34,12 @@ class Row:
 
 		# Binding top and bottom nodes together
 		if target.top:
-			self.db.at(target.top).bottom = target.bottom
-		self.db.at(target.bottom).top = target.top
+			self.history.at(target.top).bottom = target.bottom
+		self.history.at(target.bottom).top = target.top
 
 		# Binding previous and current nodes together
 		target.top = self.previous
-		self.db.at(self.previous).bottom = name
+		self.history.at(self.previous).bottom = name
 
 		# Bumping the row number another time
 		self.row += 1
@@ -65,13 +54,13 @@ class Row:
 	def if_not_done (self, name, target):
 
 		# No node can appear before any of its children
-		children = self.db.skip_if_done(target.child)
+		children = self.history.skip_if_done(target.child)
 		if len(children): return
 
 		# Bind this node with the previous, if any, or…
 		if self.previous:
 			target.top = self.previous
-			self.db.at(self.previous).bottom = name
+			self.history.at(self.previous).bottom = name
 
 		# … record this node as the first in the chain
 		else: self.first = name
@@ -81,7 +70,7 @@ class Row:
 		target.row = self.row
 
 		# Add parents to the order
-		self.order.push(self.db.skip_if_done(target.parent))
+		self.order.push(self.history.skip_if_done(target.parent))
 
 		# The current node is the next previous
 		self.previous = name
@@ -89,9 +78,7 @@ class Row:
 		# The current node is done
 		target.done = 1
 
-	def unroll (self, debug):
-
-		if debug: print('-- Row Unroll --')
+	def unroll (self):
 
 		# Visit starts with all the heads
 		self.order = VisitOrder()
@@ -109,10 +96,7 @@ class Row:
 		while self.order.has_more():
 
 			name = self.order.pop()
-			target = self.db.at(name)
-
-			if debug:
-				print('Visiting %s %s' % (name[:7], self.order.show()))
+			target = self.history.at(name)
 
 			# Even if done, a node can drop down in the chain after its
 			# last-calling child
@@ -121,6 +105,6 @@ class Row:
 
 		return self.first
 
-def unroll (db, heads, debug):
-	return Row(db, heads).unroll(debug)
+def unroll (heads, history):
+	return Row(heads, history).unroll()
 

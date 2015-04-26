@@ -46,7 +46,7 @@ def _load_HEAD ():
 
 		return [token.group(1)]
 
-def _load_heads (opt, debug):
+def _load_heads (opt):
 
 	collected = []
 
@@ -55,14 +55,8 @@ def _load_heads (opt, debug):
 	if not opt.remotes: cmdlist.append('--heads')
 	if opt.tags: cmdlist.append('--tags')
 
-	# Print the command line request
-	if debug: print('  Now invoking %s' % cmdlist)
-
 	# Invoke Git
 	git_output = check_output(cmdlist)
-
-	# Print the output
-	if debug: print(git_output)
 
 	# Parsing Git response
 	for line in git_output.split('\n'):
@@ -83,23 +77,17 @@ def _load_heads (opt, debug):
 
 	return collected
 
-def hunt (opt, debug):
+def hunt (opt):
 
 	need_order = len(opt.order)
 	if opt.match: match = _exact_match
 	else: match = _prefix_match
 
-	if debug:
-		print('  HeadHunter.Order (%s)' % ', '.join(order))
-
 	if need_order or opt.heads:
-		collected = _load_heads(opt, debug)
+		collected = _load_heads(opt)
 		if opt.heads: selected = _get_all_heads(collected)
 		else: selected = _get_selected_heads(match, collected, opt.order)
 	else: selected = _load_HEAD()
-
-	if debug:
-		print('  HeadHunter.Head(%s)' % ', '.join([e[:7] for e in selected]))
 
 	return selected
 
