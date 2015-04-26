@@ -83,5 +83,10 @@ def tell_the_story():
 	targets = head_hunt(opt, opt.d(1))
 	roots, history = history_hunt(opt, targets, opt.limit)
 
+	if opt.verbose:
+		print('Targets order   %s' % opt.order)
+		print('Targets found   %s' % targets)
+		print('Roots displayed %s' % roots)
+
 	# Graph unrolling
 	_deploy_graph(opt, roots, history)
