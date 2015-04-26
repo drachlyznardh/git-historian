@@ -81,7 +81,7 @@ def tell_the_story():
 
 	# Hunting for history
 	heads = head_hunt(opt, opt.d(1))
-	history = history_hunt(opt, opt.d(2), heads, opt.limit)
+	history = history_hunt(opt, heads, opt.limit)
 
 	# Cleaning database from missing refs
 	history.drop_missing_refs()

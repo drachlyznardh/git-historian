@@ -22,7 +22,7 @@ def _get_history_dump (opt, heads, limit):
 
 	return check_output(cmdlist)
 
-def hunt (opt, debug, heads, limit):
+def hunt (opt, heads, limit):
 
 	history = NodeDB()
 	current = None
