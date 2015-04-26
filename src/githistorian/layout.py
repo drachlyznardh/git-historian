@@ -12,10 +12,9 @@ class Column:
 
 class Layout:
 
-	def __init__ (self, size, debug):
+	def __init__ (self, size):
 		
 		self.size = size
-		self.debug = debug
 
 		self.layout = []
 
@@ -121,10 +120,6 @@ class Layout:
 	def compute_layout (self, target):
 
 		self.layout = []
-
-		if self.debug:
-			self.plot_track()
-			print(target.child)
 
 		if self.size:
 			self.compute_even_column(0, target)

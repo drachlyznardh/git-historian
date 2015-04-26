@@ -31,12 +31,9 @@ def _bind_children (debug, heads, db):
 
 		commit.done = 1
 
-def _print_graph (debug, db, first, width):
+def _print_graph (db, first, width):
 
-	if debug: print('-- Print Graph --')
-
-	t = Layout(width + 1, debug)
-
+	t = Layout(width + 1)
 	name = first
 
 	while name:
@@ -45,8 +42,6 @@ def _print_graph (debug, db, first, width):
 		if not node:
 			print("No Commit for name %s" % name[:7])
 			break
-
-		if debug: print("\nP %s" % name[:7])
 
 		transition, padding = t.compute_layout(node)
 
@@ -63,5 +58,5 @@ def deploy (opt, roots, history):
 	first = row_unroll(history, roots, opt.d(8))
 	history.clear()
 	width = column_unroll(history, roots, opt.d(16))
-	_print_graph(opt.d(32), history, first, width)
+	_print_graph(history, first, width)
 
