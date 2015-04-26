@@ -1,2 +1,4 @@
-master devel ongoing
---pretty='%C(red)%H ||| %C(yellow)%h%C(auto)%d%Creset %s %C(bold red)%ar%Cblue %an'
+master
+devel
+ongoing
+--pretty="%C(red)%H %C(yellow)%h%C(auto)%d%Creset %s %C(bold red)%ar%Cblue %an"
