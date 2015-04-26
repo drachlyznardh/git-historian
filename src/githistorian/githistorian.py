@@ -3,8 +3,10 @@
 
 from __future__ import print_function
 
+from .hunter.head import Hunter as HeadHunter
+from .hunter.hunter import HistoryHunter
+
 from .option import parse_cmd_args
-from .hunter.hunter import HeadHunter, HistoryHunter
 from .order import LeftmostFirst
 
 from .row import unroll as row_unroll
