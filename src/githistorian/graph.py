@@ -39,15 +39,10 @@ def _print_graph (db, first, width):
 	while name:
 
 		node = db.at(name)
-		if not node:
-			print("No Commit for name %s" % name[:7])
-			break
-
 		transition, padding = t.compute_layout(node)
 
 		print('\x1b[m%s\x1b[m %s' % (transition, node.message[0]))
-		for i in node.message[1:]:
-			print('\x1b[m%s\x1b[m %s' % (padding, i))
+		for i in node.message[1:]: print('\x1b[m%s\x1b[m %s' % (padding, i))
 
 		name = node.bottom
 
