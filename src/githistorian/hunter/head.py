@@ -24,7 +24,7 @@ def _get_selected_heads (f, heads, order):
 	for name in order:
 		for e in heads:
 			if f(name, e[1]):
-				heads.remove(e)
+				# heads.remove(e)
 				result.append(e[0])
 
 	return [e for e in result if not (e in seen or g(e))]
