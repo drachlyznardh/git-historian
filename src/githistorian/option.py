@@ -56,7 +56,7 @@ def _print_help ():
 	print(' -f<name>, --file<name> : load preferences from <name> instead of default .githistorian')
 
 def _print_version (o):
-	print("Git-Historian %s © 2014-2015 Ivan Simonini" % o.version)
+	print("Git-Historian %s © 2014-2017 Ivan Simonini" % o.version)
 
 def _parse(args, sopts, lopts):
 
@@ -67,7 +67,7 @@ def _parse(args, sopts, lopts):
 		optlist, args = getopt.gnu_getopt(args, sopts, lopts)
 	except getopt.GetoptError as err:
 		_print_help()
-		return False
+		return False, None
 
 	for key, value in optlist:
 		if key in ('-h', '--help'):
