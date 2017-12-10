@@ -1,6 +1,12 @@
 
+Release 0.1.0-1 – 2017/12/10
+============================
+
+Showing all heads prefix-matching arguments, stopping when not inside a
+repository, properly handling unknown options.
+
 Release 0.1.0-0 – 2014/04/26
-==========================
+============================
 
 Huge refactoring of the whole project. More configuration, more options, less
 debugging mess, better performance.
