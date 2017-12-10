@@ -67,7 +67,7 @@ def _parse(args, sopts, lopts):
 		optlist, args = getopt.gnu_getopt(args, sopts, lopts)
 	except getopt.GetoptError as err:
 		_print_help()
-		return False
+		return False, None
 
 	for key, value in optlist:
 		if key in ('-h', '--help'):
