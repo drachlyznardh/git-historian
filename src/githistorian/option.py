@@ -56,7 +56,7 @@ def _print_help ():
 	print(' -f<name>, --file<name> : load preferences from <name> instead of default .githistorian')
 
 def _print_version (o):
-	print("Git-Historian %s © 2014-2015 Ivan Simonini" % o.version)
+	print("Git-Historian %s © 2014-2017 Ivan Simonini" % o.version)
 
 def _parse(args, sopts, lopts):
 
