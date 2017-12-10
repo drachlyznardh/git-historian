@@ -1,5 +1,6 @@
 # -*- encoding: utf-8 -*-
 from __future__ import print_function
+from subprocess import check_output, STDOUT
 
 from .hunter.head import hunt as head_hunt
 from .hunter.history import hunt as history_hunt
@@ -10,6 +11,11 @@ def tell_the_story():
 
 	opt = parse_cmd_args()
 	if not opt: return
+
+	try: check_output('git rev-parse --git-dir'.split(), stderr=STDOUT)
+	except:
+		print('Not a repo')
+		return
 
 	# Hunting for history
 	targets = head_hunt(opt)
