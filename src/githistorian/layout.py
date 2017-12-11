@@ -9,20 +9,22 @@ class Column:
 
 class Layout:
 
-	def __init__ (self, size):
+	def __init__ (self, size, hflip):
 
 		self.size = size
+		self.hflip = hflip
+
 		self.layout = []
 		self.track = {i:set() for i in xrange(-1, size)}
 
-		self.ltee = '┤' if False else '├' # \u 2524 or 251c
-		self.rtee = '├' if False else '┤' # \u 251c or 2524
+		self.ltee = '├' if self.hflip else '┤' # \u 251c or 2524
+		self.rtee = '┤' if self.hflip else '├' # \u 2524 or 251c
 
-		self.lrcorner = '┘' if False else '└' # \u 2518 or 2514
-		self.llcorner = '└' if False else '┘' # \u 2514 or 2518
+		self.lrcorner = '└' if self.hflip else '┘' # \u 2514 or 2518
+		self.llcorner = '┘' if self.hflip else '└' # \u 2518 or 2514
 
-		self.rarrow = '→' if False else '←' # \u 2190 or 2192
-		self.larrow = '←' if False else '→' # \u 2192 or 2190
+		self.rarrow = '←' if self.hflip else '→' # \u 2192 or 2190
+		self.larrow = '→' if self.hflip else '←' # \u 2190 or 2192
 
 	def put_char(self, name, transition, padding):
 		column = Column(31 + name % 6, transition, padding)
@@ -132,7 +134,7 @@ class Layout:
 		for name in target.parent:
 			self.track[target.column].add(name)
 
-		if True: self.layout.reverse()
+		if self.hflip: self.layout.reverse()
 		return self.draw_transition(), self.draw_padding()
 
 	def draw_padding (self):
