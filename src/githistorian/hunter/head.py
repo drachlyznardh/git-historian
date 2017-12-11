@@ -80,15 +80,9 @@ def _load_heads (opt):
 
 def hunt (opt):
 
-	need_order = len(opt.order)
-	if opt.match: match = _exact_match
-	else: match = _prefix_match
-
-	if need_order or opt.heads:
+	if len(opt.order) or opt.heads:
 		collected = _load_heads(opt)
-		if opt.heads: selected = _get_all_heads(collected)
-		else: selected = _get_selected_heads(match, collected, opt.order)
-	else: selected = _load_HEAD()
-
-	return selected
+		if opt.heads: return _get_all_heads(collected)
+		return _get_selected_heads(_exact_match if opt.match else _prefix_match, collected, opt.order)
+	return _load_HEAD()
 
