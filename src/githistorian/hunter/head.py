@@ -49,6 +49,7 @@ def _load_HEAD ():
 def _load_heads (opt):
 
 	collected = []
+	regex = re.compile(r'^(.*) refs\/.*\/(.*)$')
 
 	# Looking for heads, i.e. active branches
 	cmdlist = ['git', 'show-ref']
@@ -65,7 +66,7 @@ def _load_heads (opt):
 		if len(line) == 0: continue
 
 		# Matching name and name
-		name_n_ref = re.compile(r'^(.*) refs\/.*\/(.*)$').match(line)
+		name_n_ref = regex.match(line)
 
 		# Broken ref: display message and skip line
 		if not name_n_ref:
