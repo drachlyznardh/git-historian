@@ -19,7 +19,7 @@ class Layout:
 		self.layout.append(column)
 
 	def compute_even_column(self, index, target):
-		
+
 		if index == target.column:
 
 			if len(target.parent): padding = '│' # \u2502
@@ -83,16 +83,16 @@ class Layout:
 	def compute_odd_column(self, index, target):
 
 		if index > target.column:
-			
+
 			if target.name in self.track[index]:
 				self.put_char(index, '→', ' ')
 				return
-			
+
 			for jndex in range(index, self.size):
 				if target.name in self.track[jndex]:
 					self.put_char(jndex, '→', ' ')
 					return
-		
+
 		else:
 
 			if target.name in self.track[index - 1]:
@@ -132,7 +132,7 @@ class Layout:
 		return padding
 
 	def draw_transition (self):
-		
+
 		padding = ''
 		for i in self.layout:
 			if i.transition == '•': padding += '\x1b[m•'
