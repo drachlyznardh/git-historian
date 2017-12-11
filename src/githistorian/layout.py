@@ -132,6 +132,7 @@ class Layout:
 		for name in target.parent:
 			self.track[target.column].add(name)
 
+		if True: self.layout.reverse()
 		return self.draw_transition(), self.draw_padding()
 
 	def draw_padding (self):
