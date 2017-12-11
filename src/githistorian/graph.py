@@ -48,20 +48,28 @@ def _bind_children (heads, db):
 
 		commit.done = 1
 
-def _print_graph (history, first, width, hflip):
+def _print_graph (history, first, width, hflip, vflip):
 
-	t = Layout(width + 1, hflip)
+	t = Layout(width + 1, hflip, vflip)
 	name = first
+	bigblock = []
 
 	while name:
 
 		node = history.at(name)
 		transition, padding = t.compute_layout(node)
 
-		print('\x1b[m%s\x1b[m %s' % (transition, node.message[0]))
-		for i in node.message[1:]: print('\x1b[m%s\x1b[m %s' % (padding, i))
+		block = ['\x1b[m%s\x1b[m %s' % (transition, node.message[0])]
+		for i in node.message[1:]: block.append('\x1b[m%s\x1b[m %s' % (padding, i))
+
+		if vflip: bigblock.append('\n'.join(block))
+		else: print('\n'.join(block))
 
 		name = node.bottom
+
+	if vflip:
+		bigblock.reverse()
+		print('\n'.join(bigblock))
 
 def deploy (opt, roots, history):
 
@@ -70,5 +78,5 @@ def deploy (opt, roots, history):
 	first = row_unroll(roots, history)
 	history.clear()
 	width = column_unroll(roots, history)
-	_print_graph(history, first, width, opt.hflip)
+	_print_graph(history, first, width, opt.hflip, opt.vflip)
 

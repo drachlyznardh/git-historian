@@ -9,7 +9,7 @@ class Column:
 
 class Layout:
 
-	def __init__ (self, size, hflip):
+	def __init__ (self, size, hflip, vflip):
 
 		self.size = size
 		self.hflip = hflip
@@ -20,8 +20,12 @@ class Layout:
 		self.ltee = '├' if self.hflip else '┤' # \u 251c or 2524
 		self.rtee = '┤' if self.hflip else '├' # \u 2524 or 251c
 
-		self.lrcorner = '└' if self.hflip else '┘' # \u 2514 or 2518
-		self.llcorner = '┘' if self.hflip else '└' # \u 2518 or 2514
+		if vflip:
+			self.lrcorner = '┌' if self.hflip else '┐' # \u 250c or 2510
+			self.llcorner = '┐' if self.hflip else '┌' # \u 2510 or 250c
+		else:
+			self.lrcorner = '└' if self.hflip else '┘' # \u 2514 or 2518
+			self.llcorner = '┘' if self.hflip else '└' # \u 2518 or 2514
 
 		self.rarrow = '←' if self.hflip else '→' # \u 2192 or 2190
 		self.larrow = '→' if self.hflip else '←' # \u 2190 or 2192
