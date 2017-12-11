@@ -50,7 +50,7 @@ def _bind_children (heads, db):
 
 def _print_graph (history, first, width, hflip, vflip):
 
-	t = Layout(width + 1, hflip)
+	t = Layout(width + 1, hflip, vflip)
 	name = first
 	bigblock = []
 
