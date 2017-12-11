@@ -10,9 +10,19 @@ class Column:
 class Layout:
 
 	def __init__ (self, size):
+
 		self.size = size
 		self.layout = []
 		self.track = {i:set() for i in xrange(-1, size)}
+
+		self.ltee = '┤' if False else '├' # \u 2524 or 251c
+		self.rtee = '├' if False else '┤' # \u 251c or 2524
+
+		self.lrcorner = '┘' if False else '└' # \u 2518 or 2514
+		self.llcorner = '└' if False else '┘' # \u 2514 or 2518
+
+		self.rarrow = '→' if False else '←' # \u 2190 or 2192
+		self.larrow = '←' if False else '→' # \u 2192 or 2190
 
 	def put_char(self, name, transition, padding):
 		column = Column(31 + name % 6, transition, padding)
@@ -41,9 +51,9 @@ class Layout:
 
 			if target.name in self.track[index]:
 				if len(self.track[index]) > 1:
-					self.put_char(index, '┤', '│') # \u2524 \u2502
+					self.put_char(index, self.ltee, '│') # \u2502
 				else:
-					self.put_char(index, '┘', ' ') # \u2518
+					self.put_char(index, self.lrcorner, ' ')
 				return
 
 			if len(self.track[index]):
@@ -52,16 +62,16 @@ class Layout:
 
 			for jndex in range(index, self.size):
 				if target.name in self.track[jndex]:
-					self.put_char(jndex, '→', ' ')
+					self.put_char(jndex, self.rarrow, ' ')
 					return
 
 		else:
 
 			if target.name in self.track[index]:
 				if len(self.track[index]) > 1:
-					self.put_char(index, '├', '│') # \u251c \u2502
+					self.put_char(index, self.rtee, '│') # \u2502
 				else:
-					self.put_char(index, '└', ' ') # \u2514
+					self.put_char(index, self.llcorner, ' ')
 				return
 
 			if len(self.track[index]):
@@ -70,7 +80,7 @@ class Layout:
 
 			for jndex in reversed(range(0, index)):
 				if target.name in self.track[jndex]:
-					self.put_char(jndex, '←', ' ') # \u2500
+					self.put_char(jndex, self.larrow, ' ') # \u2500
 					return
 
 		if len(self.track[index]):
@@ -85,23 +95,23 @@ class Layout:
 		if index > target.column:
 
 			if target.name in self.track[index]:
-				self.put_char(index, '→', ' ')
+				self.put_char(index, self.rarrow, ' ')
 				return
 
 			for jndex in range(index, self.size):
 				if target.name in self.track[jndex]:
-					self.put_char(jndex, '→', ' ')
+					self.put_char(jndex, self.rarrow, ' ')
 					return
 
 		else:
 
 			if target.name in self.track[index - 1]:
-				self.put_char(index - 1, '←', ' ')
+				self.put_char(index - 1, self.larrow, ' ')
 				return
 
 			for jndex in reversed(range(0, index - 1)):
 				if target.name in self.track[jndex]:
-					self.put_char(jndex, '←', ' ')
+					self.put_char(jndex, self.larrow, ' ')
 					return
 
 		self.put_char(index, ' ', ' ')
