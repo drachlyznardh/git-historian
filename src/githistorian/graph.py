@@ -58,8 +58,11 @@ def _print_graph (history, first, width, hflip):
 		node = history.at(name)
 		transition, padding = t.compute_layout(node)
 
-		print('\x1b[m%s\x1b[m %s' % (transition, node.message[0]))
-		for i in node.message[1:]: print('\x1b[m%s\x1b[m %s' % (padding, i))
+		block = ['\x1b[m%s\x1b[m %s' % (transition, node.message[0])]
+		for i in node.message[1:]: block.append('\x1b[m%s\x1b[m %s' % (padding, i))
+
+		if False: pass
+		else: print('\n'.join(block))
 
 		name = node.bottom
 
