@@ -52,6 +52,7 @@ def _print_graph (history, first, width, hflip):
 
 	t = Layout(width + 1, hflip)
 	name = first
+	bigblock = []
 
 	while name:
 
@@ -61,10 +62,14 @@ def _print_graph (history, first, width, hflip):
 		block = ['\x1b[m%s\x1b[m %s' % (transition, node.message[0])]
 		for i in node.message[1:]: block.append('\x1b[m%s\x1b[m %s' % (padding, i))
 
-		if False: pass
+		if True: bigblock.append('\n'.join(block))
 		else: print('\n'.join(block))
 
 		name = node.bottom
+
+	if True:
+		bigblock.reverse()
+		print('\n'.join(bigblock))
 
 def deploy (opt, roots, history):
 
