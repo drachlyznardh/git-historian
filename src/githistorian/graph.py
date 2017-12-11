@@ -48,9 +48,9 @@ def _bind_children (heads, db):
 
 		commit.done = 1
 
-def _print_graph (history, first, width):
+def _print_graph (history, first, width, hflip):
 
-	t = Layout(width + 1)
+	t = Layout(width + 1, hflip)
 	name = first
 
 	while name:
@@ -70,5 +70,5 @@ def deploy (opt, roots, history):
 	first = row_unroll(roots, history)
 	history.clear()
 	width = column_unroll(roots, history)
-	_print_graph(history, first, width)
+	_print_graph(history, first, width, opt.hflip)
 
