@@ -15,6 +15,7 @@ class Option:
 		self.tags    = False
 		self.remotes = False
 		self.hflip   = False
+		self.vflip   = False
 
 		self.order   = []
 
@@ -33,6 +34,7 @@ class Option:
 		self.tags    |= other.tags
 		self.remotes |= other.remotes
 		self.hflip   |= other.hflip
+		self.vflip   |= other.vflip
 
 		self.order.extend(other.order)
 
@@ -58,6 +60,7 @@ def _print_help ():
 	print(' -x, --exact, --exact-match : arguments must match refnames exactly')
 	print()
 	print(' -H, --horizontal, --flip-horizontally : flip layout from left to right')
+	print(' -V, --vertical, --flip-vertically : flip layout from top to bottom')
 	print()
 	print(' -f<name>, --file<name> : load preferences from <name> instead of default .githistorian')
 
@@ -102,6 +105,8 @@ def _parse(args, sopts, lopts):
 			filename = value
 		elif key in ('-H', '--horizontal', '--flip-horizontally'):
 			option.hflip = True
+		elif key in ('-V', '--vertical', '--flip-vertically'):
+			option.vflip = True
 
 	option.order = args
 
@@ -109,12 +114,13 @@ def _parse(args, sopts, lopts):
 
 def parse ():
 
-	sopts = 'atrhvn:p:xH'
+	sopts = 'atrhvn:p:xHV'
 	lopts = ['help', 'verbose', 'version',
 			'all', 'heads', 'tags', 'remotes',
 			'limit=', 'pretty=',
 			'exact', 'exact-match', 'prefix', 'prefix-match',
-			'horizontal', 'flip-horizontally']
+			'horizontal', 'flip-horizontally',
+			'vertical', 'flip-vertically']
 
 	option, filename = _parse(sys.argv[1:], sopts+'f:', lopts+['file'])
 	if not option: return False
