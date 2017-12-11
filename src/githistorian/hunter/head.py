@@ -44,7 +44,7 @@ def _load_HEAD ():
 		token = exp.match(line)
 		if not token: continue
 
-		return [token.group(1)]
+		return (token.group(1), 'HEAD')
 
 def _load_heads (opt):
 
@@ -81,7 +81,7 @@ def _load_heads (opt):
 def hunt (opt):
 
 	if len(opt.order) or opt.heads:
-		collected = _load_heads(opt)
+		collected = _load_heads(opt) + [_load_HEAD()]
 		if opt.heads: return _get_all_heads(collected)
 		return _get_selected_heads(_exact_match if opt.match else _prefix_match, collected, opt.order)
 	return _load_HEAD()
