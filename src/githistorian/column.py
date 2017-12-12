@@ -144,6 +144,7 @@ class Column:
 
 		# The order starts for the named heads
 		order = VisitOrder()
+		self.heads.reverse()
 		order.push(self.heads)
 
 		while order.has_more():
