@@ -10,7 +10,9 @@ class VisitOrder:
 
 	def push (self, arg):
 		if len(arg) == 0: return
-		self.content.extend(reversed(arg))
+		if True:
+			for e in reversed(arg): self.content.insert(0, e)
+		else: self.content.extend(reversed(arg))
 
 	def pop (self):
 		try: return self.content.pop(0)
