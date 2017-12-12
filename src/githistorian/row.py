@@ -76,10 +76,11 @@ class Row:
 		# The current node is done
 		target.done = 1
 
-	def unroll (self):
+	def unroll (self, flip):
 
 		# Visit starts with all the heads
 		self.order = VisitOrder()
+		if flip: self.heads.reverse()
 		self.order.push(self.heads)
 
 		# Reference to previous node, to build the chain
@@ -103,6 +104,6 @@ class Row:
 
 		return self.first
 
-def unroll (heads, history):
-	return Row(heads, history).unroll()
+def unroll (heads, history, flip):
+	return Row(heads, history).unroll(flip)
 

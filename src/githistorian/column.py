@@ -137,20 +137,21 @@ class Column:
 				column += 1
 		return
 
-	def unroll (self):
+	def unroll (self, flip):
 
 		self.width = -1
 		self.grid = Grid()
 
 		# The order starts for the named heads
 		order = VisitOrder()
+		if flip: self.heads.reverse()
 		order.push(self.heads)
 
 		while order.has_more():
 
 			name = order.pop()
 			target = self.history.at(name)
-			
+
 			# No node is processed more than once
 			if target.done: continue
 
@@ -169,6 +170,6 @@ class Column:
 
 		return self.width
 
-def unroll (heads, history):
-	return Column(heads, history).unroll()
+def unroll (heads, history, flip):
+	return Column(heads, history).unroll(flip)
 
