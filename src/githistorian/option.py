@@ -14,6 +14,7 @@ class Option:
 		self.heads   = False
 		self.tags    = False
 		self.remotes = False
+		self.mingle  = False
 		self.flip    = False
 		self.hflip   = False
 		self.vflip   = False
@@ -34,6 +35,7 @@ class Option:
 		self.heads   |= other.heads
 		self.tags    |= other.tags
 		self.remotes |= other.remotes
+		self.mingle  |= other.mingle
 		self.flip    |= other.flip
 		self.hflip   |= other.hflip
 		self.vflip   |= other.vflip
@@ -61,6 +63,7 @@ def _print_help ():
 	print(' --prefix, --prefix-match   : arguments match refnames by prefix')
 	print(' -x, --exact, --exact-match : arguments must match refnames exactly')
 	print()
+	print(' -M, --mingle                          : interlap commit from parallel branches')
 	print(' -F, --flip, --flip-heads              : flip heads from top to bottom')
 	print(' -H, --horizontal, --flip-horizontally : flip layout from left to right')
 	print(' -V, --vertical, --flip-vertically     : flip layout from top to bottom')
@@ -106,6 +109,8 @@ def _parse(args, sopts, lopts):
 			return False, False
 		elif key in ('-f', '--file'):
 			filename = value
+		elif key in ('-M', '--mingle'):
+			option.mingle = True
 		elif key in ('-F', '--flip', '--flip-heads'):
 			option.flip = True
 		elif key in ('-H', '--horizontal', '--flip-horizontally'):
@@ -119,11 +124,12 @@ def _parse(args, sopts, lopts):
 
 def parse ():
 
-	sopts = 'atrhvn:p:xFHV'
+	sopts = 'atrhvn:p:xMFHV'
 	lopts = ['help', 'verbose', 'version',
 			'all', 'heads', 'tags', 'remotes',
 			'limit=', 'pretty=',
 			'exact', 'exact-match', 'prefix', 'prefix-match',
+			'mingle',
 			'flip', 'flip-heads',
 			'horizontal', 'flip-horizontally',
 			'vertical', 'flip-vertically']
