@@ -19,9 +19,9 @@ class Option:
 
 		self.order   = []
 
-		self.pretty = False
-		self.limit  = False
-		self.match  = False
+		self.pretty  = False
+		self.limit   = False
+		self.match   = False
 
 		version_file = os.path.join(os.path.dirname(__file__), 'VERSION')
 		self.version = open(version_file, 'r').read().strip()
@@ -40,8 +40,8 @@ class Option:
 
 		if other.pretty: self.pretty = other.pretty
 
-		self.limit  |= other.limit
-		self.match  |= other.match
+		self.limit   |= other.limit
+		self.match   |= other.match
 
 		return self
 
@@ -60,7 +60,7 @@ def _print_help ():
 	print(' -x, --exact, --exact-match : arguments must match refnames exactly')
 	print()
 	print(' -H, --horizontal, --flip-horizontally : flip layout from left to right')
-	print(' -V, --vertical, --flip-vertically : flip layout from top to bottom')
+	print(' -V, --vertical, --flip-vertically     : flip layout from top to bottom')
 	print()
 	print(' -f<name>, --file<name> : load preferences from <name> instead of default .githistorian')
 
