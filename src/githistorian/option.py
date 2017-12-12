@@ -14,6 +14,7 @@ class Option:
 		self.heads   = False
 		self.tags    = False
 		self.remotes = False
+		self.flip    = False
 		self.hflip   = False
 		self.vflip   = False
 
@@ -33,6 +34,7 @@ class Option:
 		self.heads   |= other.heads
 		self.tags    |= other.tags
 		self.remotes |= other.remotes
+		self.flip    |= other.flip
 		self.hflip   |= other.hflip
 		self.vflip   |= other.vflip
 
@@ -59,6 +61,7 @@ def _print_help ():
 	print(' --prefix, --prefix-match   : arguments match refnames by prefix')
 	print(' -x, --exact, --exact-match : arguments must match refnames exactly')
 	print()
+	print(' -F, --flip, --flip-heads              : flip heads from top to bottom')
 	print(' -H, --horizontal, --flip-horizontally : flip layout from left to right')
 	print(' -V, --vertical, --flip-vertically     : flip layout from top to bottom')
 	print()
@@ -103,6 +106,8 @@ def _parse(args, sopts, lopts):
 			return False, False
 		elif key in ('-f', '--file'):
 			filename = value
+		elif key in ('-F', '--flip', '--flip-heads'):
+			option.flip = True
 		elif key in ('-H', '--horizontal', '--flip-horizontally'):
 			option.hflip = True
 		elif key in ('-V', '--vertical', '--flip-vertically'):
@@ -114,11 +119,12 @@ def _parse(args, sopts, lopts):
 
 def parse ():
 
-	sopts = 'atrhvn:p:xHV'
+	sopts = 'atrhvn:p:xFHV'
 	lopts = ['help', 'verbose', 'version',
 			'all', 'heads', 'tags', 'remotes',
 			'limit=', 'pretty=',
 			'exact', 'exact-match', 'prefix', 'prefix-match',
+			'flip', 'flip-heads',
 			'horizontal', 'flip-horizontally',
 			'vertical', 'flip-vertically']
 
