@@ -29,6 +29,8 @@ class VisitOrder:
 		try: return self.content.pop(0)
 		except: return None
 
+# Bind commits to their children to construct the reverse graph: each parent
+# notifies its children so they can reach it
 def _bind_children (heads, db):
 
 	order = VisitOrder()
@@ -48,6 +50,8 @@ def _bind_children (heads, db):
 
 		commit.done = 1
 
+# Given a complete grid, compute layout and print it, straight or flipped as
+# requested by options
 def _print_graph (history, first, width, hflip, vflip):
 
 	t = Layout(width + 1, hflip, vflip)
