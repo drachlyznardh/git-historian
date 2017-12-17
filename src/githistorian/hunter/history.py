@@ -18,7 +18,10 @@ def _get_history_dump (opt, heads, limit):
 	if limit: cmdlist.append('-n%d' % limit)
 	cmdlist.extend(heads)
 
-	return check_output(cmdlist)
+	try: return check_output(cmdlist)
+	except:
+		print('No history')
+		return ''
 
 def hunt (opt, heads, limit):
 
@@ -49,7 +52,7 @@ def hunt (opt, heads, limit):
 			current.message.append(line)
 
 	# Store the last node
-	history.add_node(current)
+	if current: history.add_node(current)
 
 	# Cleaning database from missing refs
 	history.drop_missing_refs()

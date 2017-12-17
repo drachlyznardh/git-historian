@@ -1,7 +1,7 @@
 # encoding: utf-8
 
 from __future__ import print_function
-from subprocess import check_output
+from subprocess import check_output, STDOUT
 import re
 
 def _exact_match (one, two):
@@ -33,7 +33,10 @@ def _load_HEAD ():
 
 	cmdlist = 'git show-ref --heads --head'.split()
 
-	output = check_output(cmdlist)
+	try: output = check_output(cmdlist, stderr=STDOUT)
+	except:
+		print('No HEAD')
+		return (None, None)
 
 	exp = re.compile(r'^(.*) HEAD$')
 
@@ -48,16 +51,19 @@ def _load_HEAD ():
 
 def _load_heads (opt):
 
-	collected = []
-	exp = re.compile(r'^(.*) refs\/.*\/(.*)$')
-
 	# Looking for heads, i.e. active branches
 	cmdlist = ['git', 'show-ref']
 	if not opt.remotes: cmdlist.append('--heads')
 	if opt.tags: cmdlist.append('--tags')
 
 	# Invoke Git
-	git_output = check_output(cmdlist)
+	try: git_output = check_output(cmdlist, stderr=STDOUT)
+	except:
+		print('No HEADs')
+		return []
+
+	collected = []
+	exp = re.compile(r'^(.*) refs\/.*\/(.*)$')
 
 	# Parsing Git response
 	for line in git_output.split('\n'):
