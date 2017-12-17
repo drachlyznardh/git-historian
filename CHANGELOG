@@ -1,4 +1,10 @@
 
+Release 0.1.1-1 – 2017/12/17
+============================
+
+Adding support for option -FHVM to modify layout. Mostly working, even if some
+combinations may show artifacts or broken history
+
 Release 0.1.0-1 – 2017/12/10
 ============================
 

@@ -2,15 +2,18 @@
 
 class VisitOrder:
 
-	def __init__ (self):
+	def __init__ (self, mingle):
 		self.content = []
+		self.mingle = mingle
 
 	def has_more (self):
 		return len(self.content)
 
 	def push (self, arg):
 		if len(arg) == 0: return
-		self.content.extend(reversed(arg))
+		if self.mingle: self.content.extend(reversed(arg))
+		else:
+			for e in reversed(arg): self.content.insert(0, e)
 
 	def pop (self):
 		try: return self.content.pop(0)
@@ -76,10 +79,11 @@ class Row:
 		# The current node is done
 		target.done = 1
 
-	def unroll (self):
+	def unroll (self, mingle, flip):
 
 		# Visit starts with all the heads
-		self.order = VisitOrder()
+		self.order = VisitOrder(mingle)
+		if flip: self.heads.reverse()
 		self.order.push(self.heads)
 
 		# Reference to previous node, to build the chain
@@ -103,6 +107,6 @@ class Row:
 
 		return self.first
 
-def unroll (heads, history):
-	return Row(heads, history).unroll()
+def unroll (heads, history, mingle, flip):
+	return Row(heads, history).unroll(mingle, flip)
 
