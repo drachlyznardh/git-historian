@@ -14,11 +14,12 @@ def _select_pretty (value):
 # with others and the custom messages
 def _get_history_dump (opt, heads, limit):
 
-	cmdlist = ['git', 'log', _select_pretty(opt.pretty)]
-	if limit: cmdlist.append('-n%d' % limit)
-	cmdlist.extend(heads)
+	try:
+		cmdlist = ['git', 'log', _select_pretty(opt.pretty)]
+		if limit: cmdlist.append('-n%d' % limit)
+		cmdlist.extend(heads)
 
-	try: return check_output(cmdlist)
+		return check_output(cmdlist)
 	except:
 		print('No history')
 		return ''
@@ -27,6 +28,10 @@ def hunt (opt, heads, limit):
 
 	history = NodeDB()
 	current = None
+
+	if heads == None:
+		print('No history')
+		return [], history
 
 	for line in _get_history_dump(opt, heads, limit).split('\n'):
 

@@ -36,7 +36,7 @@ def _load_HEAD ():
 	try: output = check_output(cmdlist, stderr=STDOUT)
 	except:
 		print('No HEAD')
-		return (None, None)
+		return False
 
 	exp = re.compile(r'^(.*) HEAD$')
 
@@ -48,6 +48,9 @@ def _load_HEAD ():
 		if not token: continue
 
 		return (token.group(1), 'HEAD')
+
+	# HEAD may not exist
+	return False
 
 def _load_heads (opt):
 
@@ -87,7 +90,7 @@ def _load_heads (opt):
 def hunt (opt):
 
 	if len(opt.order) or opt.heads:
-		collected = _load_heads(opt) + [_load_HEAD()]
+		collected = [x for x in _load_heads(opt) + [_load_HEAD()] if x]
 		if opt.heads: return _get_all_heads(collected)
 		return _get_selected_heads(_exact_match if opt.match else _prefix_match, collected, opt.order)
 	return _load_HEAD()
