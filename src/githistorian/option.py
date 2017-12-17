@@ -14,11 +14,16 @@ class Option:
 		self.heads   = False
 		self.tags    = False
 		self.remotes = False
+		self.mingle  = False
+		self.flip    = False
+		self.hflip   = False
+		self.vflip   = False
+
 		self.order   = []
 
-		self.pretty = False
-		self.limit  = False
-		self.match  = False
+		self.pretty  = False
+		self.limit   = False
+		self.match   = False
 
 		version_file = os.path.join(os.path.dirname(__file__), 'VERSION')
 		self.version = open(version_file, 'r').read().strip()
@@ -30,12 +35,17 @@ class Option:
 		self.heads   |= other.heads
 		self.tags    |= other.tags
 		self.remotes |= other.remotes
+		self.mingle  |= other.mingle
+		self.flip    |= other.flip
+		self.hflip   |= other.hflip
+		self.vflip   |= other.vflip
+
 		self.order.extend(other.order)
 
 		if other.pretty: self.pretty = other.pretty
 
-		self.limit  |= other.limit
-		self.match  |= other.match
+		self.limit   |= other.limit
+		self.match   |= other.match
 
 		return self
 
@@ -52,6 +62,11 @@ def _print_help ():
 	print()
 	print(' --prefix, --prefix-match   : arguments match refnames by prefix')
 	print(' -x, --exact, --exact-match : arguments must match refnames exactly')
+	print()
+	print(' -M, --mingle                          : interlap commit from parallel branches')
+	print(' -F, --flip, --flip-heads              : flip heads from top to bottom')
+	print(' -H, --horizontal, --flip-horizontally : flip layout from left to right')
+	print(' -V, --vertical, --flip-vertically     : flip layout from top to bottom')
 	print()
 	print(' -f<name>, --file<name> : load preferences from <name> instead of default .githistorian')
 
@@ -94,6 +109,14 @@ def _parse(args, sopts, lopts):
 			return False, False
 		elif key in ('-f', '--file'):
 			filename = value
+		elif key in ('-M', '--mingle'):
+			option.mingle = True
+		elif key in ('-F', '--flip', '--flip-heads'):
+			option.flip = True
+		elif key in ('-H', '--horizontal', '--flip-horizontally'):
+			option.hflip = True
+		elif key in ('-V', '--vertical', '--flip-vertically'):
+			option.vflip = True
 
 	option.order = args
 
@@ -101,11 +124,15 @@ def _parse(args, sopts, lopts):
 
 def parse ():
 
-	sopts = 'atrhvn:p:x'
+	sopts = 'atrhvn:p:xMFHV'
 	lopts = ['help', 'verbose', 'version',
 			'all', 'heads', 'tags', 'remotes',
 			'limit=', 'pretty=',
-			'exact', 'exact-match', 'prefix', 'prefix-match']
+			'exact', 'exact-match', 'prefix', 'prefix-match',
+			'mingle',
+			'flip', 'flip-heads',
+			'horizontal', 'flip-horizontally',
+			'vertical', 'flip-vertically']
 
 	option, filename = _parse(sys.argv[1:], sopts+'f:', lopts+['file'])
 	if not option: return False
