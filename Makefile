@@ -16,3 +16,6 @@ dist:
 install:
 	@python setup.py install
 
+tags: |
+	@ctags -f .tags -R src/
+
