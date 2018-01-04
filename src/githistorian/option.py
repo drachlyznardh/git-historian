@@ -26,6 +26,8 @@ class Option:
 		self.limit   = False
 		self.match   = False
 
+		self.needColorTrick = False
+
 		version_file = os.path.join(os.path.dirname(__file__), 'VERSION')
 		self.version = open(version_file, 'r').read().strip()
 

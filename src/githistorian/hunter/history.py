@@ -16,6 +16,7 @@ def _get_history_dump (opt, heads, limit):
 
 	try:
 		cmdlist = ['git', 'log', _select_pretty(opt.pretty)]
+		if opt.needColorTrick: cmdlist.append('--color=always')
 		if limit: cmdlist.append('-n%d' % limit)
 		cmdlist.extend(heads)
 
