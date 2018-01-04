@@ -20,6 +20,7 @@ class Option:
 		self.vflip   = False
 
 		self.order   = []
+		self.targets = []
 
 		self.pretty  = False
 		self.limit   = False
@@ -41,6 +42,7 @@ class Option:
 		self.vflip   |= other.vflip
 
 		self.order.extend(other.order)
+		self.targets.extend(other.order)
 
 		if other.pretty: self.pretty = other.pretty
 
@@ -57,8 +59,10 @@ def _print_help ():
 	print(' -t, --tags         : adds all tags to targets')
 	print(' -r, --remotes      : adds all remote branches to targets')
 	print()
-	print(' -n<N>, --limit<N>  : cuts history to N commits')
-	print(' -p<P>, --pretty<P> : uses P as the pretty format for messages')
+	print(' -n<N>, --limit <N>  : cuts history to N commits')
+	print(' -p<P>, --pretty <P> : uses P as the pretty format for messages')
+	print()
+	print(' -o<name[,names...]>, --order <name[,names...]> : show all targets in order')
 	print()
 	print(' --prefix, --prefix-match   : arguments match refnames by prefix')
 	print(' -x, --exact, --exact-match : arguments must match refnames exactly')
@@ -104,6 +108,8 @@ def _parse(args, sopts, lopts):
 			option.match = True
 		elif key in ('--prefix', '--prefix-match'):
 			option.match = False
+		elif key in ('-o', '--order'):
+			option.order = value.split(',')
 		elif key == '--version':
 			_print_version(option)
 			return False, False
@@ -118,17 +124,18 @@ def _parse(args, sopts, lopts):
 		elif key in ('-V', '--vertical', '--flip-vertically'):
 			option.vflip = True
 
-	option.order = args
+	option.targets = args
 
 	return option, filename
 
 def parse ():
 
-	sopts = 'atrhvn:p:xMFHV'
+	sopts = 'atrhvn:p:xo:MFHV'
 	lopts = ['help', 'verbose', 'version',
 			'all', 'heads', 'tags', 'remotes',
 			'limit=', 'pretty=',
 			'exact', 'exact-match', 'prefix', 'prefix-match',
+			'order=',
 			'mingle',
 			'flip', 'flip-heads',
 			'horizontal', 'flip-horizontally',

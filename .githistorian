@@ -1,4 +1,2 @@
-master
-devel
-ongoing
+--order=master,devel,rc,ongoing
 --pretty=%C(yellow)%h%C(auto)%d%Creset %s %C(bold red)%ar%Cblue %an
