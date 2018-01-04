@@ -12,6 +12,15 @@ def tell_the_story():
 	opt = parse_cmd_args()
 	if not opt: return
 
+	try:
+		output = check_output('git --version'.split(), stderr=STDOUT).strip()
+		print(output)
+		print(output.split(' '))
+		print(output.split(' ')[2].split('.'))
+	except:
+		print('Git is not installed')
+		return
+
 	try: check_output('git rev-parse --git-dir'.split(), stderr=STDOUT)
 	except:
 		print('Not a repo')
