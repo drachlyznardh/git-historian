@@ -89,9 +89,18 @@ def _load_heads (opt):
 
 def hunt (opt):
 
-	if len(opt.order) or opt.heads:
+	if len(opt.targets) or opt.heads:
+
+		wanted = []
+		for e in opt.order:
+			if e in opt.targets:
+				wanted.append(e)
+		for e in opt.targets:
+			if e not in wanted:
+				wanted.append(e)
+
 		collected = [x for x in _load_heads(opt) + [_load_HEAD()] if x]
 		if opt.heads: return _get_all_heads(collected)
-		return _get_selected_heads(_exact_match if opt.match else _prefix_match, collected, opt.order)
+		return _get_selected_heads(_exact_match if opt.match else _prefix_match, collected, wanted)
 	return _load_HEAD()
 

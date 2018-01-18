@@ -44,7 +44,7 @@ class Option:
 		self.vflip   |= other.vflip
 
 		self.order.extend(other.order)
-		self.targets.extend(other.order)
+		self.targets.extend(other.targets)
 
 		if other.pretty: self.pretty = other.pretty
 
