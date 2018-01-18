@@ -43,8 +43,8 @@ class Option:
 		self.hflip   |= other.hflip
 		self.vflip   |= other.vflip
 
-		self.order.extend(other.order)
-		self.targets.extend(other.targets)
+		if other.order: self.order = other.order
+		if other.targets: self.targets = other.targets
 
 		if other.pretty: self.pretty = other.pretty
 
