@@ -29,7 +29,7 @@ def _get_selected_heads (f, heads, order):
 
 	return [e for e in result if not (e in seen or g(e))]
 
-def _load_HEAD ():
+def _load_HEAD (outputTuple):
 
 	cmdlist = 'git show-ref --heads --head'.split()
 
@@ -47,7 +47,8 @@ def _load_HEAD ():
 		token = exp.match(line)
 		if not token: continue
 
-		return (token.group(1), 'HEAD')
+		if outputTuple: return [(token.group(1), 'HEAD')]
+		return [token.group(1)]
 
 	# HEAD may not exist
 	return False
@@ -99,8 +100,8 @@ def hunt (opt):
 			if e not in wanted:
 				wanted.append(e)
 
-		collected = [x for x in _load_heads(opt) + [_load_HEAD()] if x]
+		collected = [x for x in _load_heads(opt) + _load_HEAD(True) if x]
 		if opt.heads: return _get_all_heads(collected)
 		return _get_selected_heads(_exact_match if opt.match else _prefix_match, collected, wanted)
-	return _load_HEAD()
+	return _load_HEAD(False)
 

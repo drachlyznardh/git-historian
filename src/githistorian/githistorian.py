@@ -41,7 +41,7 @@ def tell_the_story():
 	if opt.verbose:
 		print('Targets list    %s' % opt.targets)
 		print('Targets order   %s' % opt.order)
-		print('Targets found   %s' % [targets])
+		print('Targets found   %s' % targets)
 		print('Roots displayed %s' % roots)
 		lines, commits, omitted = history.stats()
 		print('Loaded %d commits, %d omitted' % (commits, omitted))
