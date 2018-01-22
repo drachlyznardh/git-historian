@@ -15,7 +15,7 @@ def _get_all_heads (heads):
 	f = seen.add
 	return [e[0] for e in heads if not (e[0] in seen or f(e[0]))]
 
-def _get_selected_heads (f, heads, order):
+def _get_selected_heads (f, heads, order, all_heads):
 
 	seen = set()
 	g = seen.add
@@ -26,6 +26,10 @@ def _get_selected_heads (f, heads, order):
 			if f(name, e[1]):
 				# heads.remove(e)
 				result.append(e[0])
+
+	if all_heads:
+		for e in heads:
+			result.append(e[0])
 
 	return [e for e in result if not (e in seen or g(e))]
 
@@ -90,18 +94,16 @@ def _load_heads (opt):
 
 def hunt (opt):
 
-	if len(opt.targets) or opt.heads:
+	if len(opt.targets) == 0 and not opt.heads: return _load_HEAD(False)
 
-		wanted = []
-		for e in opt.order:
-			if e in opt.targets:
-				wanted.append(e)
-		for e in opt.targets:
-			if e not in wanted:
-				wanted.append(e)
+	wanted = []
+	for e in opt.order:
+		if e in opt.targets:
+			wanted.append(e)
+	for e in opt.targets:
+		if e not in wanted:
+			wanted.append(e)
 
-		collected = [x for x in _load_heads(opt) + _load_HEAD(True) if x]
-		if opt.heads: return _get_all_heads(collected)
-		return _get_selected_heads(_exact_match if opt.match else _prefix_match, collected, wanted)
-	return _load_HEAD(False)
+	collected = [x for x in _load_heads(opt) + _load_HEAD(True) if x]
+	return _get_selected_heads(_exact_match if opt.match else _prefix_match, collected, wanted, opt.heads)
 
