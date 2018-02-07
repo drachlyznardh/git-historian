@@ -93,6 +93,7 @@ class NodeDB:
 	# Due to excessively restricting size limit, some heads may not appear at
 	# all in the database. These heads are removed from the list
 	def drop_missing_heads (self, heads):
+		if not heads: return []
 		available = []
 		for name in heads:
 			if name in self.store:
