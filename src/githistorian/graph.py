@@ -2,8 +2,10 @@
 from __future__ import print_function
 
 # Silencing BROKEN PIPE errors
-from signal import signal, SIGPIPE, SIG_DFL
-signal(SIGPIPE, SIG_DFL)
+import sys
+if sys.platform != 'win32':
+    from signal import signal, SIGPIPE, SIG_DFL
+    signal(SIGPIPE, SIG_DFL)
 
 from .row import unroll as row_unroll
 from .column import unroll as column_unroll
