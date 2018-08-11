@@ -23,8 +23,8 @@ def tell_the_story():
 		return
 
 	try:
-		version = [int(x) for x in version.split(' ')[2].split('.')]
-		if version[0] == 2 and version[1] > 11: opt.needColorTrick = True
+		version = [x for x in version.split(' ')[2].split('.')]
+		if int(version[0]) == 2 and int(version[1]) > 11: opt.needColorTrick = True
 	except:
 		print('Unrecognized version %s' % version)
 		return
