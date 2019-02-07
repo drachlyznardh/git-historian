@@ -37,7 +37,7 @@ def _load_HEAD (outputTuple):
 
 	cmdlist = 'git show-ref --heads --head'.split()
 
-	try: output = check_output(cmdlist, stderr=STDOUT)
+	try: output = check_output(cmdlist, stderr=STDOUT, encoding='utf-8')
 	except:
 		print('No HEAD')
 		return False

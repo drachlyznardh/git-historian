@@ -70,6 +70,7 @@ class NodeDB:
 
 	def drop_missing_refs (self):
 
+		fakes = []
 		for node in self.store.values():
 
 			size = len(node.parent)
@@ -87,8 +88,10 @@ class NodeDB:
 						fake = Node()
 						fake.name = name
 						fake.message = ['[…]']
-						self.add_node(fake)
+						fakes.append(fake)
 						self.fake += 1
+
+		for fake in fakes: self.add_node(fake)
 
 	# Due to excessively restricting size limit, some heads may not appear at
 	# all in the database. These heads are removed from the list

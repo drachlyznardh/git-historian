@@ -9,7 +9,7 @@ from .graph import deploy as deploy_graph
 
 def get_version():
 
-	try: return check_output('git --version'.split(), stderr=STDOUT).strip()
+	try: return check_output('git --version'.split(), stderr=STDOUT, encoding='utf-8').strip()
 	except: return None
 
 def tell_the_story():

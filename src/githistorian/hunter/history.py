@@ -20,7 +20,7 @@ def _get_history_dump (opt, heads, limit):
 		if limit: cmdlist.append('-n%d' % limit)
 		cmdlist.extend(heads)
 
-		return check_output(cmdlist)
+		return check_output(cmdlist, encoding='utf-8')
 	except:
 		print('No history')
 		return ''
