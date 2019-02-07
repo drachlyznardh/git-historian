@@ -84,5 +84,7 @@ def deploy (opt, roots, history):
 	first = row_unroll(roots, history, opt.mingle, opt.flip)
 	history.clear()
 	width = column_unroll(roots, history, opt.flip)
-	_print_graph(history, first, width, opt.hflip, opt.vflip)
+
+	try: _print_graph(history, first, width, opt.hflip, opt.vflip)
+	except BrokenPipeError: pass
 
