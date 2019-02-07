@@ -10,7 +10,10 @@ check:
 build:
 	@python3 setup.py build
 
-dist:
+bdist:
+	@python3 setup.py bdist
+
+sdist:
 	@python3 setup.py sdist
 
 install:
