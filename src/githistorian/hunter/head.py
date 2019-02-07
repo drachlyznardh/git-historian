@@ -33,7 +33,7 @@ def _load_HEAD ():
 
 	cmdlist = 'git show-ref --heads --head'.split()
 
-	output = check_output(cmdlist)
+	output = check_output(cmdlist).decode('utf-8')
 
 	exp = re.compile(r'^(.*) HEAD$')
 
@@ -57,7 +57,7 @@ def _load_heads (opt):
 	if opt.tags: cmdlist.append('--tags')
 
 	# Invoke Git
-	git_output = check_output(cmdlist)
+	git_output = check_output(cmdlist).decode('utf-8')
 
 	# Parsing Git response
 	for line in git_output.split('\n'):

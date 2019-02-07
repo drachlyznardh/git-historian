@@ -15,7 +15,7 @@ class Layout:
 		self.hflip = hflip
 
 		self.layout = []
-		self.track = {i:set() for i in xrange(-1, size)}
+		self.track = {i:set() for i in range(-1, size)}
 
 		self.ltee = '├' if self.hflip else '┤' # \u 251c or 2524
 		self.rtee = '┤' if self.hflip else '├' # \u 2524 or 251c
@@ -128,7 +128,7 @@ class Layout:
 
 		if self.size: self.compute_even_column(0, target)
 
-		for i in xrange(1, self.size):
+		for i in range(1, self.size):
 			self.compute_odd_column(i, target)
 			self.compute_even_column(i, target)
 

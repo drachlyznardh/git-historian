@@ -18,7 +18,7 @@ def _get_history_dump (opt, heads, limit):
 	if limit: cmdlist.append('-n%d' % limit)
 	cmdlist.extend(heads)
 
-	return check_output(cmdlist)
+	return check_output(cmdlist).decode('utf-8')
 
 def hunt (opt, heads, limit):
 
