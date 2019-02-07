@@ -65,7 +65,7 @@ def _load_heads (opt):
 	if opt.tags: cmdlist.append('--tags')
 
 	# Invoke Git
-	try: git_output = check_output(cmdlist, stderr=STDOUT)
+	try: git_output = check_output(cmdlist, stderr=STDOUT, encoding='utf-8')
 	except:
 		print('No HEADs')
 		return []
