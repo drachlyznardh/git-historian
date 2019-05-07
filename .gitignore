@@ -1,5 +1,7 @@
 .*.swp
 *.pyc
+*.egg-info/
 MANIFEST
-dist
-.tags
+dist/
+build/
+tags
