@@ -14,5 +14,5 @@ setup(
 	packages=find_packages(where='src'),
 	package_data={'': ['VERSION']},
 	install_requires=['bintrees'],
-	scripts=['bin/githistorian']
+	entry_points = { 'console_scripts': ['githistorian=githistorian.githistorian:tell_the_story'] },
 )
