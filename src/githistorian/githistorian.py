@@ -7,18 +7,13 @@ from .hunter.history import hunt as history_hunt
 from .option import parse as parse_cmd_args
 from .graph import deploy as deploy_graph
 
-def get_version():
-
-	try: return check_output('git --version'.split(), stderr=STDOUT, encoding='utf-8').strip()
-	except: return None
-
 def tell_the_story():
 
 	opt = parse_cmd_args()
 	if not opt: return
 
-	version = get_version()
-	if not version:
+	try: version = check_output('git --version'.split(), stderr=STDOUT, encoding='utf-8').strip()
+	except:
 		print('Git is not installed')
 		return
 
