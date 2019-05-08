@@ -17,9 +17,7 @@ def tell_the_story():
 		print('Git is not installed')
 		return 1
 
-	try:
-		version = [x for x in version.split(' ')[2].split('.')]
-		if int(version[0]) == 2 and int(version[1]) > 11: opt.needColorTrick = True
+	try: version = [x for x in version.split(' ')[2].split('.')]
 	except:
 		print('Unrecognized version %s' % version)
 		return 1
@@ -30,6 +28,7 @@ def tell_the_story():
 		return 1
 
 	# Hunting for history
+	if int(version[0]) == 2 and int(version[1]) > 11: opt.needColorTrick = True
 	targets = head_hunt(opt)
 	roots, history = history_hunt(opt, targets, opt.limit)
 
