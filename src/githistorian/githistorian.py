@@ -15,19 +15,19 @@ def tell_the_story():
 	try: version = check_output('git --version'.split(), stderr=STDOUT, encoding='utf-8').strip()
 	except:
 		print('Git is not installed')
-		return
+		return 1
 
 	try:
 		version = [x for x in version.split(' ')[2].split('.')]
 		if int(version[0]) == 2 and int(version[1]) > 11: opt.needColorTrick = True
 	except:
 		print('Unrecognized version %s' % version)
-		return
+		return 1
 
 	try: check_output('git rev-parse --git-dir'.split(), stderr=STDOUT)
 	except:
 		print('Not a repo')
-		return
+		return 1
 
 	# Hunting for history
 	targets = head_hunt(opt)
@@ -43,4 +43,5 @@ def tell_the_story():
 
 	# Graph unrolling
 	deploy_graph(opt, roots, history)
+	return 0
 
