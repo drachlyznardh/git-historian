@@ -1,26 +1,19 @@
 
-all: check run
-
-run:
-	@PYTHONPATH=src python3 -m githistorian -n30
+all: check
 
 check:
 	@python3 setup.py check
 
-build:
-	@python3 setup.py build
-
-bdist:
-	@python3 setup.py bdist
-
-sdist:
-	@python3 setup.py sdist
-
 install:
-	@pip3 install --user .
+	@pip3 install --verbose --user .
 
 clean:
 	@python3 setup.py clean
 
-.PHONY: all install clean
+veryclean: clean
+	@rm -rf dist/ build/
+	@find . -name '*.egg-info' | xargs rm -rf
+	@find . -name __pycache__ | xargs rm -rf
+
+.PHONY: all check install clean veryclean
 
