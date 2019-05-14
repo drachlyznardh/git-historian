@@ -15,5 +15,11 @@ veryclean: clean
 	@find . -name '*.egg-info' | xargs rm -rf
 	@find . -name __pycache__ | xargs rm -rf
 
+dist:
+	@python3 setup.py sdist bdist_wheel
+
+publish: veryclean dist
+	@python3 -m twine upload dist/*.whl dist/*.tar.gz
+
 .PHONY: all check install clean veryclean
 
