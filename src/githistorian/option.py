@@ -130,7 +130,7 @@ def _parse(args, sopts, lopts):
 
 	return option, filename
 
-def parse ():
+def parse (inargs):
 
 	sopts = 'atrhvn:p:xo:MFHV'
 	lopts = ['help', 'verbose', 'version',
@@ -143,7 +143,7 @@ def parse ():
 			'horizontal', 'flip-horizontally',
 			'vertical', 'flip-vertically']
 
-	option, filename = _parse(sys.argv[1:], sopts+'f:', lopts+['file'])
+	option, filename = _parse(inargs or sys.argv[1:], sopts+'f:', lopts+['file'])
 	if not option: return False
 
 	if filename and os.path.exists(filename):

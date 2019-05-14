@@ -7,9 +7,9 @@ from .hunter.history import hunt as history_hunt
 from .option import parse as parse_cmd_args
 from .graph import deploy as deploy_graph
 
-def tell_the_story():
+def tell_the_story(inargs=None):
 
-	opt = parse_cmd_args()
+	opt = parse_cmd_args(inargs)
 	if not opt: return
 
 	try: version = check_output('git --version'.split(), stderr=STDOUT, encoding='utf-8').strip()
