@@ -88,3 +88,5 @@ def deploy (opt, roots, history):
 	try: _print_graph(history, first, width, opt.hflip, opt.vflip)
 	except BrokenPipeError: pass
 
+	return 0
+
