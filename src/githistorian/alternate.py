@@ -1,28 +1,22 @@
 
-class Order:
-	def __init__ (self):
-		self.order = []
+def bind_children(opt, heads, db):
 
-	def __bool__ (self):
-		return True if self.order else False
+	order = [e for e in heads]
 
-	def push (self, arg):
-		if arg: self.order = arg + self.order
+	while order:
+		name = order.pop(0)
+		print('Visiting {}'.format(name))
+		commit = db.at(name)
+		if commit.done: continue
 
-	def pop (self):
-		try: return self.order.pop(0)
-		except: return None
+		for i in commit.parent: db.at(i).add_child(name)
+
+		order = db.skip_if_done(commit.parent) + order
+		commit.done = 1
 
 def reduce_graphs(opt, heads, db):
 
 	grid = []
-	order = Order()
-
-	order.push(heads)
-
-	while order:
-		name = order.pop()
-		print('Visiting {}'.format(name))
 
 def deploy(opt, heads, db):
 
@@ -32,7 +26,10 @@ def deploy(opt, heads, db):
 		print(db)
 	except BrokenPipeError: pass
 
+	bind_children(opt, heads, db)
+	print('Children are bound')
 	reduce_graphs(opt, heads, db)
+	print('Graph was reduced')
 
 	return 0
 
