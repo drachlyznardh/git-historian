@@ -26,6 +26,8 @@ class Option:
 		self.limit   = False
 		self.match   = False
 
+		self.mode    = 0
+
 		self.needColorTrick = False
 
 		version_file = os.path.join(os.path.dirname(__file__), 'VERSION')
@@ -51,6 +53,8 @@ class Option:
 		self.limit   |= other.limit
 		self.match   |= other.match
 
+		self.mode    |= other.mode
+
 		return self
 
 def _print_help ():
@@ -75,6 +79,8 @@ def _print_help ():
 	print(' -V, --vertical, --flip-vertically     : flip layout from top to bottom')
 	print()
 	print(' -f<name>, --file<name> : load preferences from <name> instead of default .githistorian')
+	print()
+	print(' -m[0,1], --mode[01] : select original bintrees mode [0, default] or new sortedcontainer mode [1, experimental]')
 
 def _print_version (o):
 	print("Git-Historian %s © 2014-2017 Ivan Simonini" % o.version)
@@ -125,6 +131,8 @@ def _parse(args, sopts, lopts):
 			option.hflip = True
 		elif key in ('-V', '--vertical', '--flip-vertically'):
 			option.vflip = True
+		elif key in ('-m', '--mode'):
+			option.mode = int(value)
 
 	option.targets = args
 
@@ -132,7 +140,7 @@ def _parse(args, sopts, lopts):
 
 def parse (inargs):
 
-	sopts = 'atrhvn:p:xo:MFHV'
+	sopts = 'atrhvn:p:xo:MFHVm:'
 	lopts = ['help', 'verbose', 'version',
 			'all', 'heads', 'tags', 'remotes',
 			'limit=', 'pretty=',
@@ -141,7 +149,8 @@ def parse (inargs):
 			'mingle',
 			'flip', 'flip-heads',
 			'horizontal', 'flip-horizontally',
-			'vertical', 'flip-vertically']
+			'vertical', 'flip-vertically',
+			'mode']
 
 	option, filename = _parse(inargs or sys.argv[1:], sopts+'f:', lopts+['file'])
 	if not option: return False

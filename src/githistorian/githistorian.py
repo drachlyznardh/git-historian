@@ -5,7 +5,6 @@ from subprocess import check_output, STDOUT
 from .hunter.head import hunt as head_hunt
 from .hunter.history import hunt as history_hunt
 from .option import parse as parse_cmd_args
-from .graph import deploy as deploy_graph
 
 def tell_the_story(inargs=None):
 
@@ -41,6 +40,10 @@ def tell_the_story(inargs=None):
 		print('Loaded %d commits, %d omitted' % (commits, omitted))
 
 	# Graph unrolling
-	deploy_graph(opt, roots, history)
-	return 0
+	if opt.mode == 1:
+		from .alternate import deploy
+		return deploy(opt, roots, history)
+
+	from .graph import deploy as deploy_graph
+	return deploy_graph(opt, roots, history)
 
