@@ -9,6 +9,11 @@ scheck:
 	@. /tmp/gh-stest/bin/activate && pip3 install dist/githistorian-$(shell cat VERSION).tar.gz
 	@. /tmp/gh-stest/bin/activate && githistorian --version
 
+bcheck:
+	@python3 -m venv /tmp/gh-btest
+	@. /tmp/gh-btest/bin/activate && pip3 install dist/githistorian-$(shell cat VERSION)-py3-none-any.whl
+	@. /tmp/gh-btest/bin/activate && githistorian --version
+
 install:
 	@pip3 install --verbose --user .
 
