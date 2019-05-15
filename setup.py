@@ -19,6 +19,7 @@ setup(
 	package_dir={'':'src'},
 	packages=find_packages(where='src'),
 	install_requires=['bintrees'],
+	setup_requires=['wheel'],
 	entry_points = { 'console_scripts': ['githistorian=githistorian.githistorian:tell_the_story'] },
 	package_data={'': ['VERSION']},
 	classifiers=[
