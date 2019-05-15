@@ -83,7 +83,7 @@ def _print_help ():
 	print(' -m[0,1], --mode[01] : select original bintrees mode [0, default] or new sortedcontainer mode [1, experimental]')
 
 def _print_version (o):
-	print("Git-Historian %s © 2014-2017 Ivan Simonini" % o.version)
+	print("Git-Historian %s © 2014-2019 Ivan Simonini" % o.version)
 
 def _parse(args, sopts, lopts):
 
