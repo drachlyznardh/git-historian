@@ -149,7 +149,7 @@ class Grid:
 		dealtWith = False
 		state = 0 # Looking
 		for c in self.columns: # Look for column where node belongs
-			print('Checking column {}/{}'.format(c.occupiedBy, c.waitingFor))
+			print('\tChecking column {}/{}'.format(c.occupiedBy, c.waitingFor))
 			if state == 0: # Looking for waiting
 				if node.topName in c.waitingFor:
 					c.assign(node)
@@ -158,15 +158,15 @@ class Grid:
 			elif state == 1: # Closing others
 				c.wasSeen(node.name)
 
-		print('No column is waiting for {}'.format(node.topName))
 		if not dealtWith: # Node does not belong in any columns
+			print('\tNo column is waiting for {}'.format(node.topName))
 			for c in self.columns:
 				if not c.occupiedBy:
 					c.assign(node)
 					dealtWith = True
 
-		print('No column is free for {}'.format(node.topName))
 		if not dealtWith: # There are no free columns
+			print('\tNo column is free for {}'.format(node.topName))
 			c = self.Column()
 			c.assign(node)
 			self.columns.append(c)
