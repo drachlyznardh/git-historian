@@ -190,19 +190,22 @@ class DumbGrid:
 	class Row:
 		def __init__(self, columns, node, verbose):
 			self.content = ''
-			for c in columns:
+			tIndex = -1
+			for i, c in enumerate(columns):
 				if verbose: print('Checking {}'.format(c))
 				# If this is my column
 				if node.topName in c.name:
 					if verbose: print('\tRight under {}'.format(c.name))
-					self.content += ' '.join(node.getContent()[0])
+					self.content += '\x1b[m{}'.format(' '.join(node.getContent()[0]))
 				# Am I straight below the target?
 				elif node.topName in c.parents:
 					if verbose: print('\t{} belongs to {}'.format(node.topName, ','.join(c.parents)))
-					self.content += '12'
+					tIndex = i
+					self.content += '\x1b[{}m12'.format(31 + tIndex % 6)
 				else:
+					tIndex = i
 					if verbose: print('\t{} does not to {}'.format(node.topName, ','.join(c.parents)))
-					self.content += '34'
+					self.content += '\x1b[{}m34'.format(31 + tIndex % 6)
 			if verbose: print('Row has {}'.format(self.content))
 
 		def dump(self, db):
