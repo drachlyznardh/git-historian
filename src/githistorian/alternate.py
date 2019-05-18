@@ -182,7 +182,7 @@ class DumbGrid:
 	class Column:
 		def __init__(self, node):
 			self.name = node.bottomName
-			self.parents = node.parents
+			self.parents = set(node.parents)
 
 		def __str__(self):
 			return 'Column({}/{})'.format(self.name, ', '.join(self.parents))
@@ -190,7 +190,8 @@ class DumbGrid:
 	class Row:
 		def __init__(self, columns, node, verbose):
 			self.content = ''
-			tIndex = -1
+			tIndex = 0 # Column of target node
+			seenChildren = set(node.children)
 			for i, c in enumerate(columns):
 				if verbose: print('Checking {}'.format(c))
 				# If this is my column
@@ -199,13 +200,19 @@ class DumbGrid:
 					self.content += '\x1b[m{}'.format(' '.join(node.getContent()[0]))
 				# Am I straight below the target?
 				elif node.topName in c.parents:
-					if verbose: print('\t{} belongs to {}'.format(node.topName, ','.join(c.parents)))
 					tIndex = i
-					self.content += '\x1b[{}m12'.format(31 + tIndex % 6)
+					c.parents.remove(node.topName)
+					seenChildren.remove(c.name)
+					if verbose:
+						print('\t{} belongs to {}'.format(c.name, ','.join(c.parents)))
+						print('{} has {} open parents'.format(node.topName, len(c.parents)))
+					self.content += '\x1b[{}m{}←'.format(31 + tIndex % 6,
+						'├' if c.parents else '└' if seenChildren else '┷') # U+251c U+2514 U+2537
 				else:
-					tIndex = i
-					if verbose: print('\t{} does not to {}'.format(node.topName, ','.join(c.parents)))
-					self.content += '\x1b[{}m34'.format(31 + tIndex % 6)
+					if verbose:
+						print('\t{} does not to {}'.format(c.name, ','.join(c.parents)))
+						print('{} has {} open parents'.format(node.topName, len(c.parents)))
+					self.content += '\x1b[{}m{}'.format(31 + tIndex % 6, '←←' if i else '│ ') # U+2502
 			if verbose: print('Row has {}'.format(self.content))
 
 		def dump(self, db):
