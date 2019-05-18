@@ -114,6 +114,9 @@ class Grid:
 		def wasSeen(self, name):
 			if name in self.waitingFor: self.waitingFor.remove(name)
 
+		def get(self, index, node):
+			return '\x1b[{}m| '.format(31 + index % 7)
+
 	def __init__(self):
 		self.columns = [self.Column()]
 
@@ -133,13 +136,10 @@ class Grid:
 		if not dealtWith: # Node does not belong in any columns
 			pass # Find open column or create new one
 
-	def getLayout(self, node):
-		return '\x1b[31m| \x1b[m{} \x1b[32m{}'
-
 	def dealWith(self, node):
 
 		self.assign(node)
-		return self.getLayout(node)
+		return '{}{}'.format(''.join(c.get(i, node) for i, c in enumerate(self.columns)), '\x1b[m{} \x1b[32m{}\x1b[m')
 
 def fromStdin():
 	import sys
@@ -152,16 +152,13 @@ def deploy():
 		heads, db = loadDB(fromStdin())
 		heads, db = reduceDB(heads, db, True)
 
-		print('\x1b[m')
 		visit = Visit(heads)
 		grid = Grid()
 		while visit:
 			e = visit.pop()
 			layout = grid.dealWith(e)
-			for s, t in e.getContent():
-				print(layout.format(s, t))
+			for s, t in e.getContent(): print(layout.format(s, t))
 			visit.push([db[p] for p in e.parents])
-		print('\x1b[m')
 
 	except BrokenPipeError: pass
 
