@@ -1,0 +1,5 @@
+1 5 2#Release
+2 4 3#Devel
+3 4#Devel
+4 5#Devel
+5 #Base
