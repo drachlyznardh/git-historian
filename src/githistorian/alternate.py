@@ -191,7 +191,7 @@ class DumbGrid:
 		def __init__(self, columns, node, verbose):
 			self.content = ''
 			tIndex = 0 # Column of target node
-			seenChildren = set(node.children)
+			# seenChildren = set(node.children)
 			for i, c in enumerate(columns):
 				if verbose: print('Checking {}'.format(c))
 				# If this is my column
@@ -202,12 +202,13 @@ class DumbGrid:
 				elif node.topName in c.parents:
 					tIndex = i
 					c.parents.remove(node.topName)
-					seenChildren.remove(c.name)
+					# seenChildren.remove(c.name)
 					if verbose:
 						print('\t{} belongs to {}'.format(c.name, ','.join(c.parents)))
 						print('{} has {} open parents'.format(node.topName, len(c.parents)))
 					self.content += '\x1b[{}m{}←'.format(31 + tIndex % 6,
-						'├' if c.parents else '└' if seenChildren else '┷') # U+251c U+2514 U+2537
+						# '├' if c.parents else '└' if seenChildren else '┷') # U+251c U+2514 U+2537
+						'├' if c.parents else '└') # U+251c U+2514 U+2537
 				else:
 					if verbose:
 						print('\t{} does not to {}'.format(c.name, ','.join(c.parents)))
