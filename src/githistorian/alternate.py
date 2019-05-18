@@ -14,9 +14,22 @@ class Node:
 		if not self.children: return '┯' # U+252f Top head
 		return '•' # U+2022 Not a top
 
+class MultiNode:
+	def __init__(self, node):
+		self.topName = self.bottomName = node.name
+		self.children = node.children
+		self.parents = node.parents
+		self.content = [node.text]
+
+	def __str__(self):
+		return '({}) P({}) C({}) "{}"'.format(
+			self.topName if self.topName == self.bottomName else '{}/{}'.format(self.topName, self.bottomName),
+			', '.join(self.parents), ', '.join(self.children),
+			'", "'.join(self.content) if len(self.content) > 1 else self.content[0])
+
 class Visit:
 	def __init__(self, arg=None):
-		self.order = arg if arg else []
+		self.order = [e for e in arg] if arg else []
 		self.seen = set()
 		for e in self.order: self.seen.add(e)
 
@@ -56,6 +69,27 @@ def loadDB():
 
 	return [e for e in db.values() if len(e.children) == 0], db
 
+def reduceDB(heads, sdb):
+
+	bigHeads = [MultiNode(e) for e in heads]
+	mdb = {}
+	visit = Visit(heads)
+
+	for e in bigHeads:
+		if e.topName not in mdb: mdb[e.topName] = e
+		if e.bottomName not in mdb: mdb[e.bottomName] = e
+
+	while visit:
+		e = visit.pop()
+		if e in mdb: continue
+
+		s = MultiNode(e)
+		mdb[e.name] = s
+
+		visit.push([sdb[p] for p in e.parents])
+
+	return bigHeads, mdb
+
 def deploy():
 
 	try:
@@ -69,6 +103,15 @@ def deploy():
 		while visit:
 			e = visit.pop()
 			print('\x1b[31m| \x1b[m{} \x1b[32m{}'.format(e.getSymbol(), e.text))
+			visit.push([db[p] for p in e.parents])
+		print('\x1b[m')
+
+		heads, db = reduceDB(heads, db)
+		visit = Visit(heads)
+		while visit:
+			e = visit.pop()
+			print(e)
+			# print('\x1b[31m| \x1b[m{} \x1b[32m{}'.format(e.getSymbol(), e.text))
 			visit.push([db[p] for p in e.parents])
 		print('\x1b[m')
 
