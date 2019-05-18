@@ -178,12 +178,41 @@ class Grid:
 
 # This grid is simple and dumb, it assigns a new column to each chain
 class DumbGrid:
+
+	class Column:
+		def __init__(self, node):
+			self.name = node.bottomName
+			self.children = node.children
+
+	class Row:
+		def __init__(self, columns, node):
+			self.content = ''
+			for c in columns:
+				# If this is my column
+				if node.topName in c.name:
+					self.content += ' '.join(node.getContent()[0])
+				# Am I straight below the target?
+				elif node.topName in c.children:
+					self.content += '| '
+
+		def dump(self, db):
+			return self.content
+
 	def __init__(self):
+		self.columns = []
 		self.rows = []
 
-	def dealWith(self, node): pass
+	def dealWith(self, node):
 
-	def done(self): return self.rows
+		# We append a column
+		print('Adding new column for {}'.format(node))
+		self.columns.append(self.Column(node))
+
+		# We immediately generate a row
+		self.rows.append(self.Row(self.columns, node))
+
+	def done(self):
+		return self.rows
 
 def unroll(grid, heads, db):
 	visit = Visit(heads)
@@ -216,7 +245,7 @@ def deploy():
 			visit.push([db[p] for p in e.parents])
 
 		# for row in layout: row.dump(db)
-		for row in unroll(DumbGrid(), heads, db): row.dump(db)
+		for row in unroll(DumbGrid(), heads, db): print(row.dump(db))
 
 	except BrokenPipeError: pass
 
