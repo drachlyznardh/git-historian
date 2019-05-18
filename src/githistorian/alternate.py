@@ -115,6 +115,7 @@ class Grid:
 			if name in self.waitingFor: self.waitingFor.remove(name)
 
 		def get(self, index, node):
+			if node is self.occupiedBy: return '\x1b[m{} '
 			return '\x1b[{}m| '.format(31 + index % 7)
 
 	def __init__(self):
@@ -134,12 +135,14 @@ class Grid:
 				c.wasSeen(node.name)
 
 		if not dealtWith: # Node does not belong in any columns
-			pass # Find open column or create new one
+			c = self.Column()
+			c.assign(node)
+			self.columns.append(c)
 
 	def dealWith(self, node):
 
 		self.assign(node)
-		return '{}{}'.format(''.join(c.get(i, node) for i, c in enumerate(self.columns)), '\x1b[m{} \x1b[32m{}\x1b[m')
+		return '{}{}'.format(''.join(c.get(i, node) for i, c in enumerate(self.columns)), '\x1b[32m{}\x1b[m')
 
 def fromStdin():
 	import sys
