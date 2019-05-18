@@ -13,17 +13,32 @@ def nodeFromLine(line):
 	hashes = hashes.split(' ')
 	return Node(hashes[0], hashes[1:], text)
 
+def loadDB():
+	import sys
+
+	db = {}
+
+	while True:
+		line = sys.stdin.readline().strip()
+		if not line: break
+		print(line)
+
+		node = nodeFromLine(line)
+		db[node.name] = node
+
+	return db
+
 def deploy():
 
 	try:
 
-		import sys
-		while True:
-			line = sys.stdin.readline().strip()
-			if not line: break
-			node = nodeFromLine(line)
-			print('{:30s} {}'.format(line, node))
+		print()
+		db = loadDB()
+		print()
+		for e in db.values(): print(e)
+		print()
 
 	except BrokenPipeError: pass
+
 	return 0
 
