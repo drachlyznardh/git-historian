@@ -176,6 +176,24 @@ class Grid:
 		self.assign(node)
 		return '{}{}'.format(''.join(c.get(i, node) for i, c in enumerate(self.columns)), '\x1b[32m{}\x1b[m')
 
+# This grid is simple and dumb, it assigns a new column to each chain
+class DumbGrid:
+	def __init__(self):
+		self.rows = []
+
+	def dealWith(self, node): pass
+
+	def done(self): return self.rows
+
+def unroll(grid, heads, db):
+	visit = Visit(heads)
+	while visit:
+		e = visit.pop()
+		grid.dealWith(e)
+		visit.push([db[p] for p in e.parents])
+
+	return grid.done()
+
 # Reading all lines from STDIN
 def fromStdin():
 	import sys
@@ -196,6 +214,9 @@ def deploy():
 			layout = grid.dealWith(e)
 			for s, t in e.getContent(): print(layout.format(s, t))
 			visit.push([db[p] for p in e.parents])
+
+		# for row in layout: row.dump(db)
+		for row in unroll(DumbGrid(), heads, db): row.dump(db)
 
 	except BrokenPipeError: pass
 
