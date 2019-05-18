@@ -27,6 +27,12 @@ class MultiNode:
 			', '.join(self.parents), ', '.join(self.children),
 			'", "'.join(self.content) if len(self.content) > 1 else self.content[0])
 
+	def getContent(self):
+		content = [['•', e] for e in self.content] # U+2022 Common node
+		if not self.parents: content[-1][0] = '┷' # U+2537 Bottom root
+		if not self.children: content[0][0] = '┯' # U+252f Top head
+		return content
+
 	def absorb(self, node):
 		previousBottom = self.bottomName
 		self.bottomName = node.name
@@ -139,7 +145,8 @@ def deploy():
 		while visit:
 			e = visit.pop()
 			print('2nd Visit of {}'.format(e))
-			# print('\x1b[31m| \x1b[m{} \x1b[32m{}'.format(e.getSymbol(), e.text))
+			for s, t in e.getContent():
+				print('\x1b[31m| \x1b[m{} \x1b[32m{}'.format(s, t))
 			visit.push([db[p] for p in e.parents])
 		print('\x1b[m')
 
