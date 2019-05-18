@@ -182,18 +182,28 @@ class DumbGrid:
 	class Column:
 		def __init__(self, node):
 			self.name = node.bottomName
-			self.children = node.children
+			self.parents = node.parents
+
+		def __str__(self):
+			return 'Column({}/{})'.format(self.name, ', '.join(self.parents))
 
 	class Row:
 		def __init__(self, columns, node):
 			self.content = ''
 			for c in columns:
+				print('Checking {}'.format(c))
 				# If this is my column
 				if node.topName in c.name:
+					print('\tRight under {}'.format(c.name))
 					self.content += ' '.join(node.getContent()[0])
 				# Am I straight below the target?
-				elif node.topName in c.children:
+				elif node.topName in c.parents:
+					print('\t{} belongs to {}'.format(node.topName, ','.join(c.parents)))
 					self.content += '| '
+				else:
+					print('\t{} does not to {}'.format(node.topName, ','.join(c.parents)))
+					self.content += '| '
+			print('Row has {}'.format(self.content))
 
 		def dump(self, db):
 			return self.content
@@ -209,6 +219,7 @@ class DumbGrid:
 		self.columns.append(self.Column(node))
 
 		# We immediately generate a row
+		print('Adding new row for {}'.format(node))
 		self.rows.append(self.Row(self.columns, node))
 
 	def done(self):
