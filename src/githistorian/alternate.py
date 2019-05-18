@@ -107,11 +107,45 @@ def reduceDB(heads, sdb, verbose):
 	return bigHeads, mdb
 
 class Grid:
-	def __init__(self):
-		self.columns = []
 
-	def dealWith(self, chain):
+	class Column:
+		def __init__(self):
+			self.occupiedBy = None
+			self.waitingFor = set()
+
+		def assign(self, node):
+			self.occupiedBy = node
+			self.waitingFor = set(node.children)
+
+		def wasSeen(self, name):
+			if name in self.waitingFor: self.waitingFor.remove(name)
+
+	def __init__(self):
+		self.columns = [self.Column()]
+
+	def assign(self, node):
+
+		dealtWith = False
+		state = 0 # Looking
+		for c in self.columns: # Look for column where node belongs
+			if state == 0: # Looking for waiting
+				if node.topName in c.waitingFor:
+					c.assign(node)
+					state = 1 # Closing others
+					continue
+			elif state == 1: # Closing others
+				c.wasSeen(node.name)
+
+		if not dealtWith: # Node does not belong in any columns
+			pass # Find open column or create new one
+
+	def getLayout(self, node):
 		return '\x1b[31m| \x1b[m{} \x1b[32m{}'
+
+	def dealWith(self, node):
+
+		self.assign(node)
+		return self.getLayout(node)
 
 def deploy():
 
