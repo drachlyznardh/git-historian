@@ -38,7 +38,7 @@ class MultiNode:
 		self.bottomName = node.name
 		self.parents = node.parents
 		self.content.append(node.text)
-		return previousBottom, self
+		return previousBottom if previousBottom != self.topName else None, self
 
 class Visit:
 	def __init__(self, arg=None):
@@ -105,7 +105,7 @@ def reduceDB(heads, sdb):
 			oldKey, ref = mdb[e.children[0]].absorb(e)
 			mdb[e.name] = ref
 			print('{} was absorbed by {}'.format(e.name, mdb[e.children[0]]))
-			del mdb[oldKey]
+			if oldKey: del mdb[oldKey]
 
 		elif e.name not in mdb: # Create new node
 			s = MultiNode(e)
@@ -144,7 +144,7 @@ def deploy():
 		visit = Visit(heads)
 		while visit:
 			e = visit.pop()
-			print('2nd Visit of {}'.format(e))
+			# print('2nd Visit of {}'.format(e))
 			for s, t in e.getContent():
 				print('\x1b[31m| \x1b[m{} \x1b[32m{}'.format(s, t))
 			visit.push([db[p] for p in e.parents])
