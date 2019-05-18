@@ -59,22 +59,14 @@ class Visit:
 		return self.order.pop(0)
 
 def nodeFromLine(line):
-	hashes, text = line.split('#', 1)
+	hashes, text = line.strip().split('#', 1)
 	hashes = hashes.split(' ')
 	return SingleNode(hashes[0], hashes[1:], text)
 
 def loadDB():
 	import sys
 
-	db = {}
-
-	while True:
-		line = sys.stdin.readline().strip()
-		if not line: break
-		print(line)
-
-		node = nodeFromLine(line)
-		db[node.name] = node
+	db = {e.name:e for e in [nodeFromLine(e) for e in sys.stdin.readlines()]}
 
 	for e in db.values():
 		for p in e.parents:
