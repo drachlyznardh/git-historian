@@ -40,7 +40,7 @@ def nodeFromLine(line):
 def loadDB():
 	import sys
 
-	db, head = {}, None
+	db = {}
 
 	while True:
 		line = sys.stdin.readline().strip()
@@ -48,25 +48,24 @@ def loadDB():
 		print(line)
 
 		node = nodeFromLine(line)
-		if not head: head = node
 		db[node.name] = node
 
 	for e in db.values():
 		for p in e.parents:
 			db[p].children.append(e.name)
 
-	return head, db
+	return [e for e in db.values() if len(e.children) == 0], db
 
 def deploy():
 
 	try:
 
 		print()
-		head, db = loadDB()
+		heads, db = loadDB()
 		print()
 		for e in db.values(): print(e)
 		print()
-		visit = Visit([head])
+		visit = Visit(heads)
 		while visit:
 			e = visit.pop()
 			print('\x1b[31m| \x1b[m{} \x1b[32m{}'.format(e.getSymbol(), e.text))
