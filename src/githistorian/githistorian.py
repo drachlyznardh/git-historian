@@ -26,6 +26,11 @@ def tell_the_story(inargs=None):
 		print('Not a repo')
 		return 1
 
+	# Graph unrolling
+	if opt.mode == 1:
+		from .alternate import deploy
+		return deploy()
+
 	# Hunting for history
 	if int(version[0]) == 2 and int(version[1]) > 11: opt.needColorTrick = True
 	targets = head_hunt(opt)
@@ -38,11 +43,6 @@ def tell_the_story(inargs=None):
 		print('Roots displayed %s' % roots)
 		lines, commits, omitted = history.stats()
 		print('Loaded %d commits, %d omitted' % (commits, omitted))
-
-	# Graph unrolling
-	if opt.mode == 1:
-		from .alternate import deploy
-		return deploy(opt, roots, history)
 
 	from .graph import deploy as deploy_graph
 	return deploy_graph(opt, roots, history)
