@@ -27,6 +27,13 @@ class MultiNode:
 			', '.join(self.parents), ', '.join(self.children),
 			'", "'.join(self.content) if len(self.content) > 1 else self.content[0])
 
+	def absorb(self, node):
+		previousBottom = self.bottomName
+		self.bottomName = node.name
+		self.parents = node.parents
+		self.content.append(node.text)
+		return previousBottom, self
+
 class Visit:
 	def __init__(self, arg=None):
 		self.order = [e for e in arg] if arg else []
@@ -72,6 +79,7 @@ def loadDB():
 def reduceDB(heads, sdb):
 
 	bigHeads = [MultiNode(e) for e in heads]
+	print('BigHeads are {} {}'.format(bigHeads, ['{}'.format(e) for e in bigHeads]))
 	mdb = {}
 	visit = Visit(heads)
 
@@ -83,11 +91,26 @@ def reduceDB(heads, sdb):
 		e = visit.pop()
 		if e in mdb: continue
 
-		s = MultiNode(e)
-		mdb[e.name] = s
+		print(mdb)
+		print('testing {}'.format(e))
+
+		# If this node belogns to a chain
+		if len(e.children) == 1 and len(mdb[e.children[0]].parents) == 1:
+			oldKey, ref = mdb[e.children[0]].absorb(e)
+			mdb[e.name] = ref
+			print('{} was absorbed by {}'.format(e.name, mdb[e.children[0]]))
+			del mdb[oldKey]
+
+		elif e.name not in mdb: # Create new node
+			s = MultiNode(e)
+			mdb[e.name] = s
+			print('{} was promoted'.format(e.name))
+
+		else: print('{} was preserved'.format(e.name))
 
 		visit.push([sdb[p] for p in e.parents])
 
+	print('BigHeads are {} {}'.format(bigHeads, ['{}'.format(e) for e in bigHeads]))
 	return bigHeads, mdb
 
 def deploy():
@@ -107,10 +130,15 @@ def deploy():
 		print('\x1b[m')
 
 		heads, db = reduceDB(heads, db)
+		print()
+		print('Reduced heads: {}'.format(heads))
+		print('Reduced DB: {}'.format(db))
+		print()
+
 		visit = Visit(heads)
 		while visit:
 			e = visit.pop()
-			print(e)
+			print('2nd Visit of {}'.format(e))
 			# print('\x1b[31m| \x1b[m{} \x1b[32m{}'.format(e.getSymbol(), e.text))
 			visit.push([db[p] for p in e.parents])
 		print('\x1b[m')
