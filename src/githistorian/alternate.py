@@ -74,44 +74,57 @@ def loadDB():
 
 	return [e for e in db.values() if len(e.children) == 0], db
 
-def reduceDB(heads, sdb):
+def reduceDB(heads, sdb, verbose):
 
-	bigHeads = [MultiNode(e) for e in heads]
-	print('BigHeads are {} {}'.format(bigHeads, ['{}'.format(e) for e in bigHeads]))
-	mdb = {}
-	visit = Visit(heads)
-
+	bigHeads, mdb = [MultiNode(e) for e in heads], {}
 	for e in bigHeads:
 		if e.topName not in mdb: mdb[e.topName] = e
 		if e.bottomName not in mdb: mdb[e.bottomName] = e
 
+	visit = Visit(heads)
 	while visit:
 		e = visit.pop()
 		if e in mdb: continue
+		if verbose: print('testing {}'.format(e))
 
-		print(mdb)
-		print('testing {}'.format(e))
-
-		# If this node belogns to a chain
+		# If this node belongs to a chain
 		if len(e.children) == 1 and len(mdb[e.children[0]].parents) == 1:
 			oldKey, ref = mdb[e.children[0]].absorb(e)
 			mdb[e.name] = ref
-			print('{} was absorbed by {}'.format(e.name, mdb[e.children[0]]))
+			if verbose: print('{} was absorbed by {}'.format(e.name, mdb[e.children[0]]))
 			if oldKey: del mdb[oldKey]
 
-		elif e.name not in mdb: # Create new node
+		# Create new node
+		elif e.name not in mdb:
 			s = MultiNode(e)
 			mdb[e.name] = s
-			print('{} was promoted'.format(e.name))
+			if verbose: print('{} was promoted'.format(e.name))
 
-		else: print('{} was preserved'.format(e.name))
+		elif verbose: print('{} was preserved'.format(e.name))
 
 		visit.push([sdb[p] for p in e.parents])
 
-	print('BigHeads are {} {}'.format(bigHeads, ['{}'.format(e) for e in bigHeads]))
 	return bigHeads, mdb
 
 def deploy():
+
+	try:
+
+		heads, db = loadDB()
+		heads, db = reduceDB(heads, db, True)
+
+		print('\x1b[m')
+		visit = Visit(heads)
+		while visit:
+			e = visit.pop()
+			for s, t in e.getContent():
+				print('\x1b[31m| \x1b[m{} \x1b[32m{}'.format(s, t))
+			visit.push([db[p] for p in e.parents])
+		print('\x1b[m')
+
+	except BrokenPipeError: pass
+
+	return 0
 
 	try:
 
@@ -127,7 +140,7 @@ def deploy():
 			visit.push([db[p] for p in e.parents])
 		print('\x1b[m')
 
-		heads, db = reduceDB(heads, db)
+		heads, db = reduceDB(heads, db, True)
 		print()
 		print('Reduced heads: {}'.format(heads))
 		print('Reduced DB: {}'.format(db))
