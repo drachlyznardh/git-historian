@@ -135,6 +135,12 @@ class Grid:
 				c.wasSeen(node.name)
 
 		if not dealtWith: # Node does not belong in any columns
+			for c in self.columns:
+				if not c.occupiedBy:
+					c.assign(node)
+					dealtWith = True
+
+		if not dealtWith: # There are no free columns
 			c = self.Column()
 			c.assign(node)
 			self.columns.append(c)
