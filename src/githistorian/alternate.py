@@ -3,15 +3,16 @@ class Node:
 	def __init__(self, name, parents, text):
 		self.name = name
 		self.parents = parents if parents[0] else []
+		self.children = []
 		self.text = text
 
 	def __str__(self):
-		return '({}) ({}) "{}"'.format(self.name, ', '.join(self.parents), self.text)
+		return '({}) P({}) C({}) "{}"'.format(self.name, ', '.join(self.parents), ', '.join(self.children), self.text)
 
 	def getSymbol(self):
-		if self.parents: return '•' # U+2022 Not a top
-		return '┷' # U+2537 Bottom root
-		return '┯' # U+252f Top head
+		if not self.parents: return '┷' # U+2537 Bottom root
+		if not self.children: return '┯' # U+252f Top head
+		return '•' # U+2022 Not a top
 
 def nodeFromLine(line):
 	hashes, text = line.split('#', 1)
@@ -30,6 +31,10 @@ def loadDB():
 
 		node = nodeFromLine(line)
 		db[node.name] = node
+
+	for e in db.values():
+		for p in e.parents:
+			db[p].children.append(e.name)
 
 	return db
 
