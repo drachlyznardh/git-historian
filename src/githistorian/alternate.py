@@ -188,22 +188,22 @@ class DumbGrid:
 			return 'Column({}/{})'.format(self.name, ', '.join(self.parents))
 
 	class Row:
-		def __init__(self, columns, node):
+		def __init__(self, columns, node, verbose):
 			self.content = ''
 			for c in columns:
-				print('Checking {}'.format(c))
+				if verbose: print('Checking {}'.format(c))
 				# If this is my column
 				if node.topName in c.name:
-					print('\tRight under {}'.format(c.name))
+					if verbose: print('\tRight under {}'.format(c.name))
 					self.content += ' '.join(node.getContent()[0])
 				# Am I straight below the target?
 				elif node.topName in c.parents:
-					print('\t{} belongs to {}'.format(node.topName, ','.join(c.parents)))
-					self.content += '| '
+					if verbose: print('\t{} belongs to {}'.format(node.topName, ','.join(c.parents)))
+					self.content += '12'
 				else:
-					print('\t{} does not to {}'.format(node.topName, ','.join(c.parents)))
-					self.content += '| '
-			print('Row has {}'.format(self.content))
+					if verbose: print('\t{} does not to {}'.format(node.topName, ','.join(c.parents)))
+					self.content += '34'
+			if verbose: print('Row has {}'.format(self.content))
 
 		def dump(self, db):
 			return self.content
@@ -212,15 +212,15 @@ class DumbGrid:
 		self.columns = []
 		self.rows = []
 
-	def dealWith(self, node):
+	def dealWith(self, node, verbose):
 
 		# We append a column
-		print('Adding new column for {}'.format(node))
+		if verbose: print('Adding new column for {}'.format(node))
 		self.columns.append(self.Column(node))
 
 		# We immediately generate a row
-		print('Adding new row for {}'.format(node))
-		self.rows.append(self.Row(self.columns, node))
+		if verbose: print('Adding new row for {}'.format(node))
+		self.rows.append(self.Row(self.columns, node, False))
 
 	def done(self):
 		return self.rows
@@ -229,7 +229,7 @@ def unroll(grid, heads, db):
 	visit = Visit(heads)
 	while visit:
 		e = visit.pop()
-		grid.dealWith(e)
+		grid.dealWith(e, False)
 		visit.push([db[p] for p in e.parents])
 
 	return grid.done()
