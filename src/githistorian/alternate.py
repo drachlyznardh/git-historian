@@ -184,54 +184,25 @@ class DumbGrid:
 			self.name = node.bottomName
 			self.parents = set(node.parents)
 
-		def __str__(self):
-			return 'Column({}/{})'.format(self.name, ', '.join(self.parents))
-
-	class Row:
-		def __init__(self, columns, node, verbose):
-			self.content = ''
-			tIndex = 0 # Column of target node
-			# seenChildren = set(node.children)
-			for i, c in enumerate(columns):
-				if verbose: print('Checking {}'.format(c))
-				# If this is my column
-				if node.topName in c.name:
-					if verbose: print('\tRight under {}'.format(c.name))
-					self.content += '\x1b[m{}'.format(' '.join(node.getContent()[0]))
-				# Am I straight below the target?
-				elif node.topName in c.parents:
-					tIndex = i
-					c.parents.remove(node.topName)
-					# seenChildren.remove(c.name)
-					if verbose:
-						print('\t{} belongs to {}'.format(c.name, ','.join(c.parents)))
-						print('{} has {} open parents'.format(node.topName, len(c.parents)))
-					self.content += '\x1b[{}m{}←'.format(31 + tIndex % 6,
-						# '├' if c.parents else '└' if seenChildren else '┷') # U+251c U+2514 U+2537
-						'├' if c.parents else '└') # U+251c U+2514 U+2537
-				else:
-					if verbose:
-						print('\t{} does not to {}'.format(c.name, ','.join(c.parents)))
-						print('{} has {} open parents'.format(node.topName, len(c.parents)))
-					self.content += '\x1b[{}m{}'.format(31 + tIndex % 6, '←←' if i else '│ ') # U+2502
-			if verbose: print('Row has {}'.format(self.content))
-
-		def dump(self, db):
-			return self.content
+	def compose(self, node, verbose):
+		tIndex = 0 # Column of target node
+		for i, c in enumerate(self.columns):
+			# If this is my column
+			if node.topName in c.name: yield '\x1b[m{}'.format(' '.join(node.getContent()[0]))
+			# Am I straight below the target?
+			elif node.topName in c.parents:
+				tIndex = i
+				c.parents.remove(node.topName)
+				yield '\x1b[{}m{}←'.format(31 + tIndex % 6, '├' if c.parents else '└') # U+251c U+2514
+			else: yield '\x1b[{}m{}'.format(31 + tIndex % 6, '←←' if i else '│ ') # U+2502
 
 	def __init__(self):
 		self.columns = []
 		self.rows = []
 
-	def dealWith(self, node, verbose):
-
-		# We append a column
-		if verbose: print('Adding new column for {}'.format(node))
+	def dealWith(self, node):
 		self.columns.append(self.Column(node))
-
-		# We immediately generate a row
-		if verbose: print('Adding new row for {}'.format(node))
-		self.rows.append(self.Row(self.columns, node, False))
+		self.rows.append((node.topName, ''.join([e for e in self.compose(node, False)])))
 
 	def done(self):
 		return self.rows
@@ -240,7 +211,7 @@ def unroll(grid, heads, db):
 	visit = Visit(heads)
 	while visit:
 		e = visit.pop()
-		grid.dealWith(e, False)
+		grid.dealWith(e)
 		visit.push([db[p] for p in e.parents])
 
 	return grid.done()
@@ -266,8 +237,7 @@ def deploy():
 			for s, t in e.getContent(): print(layout.format(s, t))
 			visit.push([db[p] for p in e.parents])
 
-		# for row in layout: row.dump(db)
-		for row in unroll(DumbGrid(), heads, db): print(row.dump(db))
+		for e, row in unroll(DumbGrid(), heads, db): print(row.format(db[e]))
 
 	except BrokenPipeError: pass
 
