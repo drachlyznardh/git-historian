@@ -14,6 +14,24 @@ class Node:
 		if not self.children: return '┯' # U+252f Top head
 		return '•' # U+2022 Not a top
 
+class Visit:
+	def __init__(self, arg=None):
+		self.order = arg if arg else []
+		self.seen = set()
+		for e in self.order: self.seen.add(e)
+
+	def __bool__(self):
+		return len(self.order) > 0
+
+	def push(self, arg):
+		if not arg: return
+		filtered = [e for e in reversed(arg) if e not in self.seen]
+		self.order = filtered + self.order
+		for e in filtered: self.seen.add(e)
+
+	def pop(self):
+		return self.order.pop(0)
+
 def nodeFromLine(line):
 	hashes, text = line.split('#', 1)
 	hashes = hashes.split(' ')
@@ -22,7 +40,7 @@ def nodeFromLine(line):
 def loadDB():
 	import sys
 
-	db = {}
+	db, head = {}, None
 
 	while True:
 		line = sys.stdin.readline().strip()
@@ -30,24 +48,29 @@ def loadDB():
 		print(line)
 
 		node = nodeFromLine(line)
+		if not head: head = node
 		db[node.name] = node
 
 	for e in db.values():
 		for p in e.parents:
 			db[p].children.append(e.name)
 
-	return db
+	return head, db
 
 def deploy():
 
 	try:
 
 		print()
-		db = loadDB()
+		head, db = loadDB()
 		print()
 		for e in db.values(): print(e)
 		print()
-		for e in db.values(): print('\x1b[31m| \x1b[m{} \x1b[32m{}'.format(e.getSymbol(), e.text))
+		visit = Visit([head])
+		while visit:
+			e = visit.pop()
+			print('\x1b[31m| \x1b[m{} \x1b[32m{}'.format(e.getSymbol(), e.text))
+			visit.push([db[p] for p in e.parents])
 		print('\x1b[m')
 
 	except BrokenPipeError: pass
