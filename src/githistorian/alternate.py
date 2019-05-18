@@ -106,6 +106,13 @@ def reduceDB(heads, sdb, verbose):
 
 	return bigHeads, mdb
 
+class Grid:
+	def __init__(self):
+		self.columns = []
+
+	def dealWith(self, chain):
+		return '\x1b[31m| \x1b[m{} \x1b[32m{}'
+
 def deploy():
 
 	try:
@@ -115,10 +122,12 @@ def deploy():
 
 		print('\x1b[m')
 		visit = Visit(heads)
+		grid = Grid()
 		while visit:
 			e = visit.pop()
+			layout = grid.dealWith(e)
 			for s, t in e.getContent():
-				print('\x1b[31m| \x1b[m{} \x1b[32m{}'.format(s, t))
+				print(layout.format(s, t))
 			visit.push([db[p] for p in e.parents])
 		print('\x1b[m')
 
