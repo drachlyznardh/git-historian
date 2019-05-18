@@ -1,5 +1,5 @@
 
-class Node:
+class SingleNode:
 	def __init__(self, name, parents, text):
 		self.name = name
 		self.parents = parents if parents[0] else []
@@ -7,7 +7,7 @@ class Node:
 		self.text = text
 
 	def __str__(self):
-		return '({}) P({}) C({}) "{}"'.format(self.name, ', '.join(self.parents), ', '.join(self.children), self.text)
+		return 'SingleNode ({}) P({}) C({}) "{}"'.format(self.name, ', '.join(self.parents), ', '.join(self.children), self.text)
 
 	def getSymbol(self):
 		if not self.parents: return '┷' # U+2537 Bottom root
@@ -22,7 +22,7 @@ class MultiNode:
 		self.content = [node.text]
 
 	def __str__(self):
-		return '({}) P({}) C({}) "{}"'.format(
+		return 'MultiNode ({}) P({}) C({}) "{}"'.format(
 			self.topName if self.topName == self.bottomName else '{}/{}'.format(self.topName, self.bottomName),
 			', '.join(self.parents), ', '.join(self.children),
 			'", "'.join(self.content) if len(self.content) > 1 else self.content[0])
@@ -48,7 +48,7 @@ class Visit:
 def nodeFromLine(line):
 	hashes, text = line.split('#', 1)
 	hashes = hashes.split(' ')
-	return Node(hashes[0], hashes[1:], text)
+	return SingleNode(hashes[0], hashes[1:], text)
 
 def loadDB():
 	import sys
