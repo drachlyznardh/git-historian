@@ -31,8 +31,8 @@ install:
 	@pip3 install --verbose --user .
 
 test:
-	$(NAME) --version | grep $(VERSION) || pip install --user .
-	$(NAME) -m1 < tests/m1-test-00.txt
+	@$(NAME) -m1 < tests/m1-test-00.txt
+	@$(NAME) -m1 < tests/m1-test-01.txt
 
 clean:
 	@python3 setup.py clean
