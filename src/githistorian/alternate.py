@@ -85,15 +85,6 @@ def reduceDB(heads, sdb, verbose):
 				', '.join(self.parents), ', '.join(self.children),
 				'\x1b[m", "'.join([' \\n '.join(e) for e in self.content]) if len(self.content) > 1 else ''.join(self.content[0]))
 
-		# Associate a symbol to each commit depending on its relations
-		def getContent(self):
-
-			# U+252f 2537 2022
-			if len(self.content) == 1: return [('┯' if not self.children else '┷' if not self.parents else '•', self.content[0])]
-
-			# U+252f 2022 2022 U+2537 2022
-			return [('┯' if not self.children else '•', self.content[0])] + [('•', e) for e in self.content[1:-1]] + [('┷' if not self.parents else '•', self.content[-1])]
-
 		# Append a node at the end of the chain, updating boundaries
 		def absorb(self, node):
 			previousBottom = self.bottomName
@@ -105,6 +96,24 @@ def reduceDB(heads, sdb, verbose):
 			# it can be cleared from the keys. Returned along with a ref to
 			# this chain for convenience
 			return previousBottom if previousBottom != self.topName else None, self
+
+		# Given a layout line, dump the whole chain node-by-node, line-by-line
+		def dump(self, layout):
+			def _dump(self, layout, symbols, content):
+				first = layout.format(symbols[0], content[0])
+				if len(content) == 1: return first
+				return first + '\n' + '\n'.join([layout.format(symbols[1], line) for line in content[1:]])
+
+			# U+252f 2502 2537 ' ' 2022 2502
+			if len(self.content) == 1:
+				return _dump(self, layout, ('┯', '│') if not self.children else ('┷', ' ') if not self.parents else ('•', '│'), self.content[0])
+
+			# U+252f 2022 2022 U+2537 2022
+			return '\n'.join(
+					[_dump(self, layout, ('┯', '│') if not self.children else ('•', '│'), self.content[0])] +
+					[_dump(self, layout, ('•', '│'), e) for e in self.content[1:-1]] +
+					[_dump(self, layout, ('┷', ' ') if not self.parents else ('•', '│'), self.content[-1])]
+				)
 
 	# All heads are converted to MultiNodes are recorded in the new graph
 	bigHeads = [MultiNode(e) for e in heads]
@@ -286,13 +295,8 @@ class BaseGrid:
 
 			# Compose layout format by exploding all columns, even and odd, and the adding the (fixed) description field
 			layout = ''.join([c + e.get(flip, debug) + o.get(flip, debug, oddRange if lastColumn - i else 1) for i,(c,e,o) in enumerate(self.columns)]) + '\x1b[m{}\x1b[m \x1b[m{}\x1b[m'
-
-			# Populating layout format with chain content
-			# # # return '\n'.join([layout.format(symbol, content) for symbol, content in [line for line in db[self.nodeName].getContent()]])
-			# # return '\n'.join([layout.format(symbol, line) for symbol, content in db[self.nodeName].getContent() for line in content])
-			# print(db[self.nodeName].getContent())
-			return '\n'.join([layout.format(symbol, line) for symbol, block in db[self.nodeName].getContent() for line in block])
-			print('Layout is "{}"'.format(layout))
+			if False: print('Layout is "{}"'.format(layout))
+			return db[self.nodeName].dump(layout)
 
 	def __init__(self):
 		self.columns = []
@@ -372,7 +376,7 @@ def deploy():
 		# 	for s, t in e.getContent(): print(layout.format(s, t))
 		# 	visit.push([db[p] for p in e.parents])
 
-		for row in unroll(DumbGrid(), Visit(heads), heads, db, verbose): print(row.dump(db, 2))
+		# for row in unroll(DumbGrid(), Visit(heads), heads, db, verbose): print(row.dump(db, 2))
 		for row in unroll(NoGrid(), Visit(heads), heads, db, verbose): print(row.dump(db, 2))
 
 	except BrokenPipeError: pass
