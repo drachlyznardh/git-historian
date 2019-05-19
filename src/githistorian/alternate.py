@@ -34,19 +34,31 @@ def loadDB(lines):
 			self.name = name
 			self.parents = parents if parents[0] else []
 			self.children = []
-			self.text = text
+			self.text = [text]
 
 		def __str__(self):
 			return 'SingleNode ({}) P({}) C({}) "{}\x1b[m"'.format(
 				self.name, ', '.join(self.parents), ', '.join(self.children), self.text)
 
-	def nodeFromLine(line):
-		hashes, text = line.strip().split('#', 1)
-		hashes = hashes.split(' ')
-		return SingleNode(hashes[0], hashes[1:], text)
+	def nodesFromLines(lines):
+
+		node = None
+		for line in lines:
+			print('nodeFromLine({}, {}\x1b[m)'.format(node, line.strip()))
+
+			# This line contains a new node
+			if '#' in line:
+				hashes, text = line.strip().split('#', 1)
+				hashes = hashes.split(' ')
+				node = SingleNode(hashes[0], hashes[1:], text)
+				yield node
+				continue
+
+			# Append description to previous node
+			node.text.append(line.strip())
 
 	# Build a node from each line in input
-	db = {e.name:e for e in [nodeFromLine(e) for e in lines]}
+	db = {e.name: e for e in nodesFromLines(lines)}
 
 	# Bind children to their parent
 	for e in db.values():
@@ -71,14 +83,16 @@ def reduceDB(heads, sdb, verbose):
 			return 'MultiNode ({}) P({}) C({}) "{}\x1b[m"'.format(
 				self.topName if self.topName == self.bottomName else '{}/{}'.format(self.topName, self.bottomName),
 				', '.join(self.parents), ', '.join(self.children),
-				'\x1b[m", "'.join(self.content) if len(self.content) > 1 else self.content[0])
+				'\x1b[m", "'.join([' \\n '.join(e) for e in self.content]) if len(self.content) > 1 else ''.join(self.content[0]))
 
 		# Associate a symbol to each commit depending on its relations
 		def getContent(self):
-			content = [['•', e] for e in self.content] # U+2022 Common node
-			if not self.parents: content[-1][0] = '┷'  # U+2537 Bottom root
-			if not self.children: content[0][0] = '┯'  # U+252f Top head
-			return content
+
+			# U+252f 2537 2022
+			if len(self.content) == 1: return [('┯' if not self.children else '┷' if not self.parents else '•', self.content[0])]
+
+			# U+252f 2022 2022 U+2537 2022
+			return [('┯' if not self.children else '•', self.content[0])] + [('•', e) for e in self.content[1:-1]] + [('┷' if not self.parents else '•', self.content[-1])]
 
 		# Append a node at the end of the chain, updating boundaries
 		def absorb(self, node):
@@ -270,11 +284,15 @@ class DumbGrid:
 			# Extract index of last column, which does not to be repeated
 			lastColumn = len(self.columns) -1
 
-			# Compose line format by exploding all columns, even and odd, and the adding the (fixed) description field
-			line = ''.join([c + e.get(flip, debug) + o.get(flip, debug, oddRange if lastColumn - i else 1) for i,(c,e,o) in enumerate(self.columns)]) + '\x1b[m{}\x1b[m'
+			# Compose layout format by exploding all columns, even and odd, and the adding the (fixed) description field
+			layout = ''.join([c + e.get(flip, debug) + o.get(flip, debug, oddRange if lastColumn - i else 1) for i,(c,e,o) in enumerate(self.columns)]) + '\x1b[m{}\x1b[m \x1b[m{}\x1b[m'
 
-			# Populating line format with chain content
-			return '\n'.join([line.format(symbol, content) for symbol, content in db[self.nodeName].getContent()])
+			# Populating layout format with chain content
+			# # # return '\n'.join([layout.format(symbol, content) for symbol, content in [line for line in db[self.nodeName].getContent()]])
+			# # return '\n'.join([layout.format(symbol, line) for symbol, content in db[self.nodeName].getContent() for line in content])
+			# print(db[self.nodeName].getContent())
+			return '\n'.join([layout.format(symbol, line) for symbol, block in db[self.nodeName].getContent() for line in block])
+			print('Layout is "{}"'.format(layout))
 
 	def __init__(self):
 		self.columns = []
