@@ -269,6 +269,9 @@ class BaseGrid:
 			self.name = node.bottomName
 			self.parents = set(node.parents)
 
+		# Matching only the proper node
+		def isSource(self, node): return self.name == node.topName
+
 		# Mark parent as seen, removing it from the waiting list
 		def parentSeen(self, node):
 			self.parents.remove(node.topName)
@@ -294,7 +297,7 @@ class BaseGrid:
 			lastColumn = len(self.columns) -1
 
 			# Compose layout format by exploding all columns, even and odd, and the adding the (fixed) description field
-			layout = ''.join([c + e.get(flip, debug) + o.get(flip, debug, oddRange if lastColumn - i else 1) for i,(c,e,o) in enumerate(self.columns)]) + '\x1b[m{}\x1b[m \x1b[m{}\x1b[m'
+			layout = ''.join([c + e.get(flip, debug) + o.get(flip, debug, oddRange if lastColumn - i else 1) for i,(c,e,o) in enumerate(self.columns)]) + '\x1b[m{}\x1b[m'
 			if False: print('Layout is "{}"'.format(layout))
 			return db[self.nodeName].dump(layout)
 
@@ -311,7 +314,7 @@ class BaseGrid:
 		for i, c in enumerate(self.columns):
 
 			# If this is my column
-			if node.topName in c.name: yield ('', EvenColumn.SOURCE, OddColumn.EMPTY)
+			if c.isSource(node): yield ('', EvenColumn.SOURCE, OddColumn.EMPTY)
 
 			# Am I straight below the source?
 			elif node.topName in c.parents:
@@ -324,6 +327,18 @@ class BaseGrid:
 
 # This grid is a straight line
 class NoGrid(BaseGrid):
+
+	class AnyColumn:
+		def __init__(self):
+			self.name = []
+
+		# Accepting anyone
+		def isSource(self, node): return True
+
+	def __init__(self):
+		super().__init__()
+		self.columns.append(self.AnyColumn())
+
 	def dealWith(self, node, verbose):
 		self.rows.append(self.Row(node.topName, [e for e in self.compose(node, verbose)]))
 
