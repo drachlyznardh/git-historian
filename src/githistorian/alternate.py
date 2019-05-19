@@ -100,7 +100,7 @@ def reduceDB(heads, sdb, verbose):
 		# Given a layout line, dump the whole chain node-by-node, line-by-line
 		def dump(self, layout):
 			def _dump(self, layout, symbols, content):
-				first = layout.format(symbols[0], content[0])
+				first = layout.format('\x1b[m' + symbols[0], content[0])
 				if len(content) == 1: return first
 				return first + '\n' + '\n'.join([layout.format(symbols[1], line) for line in content[1:]])
 
@@ -224,7 +224,7 @@ class EvenColumn(Enum):
 		if debug: return '{}'.format(self.value)
 		return {
 				EvenColumn.EMPTY   : '    ',
-				EvenColumn.SOURCE  : ['\x1b[m{}' for e in range(4)],
+				EvenColumn.SOURCE  : ['{}' for e in range(4)],
 				EvenColumn.LCORNER : '└┘┌┐', # U+2514 2518 250c 2510
 				EvenColumn.RCORNER : '┘└┐┌', # U+2518 2514 2510 250c
 				EvenColumn.LMERGE  : '┤├┤├', # U+251c 2524 251c 2524
@@ -298,7 +298,6 @@ class BaseGrid:
 
 			# Compose layout format by exploding all columns, even and odd, and the adding the (fixed) description field
 			layout = ''.join([c + e.get(flip, debug) + o.get(flip, debug, oddRange if lastColumn - i else 1) for i,(c,e,o) in enumerate(self.columns)]) + '\x1b[m{}\x1b[m'
-			if False: print('Layout is "{}"'.format(layout))
 			return db[self.nodeName].dump(layout)
 
 	def __init__(self):
@@ -314,7 +313,7 @@ class BaseGrid:
 		for i, c in enumerate(self.columns):
 
 			# If this is my column
-			if c.isSource(node): yield ('', EvenColumn.SOURCE, OddColumn.EMPTY)
+			if c.isSource(node): yield (_color(sIndex), EvenColumn.SOURCE, OddColumn.EMPTY)
 
 			# Am I straight below the source?
 			elif node.topName in c.parents:
