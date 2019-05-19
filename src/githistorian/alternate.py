@@ -176,6 +176,23 @@ class Grid:
 		self.assign(node)
 		return '{}{}'.format(''.join(c.get(i, node) for i, c in enumerate(self.columns)), '\x1b[32m{}\x1b[m')
 
+from enum import Enum
+
+# Helper class for even, unrepeatable columns holding commits and relationships
+class EvenColumnState(Enum):
+	EMPTY   = 0 # Column is empty with no arrow
+	SOURCE  = 1 # Column holds the current commit
+	LCORNER = 2 # Left corner, arrow bending up from yet unseen source node
+	RCORNER = 3 # Right corner, arrow bending up from already seen source node
+	LMERGE  = 4 # Left merge, arrow joining from yet unseen source node
+	RMERGE  = 5 # Right merge, arrow joining from already seen source node
+
+# Helper class for odd, repeatble columns holding only arrows
+class OddColumnState(Enum):
+	EMPTY   = 0 # Column is empty
+	LARROW  = 1 # Arrow towards target's column from yet unseen source node
+	RARROW  = 2 # Arrow towards target's column from already seen source node
+
 # This grid is simple and dumb, it assigns a new column to each chain
 class DumbGrid:
 
