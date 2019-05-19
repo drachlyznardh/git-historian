@@ -1,6 +1,6 @@
-1 3 2#Synch with hotfix
-2 6#Hotfix from release
-3 5 4#Merge of feature
-4 5#Feature
-5 6#Developing
-6 #Release
+1 3 2#[36mSynch with hotfix
+2 6#[35mHotfix from release
+3 5 4#[36mMerge of feature
+4 5#[34mFeature
+5 6#[36mDeveloping
+6 #[36mRelease

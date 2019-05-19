@@ -37,7 +37,7 @@ def loadDB(lines):
 			self.text = text
 
 		def __str__(self):
-			return 'SingleNode ({}) P({}) C({}) "{}"'.format(
+			return 'SingleNode ({}) P({}) C({}) "{}\x1b[m"'.format(
 				self.name, ', '.join(self.parents), ', '.join(self.children), self.text)
 
 	def nodeFromLine(line):
@@ -68,10 +68,10 @@ def reduceDB(heads, sdb, verbose):
 			self.content = [node.text]
 
 		def __str__(self):
-			return 'MultiNode ({}) P({}) C({}) "{}"'.format(
+			return 'MultiNode ({}) P({}) C({}) "{}\x1b[m"'.format(
 				self.topName if self.topName == self.bottomName else '{}/{}'.format(self.topName, self.bottomName),
 				', '.join(self.parents), ', '.join(self.children),
-				'", "'.join(self.content) if len(self.content) > 1 else self.content[0])
+				'\x1b[m", "'.join(self.content) if len(self.content) > 1 else self.content[0])
 
 		# Associate a symbol to each commit depending on its relations
 		def getContent(self):
@@ -271,7 +271,7 @@ class DumbGrid:
 			lastColumn = len(self.columns) -1
 
 			# Compose line format by exploding all columns, even and odd, and the adding the (fixed) description field
-			line = ''.join([c + e.get(flip, debug) + o.get(flip, debug, oddRange if lastColumn - i else 1) for i,(c,e,o) in enumerate(self.columns)]) + '\x1b[32m{}\x1b[m'
+			line = ''.join([c + e.get(flip, debug) + o.get(flip, debug, oddRange if lastColumn - i else 1) for i,(c,e,o) in enumerate(self.columns)]) + '\x1b[m{}\x1b[m'
 
 			# Populating line format with chain content
 			return '\n'.join([line.format(symbol, content) for symbol, content in db[self.nodeName].getContent()])

@@ -1,5 +1,5 @@
-5 1 4#Release
-4 3#Devel
-3 2#Devel
-2 1#Devel
-1 #Base
+5 1 4#[36mRelease
+4 3#[35mDevel
+3 2#[35mDevel
+2 1#[35mDevel
+1 #[36mBase
