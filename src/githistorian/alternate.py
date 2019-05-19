@@ -252,8 +252,8 @@ class RowState(Enum):
 	COMMITFIRST = 1 # First line of commit, second in chain or later
 	CONTENT     = 2 # Second or following line in commit
 
-# This grid is simple and dumb, it assigns a new column to each chain
-class DumbGrid:
+# Base class for all grids
+class BaseGrid:
 
 	class Column:
 		def __init__(self, node):
@@ -318,6 +318,16 @@ class DumbGrid:
 			# We have no relation, but arrows may pass through this cell
 			else: yield (_color(sIndex), EvenColumn.LARROW, OddColumn.LARROW) if i else (_color(sIndex), EvenColumn.PIPE, OddColumn.EMPTY)
 
+# This grid is a straight line
+class NoGrid(BaseGrid):
+	def dealWith(self, node, verbose):
+		self.rows.append(self.Row(node.topName, [e for e in self.compose(node, verbose)]))
+
+	def done(self): return self.rows
+
+# This grid is simple and dumb, it assigns a new column to each chain
+class DumbGrid(BaseGrid):
+
 	# Append new column for each node, immediately define its row
 	def dealWith(self, node, verbose):
 		self.columns.append(self.Column(node))
@@ -363,6 +373,7 @@ def deploy():
 		# 	visit.push([db[p] for p in e.parents])
 
 		for row in unroll(DumbGrid(), Visit(heads), heads, db, verbose): print(row.dump(db, 2))
+		for row in unroll(NoGrid(), Visit(heads), heads, db, verbose): print(row.dump(db, 2))
 
 	except BrokenPipeError: pass
 
