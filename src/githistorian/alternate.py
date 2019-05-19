@@ -26,7 +26,7 @@ class Visit:
 		return self.order.pop(0)
 
 # Loads a graph from given lines
-def loadDB(lines):
+def loadDB(lines, verbose):
 
 	# Helper class representing a single commit
 	class SingleNode:
@@ -40,11 +40,11 @@ def loadDB(lines):
 			return 'SingleNode ({}) P({}) C({}) "{}\x1b[m"'.format(
 				self.name, ', '.join(self.parents), ', '.join(self.children), self.text)
 
-	def nodesFromLines(lines):
+	def nodesFromLines(lines, verbose):
 
 		node = None
 		for line in lines:
-			print('nodeFromLine({}, {}\x1b[m)'.format(node, line.strip()))
+			if verbose > 0: print('nodeFromLine({}, {}\x1b[m)'.format(node, line.strip()))
 
 			# This line contains a new node
 			if '#' in line:
@@ -58,7 +58,7 @@ def loadDB(lines):
 			node.text.append(line.strip())
 
 	# Build a node from each line in input
-	db = {e.name: e for e in nodesFromLines(lines)}
+	db = {e.name: e for e in nodesFromLines(lines, verbose)}
 
 	# Bind children to their parent
 	for e in db.values():
@@ -114,22 +114,22 @@ def reduceDB(heads, sdb, verbose):
 	while visit:
 		e = visit.pop()
 		if e in mdb: continue
-		if verbose: print('testing {}'.format(e))
+		if verbose > 0: print('testing {}'.format(e))
 
 		# If this node belongs to a chain, absorb it
 		if len(e.children) == 1 and len(mdb[e.children[0]].parents) == 1:
 			oldKey, ref = mdb[e.children[0]].absorb(e)
 			mdb[e.name] = ref
-			if verbose: print('{} was absorbed by {}'.format(e.name, mdb[e.children[0]]))
+			if verbose > 0: print('{} was absorbed by {}'.format(e.name, mdb[e.children[0]]))
 			if oldKey: del mdb[oldKey]
 
 		# Otherwise, create new dedicated node
 		elif e.name not in mdb:
 			s = MultiNode(e)
 			mdb[e.name] = s
-			if verbose: print('{} was promoted'.format(e.name))
+			if verbose > 0: print('{} was promoted'.format(e.name))
 
-		elif verbose: print('{} was preserved'.format(e.name))
+		elif verbose > 0: print('{} was preserved'.format(e.name))
 
 		visit.push([sdb[p] for p in e.parents])
 
@@ -319,9 +319,9 @@ class DumbGrid:
 			else: yield (_color(sIndex), EvenColumn.LARROW, OddColumn.LARROW) if i else (_color(sIndex), EvenColumn.PIPE, OddColumn.EMPTY)
 
 	# Append new column for each node, immediately define its row
-	def dealWith(self, node):
+	def dealWith(self, node, verbose):
 		self.columns.append(self.Column(node))
-		self.rows.append(self.Row(node.topName, [e for e in self.compose(node, False)]))
+		self.rows.append(self.Row(node.topName, [e for e in self.compose(node, verbose)]))
 
 	# No post-processing, just extend columns to the limit for alignment
 	def done(self):
@@ -330,11 +330,11 @@ class DumbGrid:
 		return self.rows
 
 # Visit the graph and populate the grid
-def unroll(grid, visit, heads, db):
+def unroll(grid, visit, heads, db, verbose):
 
 	while visit:
 		e = visit.pop()
-		grid.dealWith(e)
+		grid.dealWith(e, verbose)
 		visit.push([db[p] for p in e.parents])
 
 	return grid.done()
@@ -347,20 +347,22 @@ def fromStdin():
 # Creating and deploying graph, ignoring errors when output is cut off
 def deploy():
 
+	verbose = 1
+
 	try:
 
-		heads, db = loadDB(fromStdin())
-		heads, db = reduceDB(heads, db, True)
+		heads, db = loadDB(fromStdin(), verbose -1)
+		heads, db = reduceDB(heads, db, verbose -1)
 
-		visit = Visit(heads)
-		grid = Grid()
-		while visit:
-			e = visit.pop()
-			layout = grid.dealWith(e)
-			for s, t in e.getContent(): print(layout.format(s, t))
-			visit.push([db[p] for p in e.parents])
+		# visit = Visit(heads)
+		# grid = Grid()
+		# while visit:
+		# 	e = visit.pop()
+		# 	layout = grid.dealWith(e)
+		# 	for s, t in e.getContent(): print(layout.format(s, t))
+		# 	visit.push([db[p] for p in e.parents])
 
-		for row in unroll(DumbGrid(), Visit(heads), heads, db): print(row.dump(db, 2))
+		for row in unroll(DumbGrid(), Visit(heads), heads, db, verbose): print(row.dump(db, 2))
 
 	except BrokenPipeError: pass
 
