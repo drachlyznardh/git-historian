@@ -76,8 +76,8 @@ def reduceDB(heads, sdb, verbose):
 		# Associate a symbol to each commit depending on its relations
 		def getContent(self):
 			content = [['•', e] for e in self.content] # U+2022 Common node
-			if not self.parents: content[-1][0] = '┷' # U+2537 Bottom root
-			if not self.children: content[0][0] = '┯' # U+252f Top head
+			if not self.parents: content[-1][0] = '┷'  # U+2537 Bottom root
+			if not self.children: content[0][0] = '┯'  # U+252f Top head
 			return content
 
 		# Append a node at the end of the chain, updating boundaries
@@ -225,11 +225,14 @@ class OddColumn(Enum):
 				OddColumn.RARROW : '→←→←',
 			}[self][flip.value]
 
+	# Odd columns are repeatable, so we get the symbol once and then repeat it
 	def get(self, flip, debug, counter):
 		symbol = self._get(flip, debug)
 		if counter == 1: return symbol
 		return ''.join([symbol for e in range(counter)])
 
+# Each line type requires a slightly different column layout, structure remains
+# the same but symbols in the source column vary
 class RowState(Enum):
 	CHAINFIRST  = 0 # First line of first commit in chain
 	COMMITFIRST = 1 # First line of commit, second in chain or later
@@ -255,52 +258,60 @@ class DumbGrid:
 		# Append empty columns to match the target size
 		def extend(self, targetSize):
 			l = len(self.columns)
-			# print('\tExtending from {} to {} columns'.format(l, targetSize))
 			if l == targetSize: return # We already match the layout size
-			# print('\tExtending to {} columns, which is different from {}'.format(targetSize, l))
 			self.columns.extend([('', EvenColumn.EMPTY, OddColumn.EMPTY) for e in range(targetSize - l)])
 
 		def dump(self, db, oddRange):
-			e = db[self.nodeName]
+
+			# Simulating options
 			flip = FlipState.NONE
 			debug = False
-			# # # return ''.join(['{}{}'.format(e.get(flip, debug), o.get(flip, debug, oddRange)) for e,o in self.columns]) #.format(e.getContent())
-			# # return ''.join([e.get(flip, debug) + o.get(flip, debug, oddRange) for e,o in self.columns]) + '{}'.format(e.getContent()[0])
-			# line = ''.join([c + e.get(flip, debug) + o.get(flip, debug, oddRange) for c,e,o in self.columns]) + '\x1b[32m{}\x1b[m'
-			lastColumn = len(self.columns) -1
-			line = ''.join([c + e.get(flip, debug) + o.get(flip, debug, oddRange if lastColumn - i else 1) for i,(c,e,o) in enumerate(self.columns)]) + '\x1b[32m{}\x1b[m'
-			return '\n'.join([line.format(symbol, content) for symbol, content in e.getContent()])
 
-	def compose(self, node, verbose):
-		def _color(i): return '\x1b[{}m'.format(31 + i % 6)
-		tIndex = 0 # Column of target node
-		for i, c in enumerate(self.columns):
-			# If this is my column
-			if node.topName in c.name: yield ('', EvenColumn.SOURCE, OddColumn.EMPTY) # '\x1b[m{}'.format(' '.join(node.getContent()[0]))
-			# Am I straight below the target?
-			elif node.topName in c.parents:
-				tIndex = i
-				c.parentSeen(node)
-				yield (_color(tIndex), EvenColumn.RMERGE if c.parents else EvenColumn.LCORNER, OddColumn.LARROW)
-				# yield '\x1b[{}m{}←'.format(31 + tIndex % 6, '├' if c.parents else '└') # U+251c U+2514
-			# else: yield '\x1b[{}m{}'.format(31 + tIndex % 6, '←←' if i else '│ ') # U+2502
-			else: yield (_color(tIndex), EvenColumn.LARROW, OddColumn.LARROW) if i else (_color(tIndex), EvenColumn.PIPE, OddColumn.EMPTY)
+			# Extract index of last column, which does not to be repeated
+			lastColumn = len(self.columns) -1
+
+			# Compose line format by exploding all columns, even and odd, and the adding the (fixed) description field
+			line = ''.join([c + e.get(flip, debug) + o.get(flip, debug, oddRange if lastColumn - i else 1) for i,(c,e,o) in enumerate(self.columns)]) + '\x1b[32m{}\x1b[m'
+
+			# Populating line format with chain content
+			return '\n'.join([line.format(symbol, content) for symbol, content in db[self.nodeName].getContent()])
 
 	def __init__(self):
 		self.columns = []
 		self.rows = []
 
+	# Compose a row by computing all available columns
+	def compose(self, node, verbose):
+
+		def _color(i): return '\x1b[{}m'.format(31 + i % 6) # Helper function to set the color
+		sIndex = 0 # Column of source node
+
+		for i, c in enumerate(self.columns):
+
+			# If this is my column
+			if node.topName in c.name: yield ('', EvenColumn.SOURCE, OddColumn.EMPTY)
+
+			# Am I straight below the source?
+			elif node.topName in c.parents:
+				sIndex = i # This is the source column
+				c.parentSeen(node) # Above us, the parent has seen one child
+				yield (_color(sIndex), EvenColumn.RMERGE if c.parents else EvenColumn.LCORNER, OddColumn.LARROW)
+
+			# We have no relation, but arrows may pass through this cell
+			else: yield (_color(sIndex), EvenColumn.LARROW, OddColumn.LARROW) if i else (_color(sIndex), EvenColumn.PIPE, OddColumn.EMPTY)
+
+	# Append new column for each node, immediately define its row
 	def dealWith(self, node):
 		self.columns.append(self.Column(node))
-		# self.rows.append((node.topName, ''.join([e for e in self.compose(node, False)])))
 		self.rows.append(self.Row(node.topName, [e for e in self.compose(node, False)]))
 
+	# No post-processing, just extend columns to the limit for alignment
 	def done(self):
 		s = len(self.columns)
-		print('\tExtending rows to {} columns'.format(s))
 		for r in self.rows: r.extend(s)
 		return self.rows
 
+# Visit the graph and populate the grid
 def unroll(grid, visit, heads, db):
 
 	while visit:
@@ -331,8 +342,7 @@ def deploy():
 			for s, t in e.getContent(): print(layout.format(s, t))
 			visit.push([db[p] for p in e.parents])
 
-		# for e, row in unroll(DumbGrid(), heads, db): print(row.format(db[e]))
-		for row in unroll(DumbGrid(), Visit(heads), heads, db): print(row.dump(db, 3))
+		for row in unroll(DumbGrid(), Visit(heads), heads, db): print(row.dump(db, 2))
 
 	except BrokenPipeError: pass
 
