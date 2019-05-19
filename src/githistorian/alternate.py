@@ -201,6 +201,10 @@ class DumbGrid:
 			self.name = node.bottomName
 			self.parents = set(node.parents)
 
+		# Mark parent as seen, removing it from the waiting list
+		def parentSeen(self, node):
+			self.parents.remove(node.topName)
+
 	def compose(self, node, verbose):
 		tIndex = 0 # Column of target node
 		for i, c in enumerate(self.columns):
@@ -209,7 +213,7 @@ class DumbGrid:
 			# Am I straight below the target?
 			elif node.topName in c.parents:
 				tIndex = i
-				c.parents.remove(node.topName)
+				c.parentSeen(node)
 				yield '\x1b[{}m{}←'.format(31 + tIndex % 6, '├' if c.parents else '└') # U+251c U+2514
 			else: yield '\x1b[{}m{}'.format(31 + tIndex % 6, '←←' if i else '│ ') # U+2502
 
