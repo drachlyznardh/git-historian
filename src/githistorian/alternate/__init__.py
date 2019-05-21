@@ -27,11 +27,9 @@ from .grid import getGrid
 # Creating and deploying graph, ignoring errors when output is cut off
 def deploy(options):
 
-	visitClass = getVisit('reverse')
+	visitClass = getVisit(options.visit)
 	heads, db = loadAndReduceDB(visitClass, fromStdin(), options.verbose -2)
-	gridClass = getGrid('no')
-
-	print(options.width)
+	gridClass = getGrid(options.grid)
 
 	try:
 		for row in unroll(gridClass, visitClass, heads, db, options.verbose): print(row.dump(db, options.width))

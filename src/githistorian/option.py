@@ -28,6 +28,8 @@ class Option:
 
 		self.mode    = 0
 		self.width   = 0
+		self.grid    = 'dumb'
+		self.visit   = 'reverse'
 
 		self.needColorTrick = False
 
@@ -56,6 +58,8 @@ class Option:
 
 		self.mode    |= other.mode
 		self.width   |= other.width
+		if other.grid: self.grid = other.grid
+		if other.visit: self.visit = other.visit
 
 		return self
 
@@ -85,6 +89,8 @@ def _print_help ():
 	print(' -m[0,1], --mode[01] : select original bintrees mode [0, default] or new sortedcontainer mode [1, experimental]')
 	print(' -v, --verbose : increase verbosity counter, repeat for additional verbosity')
 	print(' -w<N>, --width <N>: pad layout columns up to N')
+	print(' --grid <name>: layout column with class <name>')
+	print(' --visit <name>: visit nodes with class <name>')
 
 def _print_version (o):
 	print("Git-Historian %s © 2014-2019 Ivan Simonini" % o.version)
@@ -139,6 +145,10 @@ def _parse(args, sopts, lopts):
 			option.mode = int(value)
 		elif key in ('-w', '--width'):
 			option.width = int(value)
+		elif key in ('--grid'):
+			option.grid = value
+		elif key in ('--visit'):
+			option.visit = value
 
 	option.targets = args
 
@@ -156,7 +166,7 @@ def parse (inargs):
 			'flip', 'flip-heads',
 			'horizontal', 'flip-horizontally',
 			'vertical', 'flip-vertically',
-			'mode', 'width']
+			'mode', 'width', 'grid', 'visit']
 
 	option, filename = _parse(inargs or sys.argv[1:], sopts+'f:', lopts+['file'])
 	if not option: return False

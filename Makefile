@@ -31,12 +31,18 @@ install:
 	@pip3 install --verbose --user .
 
 test:
-	@$(NAME) -m1 -w0 < tests/m1-test-00.txt
-	@$(NAME) -m1 -w1 < tests/m1-test-01.txt
-	@$(NAME) -m1 -w2 < tests/m1-test-02.txt
-	@$(NAME) -m1 -w3 < tests/m1-test-03.txt
-	@$(NAME) -m1 -w4 < tests/m1-test-04.txt
-	@$(NAME) -m1 -w5 < tests/m1-test-05.txt
+	@$(NAME) -m1 < tests/m1-test-00.txt
+	@$(NAME) -m1 < tests/m1-test-01.txt
+	@$(NAME) -m1 < tests/m1-test-02.txt
+	@$(NAME) -m1 < tests/m1-test-03.txt
+	@$(NAME) -m1 < tests/m1-test-04.txt
+	@$(NAME) -m1 < tests/m1-test-05.txt
+	@$(NAME) -m1 -w0 --grid dumb < tests/m1-test-00.txt
+	@$(NAME) -m1 -w1 --grid dumb < tests/m1-test-01.txt
+	@$(NAME) -m1 -w2 --grid dumb < tests/m1-test-02.txt
+	@$(NAME) -m1 -w3 --grid dumb < tests/m1-test-03.txt
+	@$(NAME) -m1 -w4 --grid dumb < tests/m1-test-04.txt
+	@$(NAME) -m1 -w5 --grid dumb < tests/m1-test-05.txt
 
 clean:
 	@python3 setup.py clean
