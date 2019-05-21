@@ -78,9 +78,9 @@ def reduceDB(visitClass, heads, sdb, verbose):
 		# Given a layout line, dump the whole chain node-by-node, line-by-line
 		def dump(self, layout):
 			def _dump(self, layout, symbols, content):
-				first = layout.format('\x1b[m' + symbols[0], content[0])
+				first = layout[0].format('\x1b[m' + symbols[0], content[0])
 				if len(content) == 1: return first
-				return first + '\n' + '\n'.join([layout.format(symbols[1], line) for line in content[1:]])
+				return first + '\n' + '\n'.join([layout[1].format(symbols[1], line) for line in content[1:]])
 
 			# U+252f 2502 2537 ' ' 2022 2502
 			if len(self.content) == 1:

@@ -32,7 +32,7 @@ class EvenColumn(Enum):
 				EvenColumn.PIPE    : '││││', # U+2502 2502 2502 2502
 				EvenColumn.LARROW  : '←→←→',
 				EvenColumn.RARROW  : '→←→←',
-			}[self][flip.value]
+			}[self][flip.value], '││││'[flip.value]
 
 # Helper class for odd, repeatble columns holding only arrows
 class OddColumn(Enum):
@@ -46,12 +46,14 @@ class OddColumn(Enum):
 				OddColumn.EMPTY  : '    ',
 				OddColumn.LARROW : '←→←→',
 				OddColumn.RARROW : '→←→←',
-			}[self][flip.value]
+			}[self][flip.value], ' '
 
 	# Odd columns are repeatable, so we get the symbol once and then repeat it
 	def get(self, flip, debug, counter):
 		symbol = self._get(flip, debug)
 		if counter == 1: return symbol
+		return [e * counter for e in symbol]
+		return symbol[0] * counter, symbol[1] * counter
 		return ''.join([symbol for e in range(counter)])
 
 # Each line type requires a slightly different column layout, structure remains
@@ -97,7 +99,11 @@ class BaseGrid:
 			lastColumn = len(self.columns) -1
 
 			# Compose layout format by exploding all columns, even and odd, and the adding the (fixed) description field
-			layout = ''.join([c + e.get(flip, debug) + o.get(flip, debug, oddRange if lastColumn - i else 1) for i,(c,e,o) in enumerate(self.columns)]) + '\x1b[m{}\x1b[m'
+			# print([(c, e.get(flip, debug), o.get(flip, debug, oddRange if lastColumn - i else 1)) for i,(c,e,o) in enumerate(self.columns)])
+			# print([(c + e1 + o1, c + e2 + o2) for c, (e1, e2), (o1, o2) in [(c, e.get(flip, debug), o.get(flip, debug, oddRange if lastColumn - i else 1)) for i,(c,e,o) in enumerate(self.columns)]])
+			# print([e for e in zip(*[(c + e1 + o1, c + e2 + o2) for c, (e1, e2), (o1, o2) in [(c, e.get(flip, debug), o.get(flip, debug, oddRange if lastColumn - i else 1)) for i,(c,e,o) in enumerate(self.columns)]])])
+			layout = ['{}{}'.format(e[0], '\x1b[m{}\x1b[m') for e in zip(*[(c + e1 + o1, c + e2 + o2) for c, (e1, e2), (o1, o2) in [(c, e.get(flip, debug), o.get(flip, debug, oddRange if lastColumn - i else 1)) for i,(c,e,o) in enumerate(self.columns)]])]
+			# layout = ''.join([c + e.get(flip, debug) + o.get(flip, debug, oddRange if lastColumn - i else 1) for i,(c,e,o) in enumerate(self.columns)]) + '\x1b[m{}\x1b[m'
 			return db[self.nodeName].dump(layout)
 
 	def __init__(self):
