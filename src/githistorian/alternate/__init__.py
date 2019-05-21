@@ -237,21 +237,11 @@ from .db import loadAndReduceDB
 # Creating and deploying graph, ignoring errors when output is cut off
 def deploy(options):
 
+	visitClass = getVisit('Reverse')
+	heads, db = loadAndReduceDB(visitClass, fromStdin(), options.verbose -2)
+
 	try:
-
-		heads, db = loadAndReduceDB(getVisit('Reverse'), fromStdin(), options.verbose -2)
-
-		# visit = Visit(heads)
-		# grid = Grid()
-		# while visit:
-		# 	e = visit.pop()
-		# 	layout = grid.dealWith(e)
-		# 	for s, t in e.getContent(): print(layout.format(s, t))
-		# 	visit.push([db[p] for p in e.parents])
-
-		# for row in unroll(DumbGrid(), Visit(heads), heads, db, verbose): print(row.dump(db, 2))
-		for row in unroll(NoGrid(), getVisit('Reverse'), heads, db, options.verbose): print(row.dump(db, 2))
-
+		for row in unroll(NoGrid(), visitClass, heads, db, options.verbose): print(row.dump(db, 2))
 	except BrokenPipeError: pass
 
 	return 0
