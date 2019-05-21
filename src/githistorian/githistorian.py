@@ -29,7 +29,7 @@ def tell_the_story(inargs=None):
 	# Graph unrolling
 	if opt.mode == 1:
 		from .alternate import deploy
-		return deploy()
+		return deploy(opt)
 
 	# Hunting for history
 	if int(version[0]) == 2 and int(version[1]) > 11: opt.needColorTrick = True

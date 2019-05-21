@@ -81,6 +81,7 @@ def _print_help ():
 	print(' -f<name>, --file<name> : load preferences from <name> instead of default .githistorian')
 	print()
 	print(' -m[0,1], --mode[01] : select original bintrees mode [0, default] or new sortedcontainer mode [1, experimental]')
+	print(' -v, --verbose : increase verbosity counter, repeat for additional verbosity')
 
 def _print_version (o):
 	print("Git-Historian %s © 2014-2019 Ivan Simonini" % o.version)
@@ -101,7 +102,7 @@ def _parse(args, sopts, lopts):
 			_print_help()
 			return False, False
 		elif key in ('-v', '--verbose'):
-			option.verbose = 1
+			option.verbose += 1
 		elif key in ('-a', '--all', '--heads'):
 			option.heads = True
 		elif key in ('-t', '--tags'):

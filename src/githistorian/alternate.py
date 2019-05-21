@@ -373,14 +373,12 @@ def fromStdin():
 	return sys.stdin.readlines()
 
 # Creating and deploying graph, ignoring errors when output is cut off
-def deploy():
-
-	verbose = 1
+def deploy(options):
 
 	try:
 
-		heads, db = loadDB(fromStdin(), verbose -1)
-		heads, db = reduceDB(heads, db, verbose -1)
+		heads, db = loadDB(fromStdin(), options.verbose -1)
+		heads, db = reduceDB(heads, db, options.verbose -1)
 
 		# visit = Visit(heads)
 		# grid = Grid()
@@ -391,7 +389,7 @@ def deploy():
 		# 	visit.push([db[p] for p in e.parents])
 
 		# for row in unroll(DumbGrid(), Visit(heads), heads, db, verbose): print(row.dump(db, 2))
-		for row in unroll(NoGrid(), Visit(heads), heads, db, verbose): print(row.dump(db, 2))
+		for row in unroll(NoGrid(), Visit(heads), heads, db, options.verbose): print(row.dump(db, 2))
 
 	except BrokenPipeError: pass
 
