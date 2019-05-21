@@ -89,11 +89,13 @@ class BaseGrid:
 			if l == targetSize: return # We already match the layout size
 			self.columns.extend([('', EvenColumn.EMPTY, OddColumn.EMPTY) for e in range(targetSize - l)])
 
-		def dump(self, db, oddRange):
+		# TODO please describe what is happening down there, it's scary!
+		def dump(self, db, options):
 
 			# Simulating options
-			flip = FlipState.NONE
-			debug = False
+			oddRange = options.width
+			flip = options.FlipState.NONE
+			debug = options.highlightSymbols
 
 			# Extract index of last column, which does not to be repeated
 			lastColumn = len(self.columns) -1
