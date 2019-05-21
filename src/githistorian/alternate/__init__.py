@@ -1,30 +1,4 @@
 
-# Manages the visit of a graph, tracking nodes we need to visit (in order) and
-# those we are already aware of
-class Visit:
-
-	# Costructor from initial set of nodes to visit, in the proper order
-	def __init__(self, arg):
-		self.order = [e for e in arg] # Deep copy of input list
-		self.seen = set(self.order) # Won't be added again
-
-	# Visit is valid until we run out of nodes to visit
-	def __bool__(self):
-		return len(self.order) > 0
-
-	# Prepend nodes in reverse order
-	def push(self, arg):
-		if not arg: return # Skip empty list
-
-		# Selecting only previously unseen nodes
-		filtered = [e for e in reversed(arg) if e not in self.seen]
-		self.order = filtered + self.order
-		for e in filtered: self.seen.add(e) # Won't be added again
-
-	# Pop the first node in the list
-	def pop(self):
-		return self.order.pop(0)
-
 # Loads a graph from given lines
 def loadDB(lines, verbose):
 
@@ -71,7 +45,7 @@ def loadDB(lines, verbose):
 	return [e for e in db.values() if len(e.children) == 0], db
 
 # Reduce graph by collapsing chains of nodes into supernodes
-def reduceDB(heads, sdb, verbose):
+def reduceDB(visitClass, heads, sdb, verbose):
 
 	# Helper class representing a straight chain of nodes
 	class MultiNode:
@@ -121,7 +95,7 @@ def reduceDB(heads, sdb, verbose):
 	bigHeads = [MultiNode(e) for e in heads]
 	mdb = {e.topName:e for e in bigHeads}
 
-	visit = Visit(heads)
+	visit = visitClass(heads)
 	while visit:
 		e = visit.pop()
 		if e in mdb: continue
@@ -360,8 +334,9 @@ class DumbGrid(BaseGrid):
 		return self.rows
 
 # Visit the graph and populate the grid
-def unroll(grid, visit, heads, db, verbose):
+def unroll(grid, visitClass, heads, db, verbose):
 
+	visit = visitClass(heads)
 	while visit:
 		e = visit.pop()
 		grid.dealWith(e, verbose)
@@ -374,13 +349,15 @@ def fromStdin():
 	import sys
 	return sys.stdin.readlines()
 
+from .visit import getVisit
+
 # Creating and deploying graph, ignoring errors when output is cut off
 def deploy(options):
 
 	try:
 
 		heads, db = loadDB(fromStdin(), options.verbose -2)
-		heads, db = reduceDB(heads, db, options.verbose -2)
+		heads, db = reduceDB(getVisit('Reverse'), heads, db, options.verbose -2)
 
 		# visit = Visit(heads)
 		# grid = Grid()
@@ -391,7 +368,7 @@ def deploy(options):
 		# 	visit.push([db[p] for p in e.parents])
 
 		# for row in unroll(DumbGrid(), Visit(heads), heads, db, verbose): print(row.dump(db, 2))
-		for row in unroll(NoGrid(), Visit(heads), heads, db, options.verbose): print(row.dump(db, 2))
+		for row in unroll(NoGrid(), getVisit('Reverse'), heads, db, options.verbose): print(row.dump(db, 2))
 
 	except BrokenPipeError: pass
 
