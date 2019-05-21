@@ -1,4 +1,8 @@
 
+from .visit import getVisit
+from .db import loadAndReduceDB
+from .grid import getGrid
+
 # Visit the graph and populate the grid
 def unroll(gridClass, visitClass, heads, db, verbose):
 
@@ -19,10 +23,6 @@ def fromStdin():
 		line = sys.stdin.readline()
 		if not line: return
 		yield line
-
-from .visit import getVisit
-from .db import loadAndReduceDB
-from .grid import getGrid
 
 # Creating and deploying graph, ignoring errors when output is cut off
 def deploy(options):
