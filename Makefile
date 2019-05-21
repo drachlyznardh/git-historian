@@ -30,13 +30,13 @@ bcheck: $(WHEEL)
 install:
 	@pip3 install --verbose --user .
 
-test: test-dumb
+test: test-simple
 
 test-simple:
-	@$(NAME) -m1 < tests/m1-test-00.txt
-	@$(NAME) -m1 < tests/m1-test-01.txt
-	@$(NAME) -m1 < tests/m1-test-02.txt
-	@$(NAME) -m1 < tests/m1-test-03.txt
+	@#$(NAME) -m1 < tests/m1-test-00.txt
+	@#$(NAME) -m1 < tests/m1-test-01.txt
+	@#$(NAME) -m1 < tests/m1-test-02.txt
+	@#$(NAME) -m1 < tests/m1-test-03.txt
 	@$(NAME) -m1 < tests/m1-test-04.txt
 	@$(NAME) -m1 < tests/m1-test-05.txt
 
