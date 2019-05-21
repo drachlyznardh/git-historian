@@ -1,0 +1,18 @@
+#ddc64e40d85fce8c7897e3f9245b8132c8c330e6 35e65f5721d40dd7396640f9e6a3d6a16b76f592 7d5273525cc9c6ece46c03220e61bc7f7a7e1635#Merge
+
+This is the third (#3) commit in the list.
+
+Its description is full of empty lines.
+
+I wonder what will happen. # # #
+
+#7d5273525cc9c6ece46c03220e61bc7f7a7e1635 35e65f5721d40dd7396640f9e6a3d6a16b76f592#Devel
+
+This is the second (#2) commit in the list. Its description is long and contains
+some #s for test purposes.
+
+#35e65f5721d40dd7396640f9e6a3d6a16b76f592 #Start
+
+This is the first (#1) commit of a test project, with a long description. It's
+number is #1 'cause it's the first in the list
+
