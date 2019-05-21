@@ -37,7 +37,7 @@ class ReverseVisit(BaseVisit):
 # Return visit class by name, or ReverseVisit by default
 def getVisit(name):
 	return {
-			'Direct': DirectVisit,
-			'Reverse': ReverseVisit,
-		}.get(name, ReverseVisit)
+			'direct': DirectVisit,
+			'reverse': ReverseVisit,
+		}.get(name.lower(), ReverseVisit)
 

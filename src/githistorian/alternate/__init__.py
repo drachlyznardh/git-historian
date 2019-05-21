@@ -237,7 +237,7 @@ from .db import loadAndReduceDB
 # Creating and deploying graph, ignoring errors when output is cut off
 def deploy(options):
 
-	visitClass = getVisit('Reverse')
+	visitClass = getVisit('reverse')
 	heads, db = loadAndReduceDB(visitClass, fromStdin(), options.verbose -2)
 
 	try:
