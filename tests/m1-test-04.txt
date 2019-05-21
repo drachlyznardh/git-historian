@@ -1,13 +1,13 @@
-5 4#[36mRelease
+#5 4#[36mRelease
 Long Description
-4 3#[36mDevel
+#4 3#[36mDevel
 Long Description
-3 2#[36mDevel
+#3 2#[36mDevel
 Very Long Description
 Very Long Description
 Very Long Description
 Very Long Description
-2 1#[36mDevel
+#2 1#[36mDevel
 Long Description
-1 #[36mBase
+#1 #[36mBase
 Long Description
