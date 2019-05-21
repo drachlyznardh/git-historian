@@ -42,13 +42,15 @@ def loadDB(lines, verbose):
 
 	def nodesFromLines(lines, verbose):
 
-		node = None
+		count, node = 0, None
 		for line in lines:
+			count += 1
 			if verbose > 0: print('nodeFromLine({}, {}\x1b[m)'.format(node, line.strip()))
 
 			# This line contains a new node
-			if '#' in line:
-				hashes, text = line.strip().split('#', 1)
+			if line and line[0] is '#':
+				empty, hashes, text = line.strip().split('#', 2)
+				if empty and verbose > 0: print('Fragment {} preceding # is not empty as expected on line {}'.format(empty, count))
 				hashes = hashes.split(' ')
 				node = SingleNode(hashes[0], hashes[1:], text)
 				yield node
@@ -377,8 +379,8 @@ def deploy(options):
 
 	try:
 
-		heads, db = loadDB(fromStdin(), options.verbose -1)
-		heads, db = reduceDB(heads, db, options.verbose -1)
+		heads, db = loadDB(fromStdin(), options.verbose -2)
+		heads, db = reduceDB(heads, db, options.verbose -2)
 
 		# visit = Visit(heads)
 		# grid = Grid()
