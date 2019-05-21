@@ -347,7 +347,10 @@ def unroll(grid, visitClass, heads, db, verbose):
 # Reading all lines from STDIN
 def fromStdin():
 	import sys
-	return sys.stdin.readlines()
+	while True:
+		line = sys.stdin.readline()
+		if not line: return
+		yield line
 
 from .visit import getVisit
 
