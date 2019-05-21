@@ -27,6 +27,7 @@ class Option:
 		self.match   = False
 
 		self.mode    = 0
+		self.width   = 0
 
 		self.needColorTrick = False
 
@@ -54,6 +55,7 @@ class Option:
 		self.match   |= other.match
 
 		self.mode    |= other.mode
+		self.width   |= other.width
 
 		return self
 
@@ -82,6 +84,7 @@ def _print_help ():
 	print()
 	print(' -m[0,1], --mode[01] : select original bintrees mode [0, default] or new sortedcontainer mode [1, experimental]')
 	print(' -v, --verbose : increase verbosity counter, repeat for additional verbosity')
+	print(' -w<N>, --width <N>: pad layout columns up to N')
 
 def _print_version (o):
 	print("Git-Historian %s © 2014-2019 Ivan Simonini" % o.version)
@@ -134,6 +137,8 @@ def _parse(args, sopts, lopts):
 			option.vflip = True
 		elif key in ('-m', '--mode'):
 			option.mode = int(value)
+		elif key in ('-w', '--width'):
+			option.width = int(value)
 
 	option.targets = args
 
@@ -141,7 +146,7 @@ def _parse(args, sopts, lopts):
 
 def parse (inargs):
 
-	sopts = 'atrhvn:p:xo:MFHVm:'
+	sopts = 'atrhvn:p:xo:MFHVm:w:'
 	lopts = ['help', 'verbose', 'version',
 			'all', 'heads', 'tags', 'remotes',
 			'limit=', 'pretty=',
@@ -151,7 +156,7 @@ def parse (inargs):
 			'flip', 'flip-heads',
 			'horizontal', 'flip-horizontally',
 			'vertical', 'flip-vertically',
-			'mode']
+			'mode', 'width']
 
 	option, filename = _parse(inargs or sys.argv[1:], sopts+'f:', lopts+['file'])
 	if not option: return False

@@ -31,8 +31,10 @@ def deploy(options):
 	heads, db = loadAndReduceDB(visitClass, fromStdin(), options.verbose -2)
 	gridClass = getGrid('no')
 
+	print(options.width)
+
 	try:
-		for row in unroll(gridClass, visitClass, heads, db, options.verbose): print(row.dump(db, 2))
+		for row in unroll(gridClass, visitClass, heads, db, options.verbose): print(row.dump(db, options.width))
 	except BrokenPipeError: pass
 
 	return 0
