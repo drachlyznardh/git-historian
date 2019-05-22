@@ -101,7 +101,7 @@ class BaseGrid:
 			# Compose layout format by exploding all columns, even and odd, and the adding the (fixed) description field
 			# print([(c, e.get(flip, debug), o.get(flip, debug, width if lastColumn - i else 1)) for i,(c,e,o) in enumerate(self.columns)])
 			# print([(c + e1 + o1, c + e2 + o2) for c, (e1, e2), (o1, o2) in [(c, e.get(flip, debug), o.get(flip, debug, width if lastColumn - i else 1)) for i,(c,e,o) in enumerate(self.columns)]])
-			# print([e for e in zip(*[(c + e1 + o1, c + e2 + o2) for c, (e1, e2), (o1, o2) in [(c, e.get(flip, debug), o.get(flip, debug, width if lastColumn - i else 1)) for i,(c,e,o) in enumerate(self.columns)]])])
+			print([e for e in zip(*[(c + e1 + o1, c + e2 + o2) for c, (e1, e2), (o1, o2) in [(c, e.get(flip, debug), o.get(flip, debug, width if lastColumn - i else 1)) for i,(c,e,o) in enumerate(self.columns)]])])
 			layout = ['{}{}'.format(e[0], '\x1b[m{}\x1b[m') for e in zip(*[(c + e1 + o1, c + e2 + o2) for c, (e1, e2), (o1, o2) in [(c, e.get(flip, debug), o.get(flip, debug, width if lastColumn - i else 1)) for i,(c,e,o) in enumerate(self.columns)]])]
 			# layout = ''.join([c + e.get(flip, debug) + o.get(flip, debug, width if lastColumn - i else 1) for i,(c,e,o) in enumerate(self.columns)]) + '\x1b[m{}\x1b[m'
 			return db[self.nodeName].dump(layout)
