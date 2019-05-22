@@ -102,7 +102,7 @@ def reduceDB(visitClass, heads, sdb, verbose):
 	visit = visitClass(heads)
 	while visit:
 		e = visit.pop()
-		if e in mdb: continue
+		if e in mdb: continue # This node may be a head from the initialization list
 		if verbose > 0: print('testing {}'.format(e))
 
 		# If this node belongs to a chain, absorb it
