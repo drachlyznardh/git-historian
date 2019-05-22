@@ -171,7 +171,7 @@ def parse (inargs):
 			'flip', 'flip-heads',
 			'horizontal', 'flip-horizontally',
 			'vertical', 'flip-vertically',
-			'mode', 'width', 'grid', 'visit', 'no-symbols']
+			'mode=', 'width=', 'grid=', 'visit=', 'no-symbols']
 
 	option, filename = _parse(inargs or sys.argv[1:], sopts+'f:', lopts+['file'])
 	if not option: return False

@@ -27,13 +27,15 @@ bcheck: $(WHEEL)
 	@. $(BTESTDIR) && pip3 install $(WHEEL)
 	@. $(BTESTDIR) && $(NAME) --version
 
+tinstall: install test
+
 install:
 	@pip3 install --verbose --user .
 
 test: test-simple
 
 test-simple:
-	@$(NAME) -m1 -vvvvv < tests/m1-test-00.txt
+	@$(NAME) -m1 --grid no -vvvvv < tests/m1-test-00.txt
 	@#$(NAME) -m1 < tests/m1-test-01.txt
 	@#$(NAME) -m1 < tests/m1-test-02.txt
 	@#$(NAME) -m1 < tests/m1-test-03.txt
