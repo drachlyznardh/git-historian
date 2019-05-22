@@ -20,19 +20,19 @@ def loadDB(lines, verbose: int):
 		for line in lines:
 			if not line: return
 
-			if verbose > 0: print('nodeFromLine({}, {}\x1b[m)'.format(node, line.strip()))
-
 			# Lines starting with # mark new nodes
 			if line[0] is '#':
 				empty, hashes, text = line.strip().split('#', 2)
 				hashes = hashes.split(' ')
 				node = SingleNode(hashes[0], hashes[1:], text)
+				if verbose > 0: print('nodeFromLine({}, {}\x1b[m)'.format(node, line.strip()))
 				yield node
 				continue
 
 			# Lines not starting with # are a continuation of previous nodes.
 			# Line is appended to its description
 			node.text.append(line.strip())
+			if verbose > 0: print('nodeFromLine({}, {}\x1b[m)'.format(node, line.strip()))
 
 	# Build nodes from input lines
 	db = {e.name: e for e in nodesFromLines(lines, verbose)}
