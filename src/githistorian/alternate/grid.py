@@ -1,12 +1,11 @@
 
 from enum import Enum
 
-# Single-value representation of flip
-class FlipState(Enum):
-	NONE  = 0 # No flip, top to bottom, left to right
-	HFLIP = 1 # Horizontal flip, top to bottom, right to left
-	VFLIP = 2 # Vertical flip, bottom to top, left to right
-	BOTH  = 3 # Both flips, bottom to top, right to left
+# NONE  = 0 # No flip, top to bottom, left to right
+# HFLIP = 1 # Horizontal flip, top to bottom, right to left
+# VFLIP = 2 # Vertical flip, bottom to top, left to right
+# BOTH  = 3 # Both flips, bottom to top, right to left
+def getOrientation(horizontalFlip, verticalFlip): return 1 * horizontalFlip + 2 * verticalFlip
 
 # Helper class for even, unrepeatable columns holding commits and relationships
 class EvenColumn(Enum):
@@ -94,22 +93,17 @@ class BaseGrid:
 			self.columns.extend([('', EvenColumn.EMPTY, OddColumn.EMPTY) for e in range(targetSize - l)])
 
 		# TODO please describe what is happening down there, it's scary!
-		def dump(self, db, options):
-
-			# Simulating options
-			oddRange = options.width
-			flip = options.FlipState.NONE
-			debug = options.highlightSymbols
+		def dump(self, db, width, flip, debug):
 
 			# Extract index of last column, which does not to be repeated
 			lastColumn = len(self.columns) -1
 
 			# Compose layout format by exploding all columns, even and odd, and the adding the (fixed) description field
-			# print([(c, e.get(flip, debug), o.get(flip, debug, oddRange if lastColumn - i else 1)) for i,(c,e,o) in enumerate(self.columns)])
-			# print([(c + e1 + o1, c + e2 + o2) for c, (e1, e2), (o1, o2) in [(c, e.get(flip, debug), o.get(flip, debug, oddRange if lastColumn - i else 1)) for i,(c,e,o) in enumerate(self.columns)]])
-			# print([e for e in zip(*[(c + e1 + o1, c + e2 + o2) for c, (e1, e2), (o1, o2) in [(c, e.get(flip, debug), o.get(flip, debug, oddRange if lastColumn - i else 1)) for i,(c,e,o) in enumerate(self.columns)]])])
-			layout = ['{}{}'.format(e[0], '\x1b[m{}\x1b[m') for e in zip(*[(c + e1 + o1, c + e2 + o2) for c, (e1, e2), (o1, o2) in [(c, e.get(flip, debug), o.get(flip, debug, oddRange if lastColumn - i else 1)) for i,(c,e,o) in enumerate(self.columns)]])]
-			# layout = ''.join([c + e.get(flip, debug) + o.get(flip, debug, oddRange if lastColumn - i else 1) for i,(c,e,o) in enumerate(self.columns)]) + '\x1b[m{}\x1b[m'
+			# print([(c, e.get(flip, debug), o.get(flip, debug, width if lastColumn - i else 1)) for i,(c,e,o) in enumerate(self.columns)])
+			# print([(c + e1 + o1, c + e2 + o2) for c, (e1, e2), (o1, o2) in [(c, e.get(flip, debug), o.get(flip, debug, width if lastColumn - i else 1)) for i,(c,e,o) in enumerate(self.columns)]])
+			# print([e for e in zip(*[(c + e1 + o1, c + e2 + o2) for c, (e1, e2), (o1, o2) in [(c, e.get(flip, debug), o.get(flip, debug, width if lastColumn - i else 1)) for i,(c,e,o) in enumerate(self.columns)]])])
+			layout = ['{}{}'.format(e[0], '\x1b[m{}\x1b[m') for e in zip(*[(c + e1 + o1, c + e2 + o2) for c, (e1, e2), (o1, o2) in [(c, e.get(flip, debug), o.get(flip, debug, width if lastColumn - i else 1)) for i,(c,e,o) in enumerate(self.columns)]])]
+			# layout = ''.join([c + e.get(flip, debug) + o.get(flip, debug, width if lastColumn - i else 1) for i,(c,e,o) in enumerate(self.columns)]) + '\x1b[m{}\x1b[m'
 			return db[self.nodeName].dump(layout)
 
 	def __init__(self):

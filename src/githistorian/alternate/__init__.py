@@ -1,7 +1,7 @@
 
 from .visit import getVisit
 from .db import loadAndReduceDB
-from .grid import getGrid
+from .grid import getGrid, getOrientation
 
 # Visit the graph and populate the grid
 def unroll(gridClass, visitClass, heads, db, verbose):
@@ -30,9 +30,10 @@ def deploy(options):
 	visitClass = getVisit(options.visit)
 	heads, db = loadAndReduceDB(visitClass, fromStdin(), options.verbose -2)
 	gridClass = getGrid(options.grid)
+	orientation = getOrientation(options.hflip, options.vflip)
 
 	try:
-		for row in unroll(gridClass, visitClass, heads, db, options.verbose): print(row.dump(db, options.width))
+		for row in unroll(gridClass, visitClass, heads, db, options.verbose): print(row.dump(db, options.width, orientation, True))
 	except BrokenPipeError: pass
 
 	return 0
