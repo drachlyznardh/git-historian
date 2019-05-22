@@ -74,7 +74,10 @@ def reduceDB(visitClass, heads, sdb, verbose):
 			# this chain for convenience
 			return previousBottom if previousBottom != self.topName else None, self
 
-		# Given a layout line, dump the whole chain node-by-node, line-by-line
+		# Given a layout line, dump the whole chain node-by-node, line-by-line.
+		# Each node has a symbol for its first line and another for the
+		# following lines. The first and last node in the chain may also be a
+		# head or a root with dedicated symbols
 		def dump(self, layout):
 			def _dump(self, layout, symbols, content):
 				first = layout[0].format('\x1b[m' + symbols[0], content[0])
@@ -117,10 +120,14 @@ def reduceDB(visitClass, heads, sdb, verbose):
 
 		elif verbose > 0: print('{} was preserved'.format(e.name))
 
+		# Pushing all parent to the visit, they will be filtered automatically
 		visit.push([sdb[p] for p in e.parents])
 
 	return bigHeads, mdb
 
+# A bi-directional graph of simple nodes is loaded from the input lines, then
+# it is reduced to a simpler graph where all straight chains of nodes are
+# collected into multi-nodes
 def loadAndReduceDB(visitClass, lines, verbose):
 	heads, db = loadDB(lines, verbose)
 	return reduceDB(visitClass, heads, db, verbose)
