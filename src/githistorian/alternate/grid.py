@@ -21,7 +21,7 @@ class EvenColumn(Enum):
 
 	# Select symbols according to flip status, return one for the first line
 	# and another for the following line. When debugging, dump the enum value
-	def get(self, flip, debug):
+	def get(self, flip:int, debug:int):
 		if debug: return ['{}'.format(self.value) for e in range(2)]
 		return {
 				EvenColumn.EMPTY   : '    ',
@@ -33,7 +33,7 @@ class EvenColumn(Enum):
 				EvenColumn.PIPE    : '││││', # U+2502 2502 2502 2502
 				EvenColumn.LARROW  : '←→←→',
 				EvenColumn.RARROW  : '→←→←',
-			}[self][flip.value], '││││'[flip.value]
+			}[self][flip], '││││'[flip]
 
 # Helper class for odd, repeatble columns holding only arrows
 class OddColumn(Enum):
@@ -43,16 +43,16 @@ class OddColumn(Enum):
 
 	# Select symbols according to flip status, return one for the first line
 	# and another for the following line. When debugging, dump the enum value
-	def _get(self, flip, debug):
+	def _get(self, flip:int, debug:int):
 		if debug: return ['{}'.format(self.value) for e in range(2)]
 		return {
 				OddColumn.EMPTY  : '    ',
 				OddColumn.LARROW : '←→←→',
 				OddColumn.RARROW : '→←→←',
-			}[self][flip.value], ' '
+			}[self][flip], ' '
 
 	# Odd columns are repeatable, so we get the symbol once and then repeat it
-	def get(self, flip, debug, counter):
+	def get(self, flip:int, debug:int, counter:int):
 		symbol = self._get(flip, debug)
 		if counter == 1: return symbol
 		return [e * counter for e in symbol]
