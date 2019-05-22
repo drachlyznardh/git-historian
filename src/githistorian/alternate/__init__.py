@@ -27,13 +27,17 @@ def fromStdin():
 # Creating and deploying graph, ignoring errors when output is cut off
 def deploy(options):
 
-	visitClass = getVisit(options.visit)
-	heads, db = loadAndReduceDB(visitClass, fromStdin(), options.verbose -2)
+	# visitClass = getVisit(options.visit)
+	if ',' in options.visit:
+		dbVisitClass, gridVisitClass = [getVisit(e) for e in options.visit.split(',')]
+	else: dbVisitClass = gridVisitClass = getVisit(options.visit)
+
+	heads, db = loadAndReduceDB(dbVisitClass, fromStdin(), options.verbose -4)
 	gridClass = getGrid(options.grid)
 	orientation = getOrientation(options.hflip, options.vflip)
 
 	try:
-		for row in unroll(gridClass, visitClass, heads, db, options.verbose):
+		for row in unroll(gridClass, gridVisitClass, heads, db, options.verbose):
 			print(row.dump(db, options.width, orientation, options.highlight))
 	except BrokenPipeError: pass
 

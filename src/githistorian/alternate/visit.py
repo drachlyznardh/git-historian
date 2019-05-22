@@ -21,23 +21,39 @@ class BaseVisit:
 		for e in pushed: self.seen.add(e) # So they won't be added again
 
 # Items are prepended in order
-class DirectVisit(BaseVisit):
+class DirectPreVisit(BaseVisit):
 	def _push(self, items):
 		filtered = [e for e in items if self.isUnseen(e)]
 		self.setItems(filtered + self.getItems())
 		return filtered
 
 # Items are prepended in reverse order
-class ReverseVisit(BaseVisit):
+class ReversePreVisit(BaseVisit):
 	def _push(self, items):
 		filtered = [e for e in reversed(items) if self.isUnseen(e)]
 		self.setItems(filtered + self.getItems())
 		return filtered
 
+# Items are appended in order
+class DirectPostVisit(BaseVisit):
+	def _push(self, items):
+		filtered = [e for e in items if self.isUnseen(e)]
+		self.setItems(self.getItems() + filtered)
+		return filtered
+
+# Items are appended in reverse order
+class ReversePostVisit(BaseVisit):
+	def _push(self, items):
+		filtered = [e for e in reversed(items) if self.isUnseen(e)]
+		self.setItems(self.getItems() + filtered)
+		return filtered
+
 # Return visit class by name, or ReverseVisit by default
 def getVisit(name):
 	return {
-			'direct': DirectVisit,
-			'reverse': ReverseVisit,
-		}.get(name.lower(), ReverseVisit)
+			'direct-pre'   : DirectPreVisit,
+			'reverse-pre'  : ReversePreVisit,
+			'direct-post'  : DirectPostVisit,
+			'reverse-post' : ReversePostVisit,
+		}.get(name.lower(), ReversePreVisit)
 
