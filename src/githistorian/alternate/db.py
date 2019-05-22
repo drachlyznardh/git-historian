@@ -1,6 +1,6 @@
 
 # Loads a graph from given lines
-def loadDB(lines, verbose):
+def loadDB(lines, verbose: int):
 
 	# Helper class representing a single commit
 	class SingleNode:
@@ -14,7 +14,7 @@ def loadDB(lines, verbose):
 			return 'SingleNode ({}) P({}) C({}) "{}\x1b[m"'.format(
 				self.name, ', '.join(self.parents), ', '.join(self.children), self.text)
 
-	def nodesFromLines(lines, verbose):
+	def nodesFromLines(lines, verbose: int):
 
 		count, node = 0, None
 		for line in lines:
@@ -23,7 +23,7 @@ def loadDB(lines, verbose):
 			count += 1
 			if verbose > 0: print('nodeFromLine({}, {}\x1b[m)'.format(node, line.strip()))
 
-			# This line contains a new node
+			# Lines starting with # mark new nodes
 			if line[0] is '#':
 				empty, hashes, text = line.strip().split('#', 2)
 				if empty and verbose > 0: print('Fragment {} preceding # is not empty as expected on line {}'.format(empty, count))
@@ -32,10 +32,11 @@ def loadDB(lines, verbose):
 				yield node
 				continue
 
-			# Append description to previous node
+			# Lines not starting with # are a continuation of previous nodes.
+			# Line is appended to its description
 			node.text.append(line.strip())
 
-	# Build a node from each line in input
+	# Build nodes from input lines
 	db = {e.name: e for e in nodesFromLines(lines, verbose)}
 
 	# Bind children to their parent
