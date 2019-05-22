@@ -20,8 +20,10 @@ class EvenColumn(Enum):
 	LARROW  = 7 # Arrow towards target's column from yet unseen source node
 	RARROW  = 8 # Arrow towards target's column from already seen source node
 
+	# Select symbols according to flip status, return one for the first line
+	# and another for the following line. When debugging, dump the enum value
 	def get(self, flip, debug):
-		if debug: return '{}'.format(self.value)
+		if debug: return ['{}'.format(self.value) for e in range(2)]
 		return {
 				EvenColumn.EMPTY   : '    ',
 				EvenColumn.SOURCE  : ['{}' for e in range(4)],
@@ -40,8 +42,10 @@ class OddColumn(Enum):
 	LARROW  = 1 # Arrow towards target's column from yet unseen source node
 	RARROW  = 2 # Arrow towards target's column from already seen source node
 
+	# Select symbols according to flip status, return one for the first line
+	# and another for the following line. When debugging, dump the enum value
 	def _get(self, flip, debug):
-		if debug: return '{}'.format(self.value)
+		if debug: return ['{}'.format(self.value) for e in range(2)]
 		return {
 				OddColumn.EMPTY  : '    ',
 				OddColumn.LARROW : '←→←→',
