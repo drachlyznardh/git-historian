@@ -16,17 +16,15 @@ def loadDB(lines, verbose: int):
 
 	def nodesFromLines(lines, verbose: int):
 
-		count, node = 0, None
+		node = None
 		for line in lines:
 			if not line: return
 
-			count += 1
 			if verbose > 0: print('nodeFromLine({}, {}\x1b[m)'.format(node, line.strip()))
 
 			# Lines starting with # mark new nodes
 			if line[0] is '#':
 				empty, hashes, text = line.strip().split('#', 2)
-				if empty and verbose > 0: print('Fragment {} preceding # is not empty as expected on line {}'.format(empty, count))
 				hashes = hashes.split(' ')
 				node = SingleNode(hashes[0], hashes[1:], text)
 				yield node
