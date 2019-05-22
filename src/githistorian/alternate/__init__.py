@@ -33,7 +33,8 @@ def deploy(options):
 	orientation = getOrientation(options.hflip, options.vflip)
 
 	try:
-		for row in unroll(gridClass, visitClass, heads, db, options.verbose): print(row.dump(db, options.width, orientation, True))
+		for row in unroll(gridClass, visitClass, heads, db, options.verbose):
+			print(row.dump(db, options.width, orientation, options.highlight))
 	except BrokenPipeError: pass
 
 	return 0

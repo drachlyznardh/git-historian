@@ -31,6 +31,7 @@ class Option:
 		self.grid    = 'dumb'
 		self.visit   = 'reverse'
 
+		self.highlight      = False
 		self.needColorTrick = False
 
 		version_file = os.path.join(os.path.dirname(__file__), 'VERSION')
@@ -60,6 +61,8 @@ class Option:
 		self.width   |= other.width
 		if other.grid: self.grid = other.grid
 		if other.visit: self.visit = other.visit
+
+		self.highlight |= other.highlight
 
 		return self
 
@@ -149,6 +152,8 @@ def _parse(args, sopts, lopts):
 			option.grid = value
 		elif key in ('--visit'):
 			option.visit = value
+		elif key in ('-s', '--no-symbols'):
+			option.highlight = True
 
 	option.targets = args
 
@@ -156,7 +161,7 @@ def _parse(args, sopts, lopts):
 
 def parse (inargs):
 
-	sopts = 'atrhvn:p:xo:MFHVm:w:'
+	sopts = 'atrhvn:p:xo:MFHVm:w:s'
 	lopts = ['help', 'verbose', 'version',
 			'all', 'heads', 'tags', 'remotes',
 			'limit=', 'pretty=',
@@ -166,7 +171,7 @@ def parse (inargs):
 			'flip', 'flip-heads',
 			'horizontal', 'flip-horizontally',
 			'vertical', 'flip-vertically',
-			'mode', 'width', 'grid', 'visit']
+			'mode', 'width', 'grid', 'visit', 'no-symbols']
 
 	option, filename = _parse(inargs or sys.argv[1:], sopts+'f:', lopts+['file'])
 	if not option: return False
