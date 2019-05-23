@@ -33,7 +33,7 @@ class EvenColumn(Enum):
 				EvenColumn.PIPE    : '││││', # U+2502 2502 2502 2502
 				EvenColumn.LARROW  : '←→←→',
 				EvenColumn.RARROW  : '→←→←',
-			}[self][flip], '││││'[flip]
+			}[self][flip], '{}' if self is EvenColumn.SOURCE else '│'
 
 # Helper class for odd, repeatble columns holding only arrows
 class OddColumn(Enum):
