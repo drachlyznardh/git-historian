@@ -1,5 +1,5 @@
 
-NAME=githistorian
+export NAME=githistorian
 VERSION=$(shell cat VERSION)
 
 STESTDIR=/tmp/gh-stest
@@ -32,7 +32,8 @@ tinstall: install test
 install:
 	@pip3 install --verbose --user .
 
-test: test-simple
+test:
+	@cd tests/ && $(MAKE) --quiet
 
 TEST_SIMPLE_ARGS=-m1 --visit reverse-pre,reserve-pre --grid no -vvv
 test-simple:
