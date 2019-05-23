@@ -84,6 +84,14 @@ def reduceDB(visitClass, heads, sdb, verbose):
 				if len(content) == 1: return first
 				return first + '\n' + '\n'.join([layout[1].format(symbols[1], line) for line in content[1:]])
 
+			# TODO Not only I can flip the top and bottom tuple if layout is
+			# flipped, I could wildly simplify the whole symbol-select phase by
+			# checking the flip (and debug) status just once at the top
+
+			topTuple = ('┯', '│') # U+252f 2502
+			midTuple = ('•', '│') # U+2022 2502
+			btmTuple = ('┷', ' ') # U+2537
+
 			# U+252f 2502 2537 ' ' 2022 2502
 			if len(self.content) == 1:
 				return _dump(self, layout, ('┯', '│') if not self.children else ('┷', ' ') if not self.parents else ('•', '│'), self.content[0])

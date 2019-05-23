@@ -146,7 +146,7 @@ class NoGrid(BaseGrid):
 	def dealWith(self, node, verbose):
 		self.rows.append(self.Row(node.topName, [e for e in self.compose(node, verbose)]))
 
-	def done(self): return self.rows
+	def done(self, flip): return reversed(self.rows) if flip else self.rows
 
 # This grid is simple and dumb, it assigns a new column to each chain
 class DumbGrid(BaseGrid):
@@ -157,10 +157,10 @@ class DumbGrid(BaseGrid):
 		self.rows.append(self.Row(node.topName, [e for e in self.compose(node, verbose)]))
 
 	# No post-processing, just extend columns to the limit for alignment
-	def done(self):
+	def done(self, flip):
 		s = len(self.columns)
 		for r in self.rows: r.extend(s)
-		return self.rows
+		return reversed(self.rows) if flip else self.rows
 
 # Return grid class by name
 def getGrid(name):
