@@ -152,7 +152,7 @@ def _parse(args, sopts, lopts):
 			option.grid = value
 		elif key in ('--visit'):
 			option.visit = value
-		elif key in ('-s', '--no-symbols'):
+		elif key in ('--highlight'):
 			option.highlight = True
 
 	option.targets = args
@@ -161,7 +161,7 @@ def _parse(args, sopts, lopts):
 
 def parse (inargs):
 
-	sopts = 'atrhvn:p:xo:MFHVm:w:s'
+	sopts = 'atrhvn:p:xo:MFHVm:w:'
 	lopts = ['help', 'verbose', 'version',
 			'all', 'heads', 'tags', 'remotes',
 			'limit=', 'pretty=',
@@ -171,7 +171,7 @@ def parse (inargs):
 			'flip', 'flip-heads',
 			'horizontal', 'flip-horizontally',
 			'vertical', 'flip-vertically',
-			'mode=', 'width=', 'grid=', 'visit=', 'no-symbols']
+			'mode=', 'width=', 'grid=', 'visit=', 'highlight']
 
 	option, filename = _parse(inargs or sys.argv[1:], sopts+'f:', lopts+['file'])
 	if not option: return False
