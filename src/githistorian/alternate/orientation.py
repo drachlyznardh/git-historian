@@ -15,14 +15,18 @@ class CellState(Enum):
 class Orientation:
 	def __init__(self, highlight, flip):
 		self.EMPTY   = '00' if highlight else '  '
-		self.SOURCE  = '11' if highlight else ('{}', '{}')
+		self.SOURCE  = '{}', '{}'
 		self.LCORNER = '22' if highlight else '└┘┌┐'[flip] + ' ' # U+2514 2518 250c 2510
 		self.RCORNER = '33' if highlight else '┘└┐┌'[flip] + ' ' # U+2518 2514 2510 250c
-		self.LMERGE  = '44' if highlight else '┤├┤├'[flip] + '│' # U+251c 2524 251c 2524
-		self.RMERGE  = '55' if highlight else '├┤├┤'[flip] + '│' # U+251c 2524 251c 2524
-		self.PIPE    = '66' if highlight else '││││'[flip] + '│' # U+2502 2502 2502 2502
+		self.LMERGE  = '44' if highlight else '┤├┤├'[flip] + '│' # U+251c 2524 251c 2524 2502
+		self.RMERGE  = '55' if highlight else '├┤├┤'[flip] + '│' # U+251c 2524 251c 2524 2502
+		self.PIPE    = '66' if highlight else '││││'[flip] + '│' # U+2502 2502 2502 2502 2502
 		self.LARROW  = '77' if highlight else '←→←→'[flip] + ' '
 		self.RARROW  = '88' if highlight else '→←→←'[flip] + ' '
+
+		self.HEAD    = 'aa' if highlight else '┯┯┷┷'[flip] + '││  '[flip] # U+252f 2537 252f 2537 2502 2502
+		self.NODE    = 'bb' if highlight else '•│'                        # U+2022 2502
+		self.ROOT    = 'cc' if highlight else '┷┷┯┯'[flip] + '  ││'[flip] # U+2537 252f 2537 252f 2502 2502
 
 # NONE  = 0 # No flip, top to bottom, left to right
 # HFLIP = 1 # Horizontal flip, top to bottom, right to left

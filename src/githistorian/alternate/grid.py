@@ -25,7 +25,7 @@ class BaseGrid:
 			self.columns.extend([('', orientation.EMPTY, orientation.EMPTY) for e in range(targetSize - l)])
 
 		# TODO please describe what is happening down there, it's scary!
-		def dump(self, db, width, debug):
+		def dump(self, db, width, orientation):
 			def _extend(s, w): return [e * w for e in s]
 
 			# Extract index of last column, which does not to be repeated
@@ -44,7 +44,7 @@ class BaseGrid:
 			layout = [e[0] + '\x1b[m{}\x1b[m' for e in zip(*[(c + e1 + o1, c + e2 + o2) for c, (e1, e2), (o1, o2) in [(c, e, _extend(o, width if lastColumn - i else 1)) for i, (c, e, o) in enumerate(self.columns)]])]
 			# layout = ['{}{}'.format(e[0], '\x1b[m{}\x1b[m') for e in zip(*[(c + e1 + o1, c + e2 + o2) for c, (e1, e2), (o1, o2) in [(c, e, o * (width if lastColumn - i else 1)) for i,(c,e,o) in enumerate(self.columns)]])]
 			# # layout = ''.join([c + e.get(flip, debug) + o.get(flip, debug, width if lastColumn - i else 1) for i,(c,e,o) in enumerate(self.columns)]) + '\x1b[m{}\x1b[m'
-			return db[self.nodeName].dump(layout)
+			return db[self.nodeName].dump(orientation, layout)
 
 	def __init__(self, columns, rows):
 		self.columns = columns
