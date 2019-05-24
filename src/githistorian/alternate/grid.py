@@ -26,6 +26,7 @@ class BaseGrid:
 
 		# TODO please describe what is happening down there, it's scary!
 		def dump(self, db, width, debug):
+			def _extend(s, w): return [e * w for e in s]
 
 			# Extract index of last column, which does not to be repeated
 			lastColumn = len(self.columns) -1
@@ -35,7 +36,13 @@ class BaseGrid:
 			# # print([(c + e1 + o1, c + e2 + o2) for c, (e1, e2), (o1, o2) in [(c, e.get(flip, debug), o.get(flip, debug, width if lastColumn - i else 1)) for i,(c,e,o) in enumerate(self.columns)]])
 			# # print([e for e in zip(*[(c + e1 + o1, c + e2 + o2) for c, (e1, e2), (o1, o2) in [(c, e.get(flip, debug), o.get(flip, debug, width if lastColumn - i else 1)) for i,(c,e,o) in enumerate(self.columns)]])])
 			# layout = ['{}{}'.format(e[0], '\x1b[m{}\x1b[m') for e in zip(*[(c + e1 + o1, c + e2 + o2) for c, (e1, e2), (o1, o2) in [(c, e.get(flip, debug), o.get(flip, debug, width if lastColumn - i else 1)) for i,(c,e,o) in enumerate(self.columns)]])]
-			layout = ['{}{}'.format(e[0], '\x1b[m{}\x1b[m') for e in zip(*[(c + e1 + o1, c + e2 + o2) for c, (e1, e2), (o1, o2) in [(c, e, o * (width if lastColumn - i else 1)) for i,(c,e,o) in enumerate(self.columns)]])]
+			# print([e for e in self.columns])
+			# print([(i, c, e, [j for j in o]) for i, (c, e, o) in enumerate(self.columns)])
+			# print([(i, c, e, _extend(o, width if lastColumn - i else 1)) for i, (c, e, o) in enumerate(self.columns)])
+			# print([(c + e1 + o1, c + e2 + o2) for c, (e1, e2), (o1, o2) in [(c, e, _extend(o, width if lastColumn - i else 1)) for i, (c, e, o) in enumerate(self.columns)]])
+			# print([e[0] + '\x1b[m{}\x1b[m' for e in zip(*[(c + e1 + o1, c + e2 + o2) for c, (e1, e2), (o1, o2) in [(c, e, _extend(o, width if lastColumn - i else 1)) for i, (c, e, o) in enumerate(self.columns)]])])
+			layout = [e[0] + '\x1b[m{}\x1b[m' for e in zip(*[(c + e1 + o1, c + e2 + o2) for c, (e1, e2), (o1, o2) in [(c, e, _extend(o, width if lastColumn - i else 1)) for i, (c, e, o) in enumerate(self.columns)]])]
+			# layout = ['{}{}'.format(e[0], '\x1b[m{}\x1b[m') for e in zip(*[(c + e1 + o1, c + e2 + o2) for c, (e1, e2), (o1, o2) in [(c, e, o * (width if lastColumn - i else 1)) for i,(c,e,o) in enumerate(self.columns)]])]
 			# # layout = ''.join([c + e.get(flip, debug) + o.get(flip, debug, width if lastColumn - i else 1) for i,(c,e,o) in enumerate(self.columns)]) + '\x1b[m{}\x1b[m'
 			return db[self.nodeName].dump(layout)
 
