@@ -28,7 +28,6 @@ def fromStdin():
 # Creating and deploying graph, ignoring errors when output is cut off
 def deploy(options):
 
-	# visitClass = getVisit(options.visit)
 	if ',' in options.visit:
 		dbVisitClass, gridVisitClass = [getVisit(e) for e in options.visit.split(',')]
 	else: dbVisitClass = gridVisitClass = getVisit(options.visit)

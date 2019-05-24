@@ -2,19 +2,20 @@
 # Loads a graph from given lines
 def loadDB(lines, verbose: int):
 
-	# Helper class representing a single commit
-	class SingleNode:
-		def __init__(self, name, parents, text):
-			self.name = name
-			self.parents = parents if parents[0] else []
-			self.children = []
-			self.text = [text]
-
-		def __str__(self):
-			return 'SingleNode ({}) P({}) C({}) "{}\x1b[m"'.format(
-				self.name, ', '.join(self.parents), ', '.join(self.children), self.text)
-
+	# Build nodes from from given lines
 	def nodesFromLines(lines, verbose: int):
+
+		# Helper class representing a single commit
+		class SingleNode:
+			def __init__(self, name, parents, text):
+				self.name = name
+				self.parents = parents if parents[0] else []
+				self.children = []
+				self.text = [text]
+
+			def __str__(self):
+				return 'SingleNode ({}) P({}) C({}) "{}\x1b[m"'.format(
+					self.name, ', '.join(self.parents), ', '.join(self.children), self.text)
 
 		node = None
 		for line in lines:
@@ -84,27 +85,13 @@ def reduceDB(visitClass, heads, sdb, verbose):
 				if len(content) == 1: return first
 				return first + '\n' + '\n'.join([layout[1].format(symbols[1], line) for line in content[1:]])
 
-			# TODO Not only I can flip the top and bottom tuple if layout is
-			# flipped, I could wildly simplify the whole symbol-select phase by
-			# checking the flip (and debug) status just once at the top
-
-			topTuple = ('┯', '│') # U+252f 2502
-			midTuple = ('•', '│') # U+2022 2502
-			btmTuple = ('┷', ' ') # U+2537
-
-			# U+252f 2502 2537 ' ' 2022 2502
 			if len(self.content) == 1:
 				return _dump(self, layout, orientation.HEAD if not self.children else orientation.ROOT if not self.parents else orientation.NODE, self.content[0])
-				return _dump(self, layout, ('┯', '│') if not self.children else ('┷', ' ') if not self.parents else ('•', '│'), self.content[0])
 
-			# U+252f 2022 2022 U+2537 2022
 			return '\n'.join(
 					[_dump(self, layout, orientation.HEAD if not self.children else orientation.NODE, self.content[0])] +
-					# [_dump(self, layout, ('┯', '│') if not self.children else ('•', '│'), self.content[0])] +
 					[_dump(self, layout, orientation.NODE, e) for e in self.content[1:-1]] +
-					# [_dump(self, layout, ('•', '│'), e) for e in self.content[1:-1]] +
 					[_dump(self, layout, orientation.ROOT if not self.parents else orientation.NODE, self.content[-1])]
-					# [_dump(self, layout, ('┷', ' ') if not self.parents else ('•', '│'), self.content[-1])]
 				)
 
 	# All heads are converted to MultiNodes are recorded in the new graph
