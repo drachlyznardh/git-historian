@@ -4,18 +4,19 @@ from .db import loadAndReduceDB
 from .grid import getGrid
 from .orientation import getOrientation
 
-# Visit the graph and populate the grid
-def unroll(gridClass, visitClass, heads, db, orientation, vflip, verbose):
+class Logger:
+	def __init__(self, value, prefix=' ', step=' '):
+		self.value = value
+		self.prefix = prefix
+		self.step = step
 
-	visit = visitClass(heads)
-	grid = gridClass()
+	def log(self, *args):
+		if self.value > 0:
+			from sys import stderr
+			print(self.prefix + args[0].format(*args[1:]), file=stderr)
 
-	while visit:
-		e = visit.pop()
-		grid.dealWith(e, orientation, verbose)
-		visit.push([db[p] for p in e.parents])
-
-	return grid.done(vflip)
+	def __sub__(self, value):
+		return Logger(self.value - value, self.prefix + self.step, self.step)
 
 # Reading all lines from STDIN
 def fromStdin():
@@ -32,12 +33,12 @@ def deploy(options):
 		dbVisitClass, gridVisitClass = [getVisit(e) for e in options.visit.split(',')]
 	else: dbVisitClass = gridVisitClass = getVisit(options.visit)
 
-	heads, db = loadAndReduceDB(dbVisitClass, fromStdin(), options.verbose -4)
-	gridClass = getGrid(options.grid)
+	logger = Logger(options.verbose)
+	heads, db = loadAndReduceDB(dbVisitClass, fromStdin(), logger -4)
 	orientation = getOrientation(options)
 
 	try:
-		for row in unroll(gridClass, gridVisitClass, heads, db, orientation, options.vflip, options.verbose):
+		for row in getGrid(options.grid)().unroll(gridVisitClass, heads, db, orientation, options.vflip, Logger(options.verbose)):
 			print(row.dump(db, options.width, orientation))
 	except BrokenPipeError: pass
 

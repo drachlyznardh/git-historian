@@ -1,9 +1,9 @@
 
 # Loads a graph from given lines
-def loadDB(lines, verbose: int):
+def loadDB(lines, logger: int):
 
 	# Build nodes from from given lines
-	def nodesFromLines(lines, verbose: int):
+	def nodesFromLines(lines, logger: int):
 
 		# Helper class representing a single commit
 		class SingleNode:
@@ -26,17 +26,17 @@ def loadDB(lines, verbose: int):
 				empty, hashes, text = line.strip().split('#', 2)
 				hashes = hashes.split(' ')
 				node = SingleNode(hashes[0], hashes[1:], text)
-				if verbose > 0: print('nodeFromLine({}, {}\x1b[m)'.format(node, line.strip()))
+				logger.log('nodeFromLine({}, {}\x1b[m)', node, line.strip())
 				yield node
 				continue
 
 			# Lines not starting with # are a continuation of previous nodes.
 			# Line is appended to its description
 			node.text.append(line.strip())
-			if verbose > 0: print('nodeFromLine({}, {}\x1b[m)'.format(node, line.strip()))
+			logger.log('nodeFromLine({}, {}\x1b[m)', node, line.strip())
 
 	# Build nodes from input lines
-	db = {e.name: e for e in nodesFromLines(lines, verbose)}
+	db = {e.name: e for e in nodesFromLines(lines, logger)}
 
 	# Bind children to their parent
 	for e in db.values():
@@ -47,7 +47,7 @@ def loadDB(lines, verbose: int):
 	return [e for e in db.values() if len(e.children) == 0], db
 
 # Reduce graph by collapsing chains of nodes into supernodes
-def reduceDB(visitClass, heads, sdb, verbose):
+def reduceDB(visitClass, heads, sdb, logger):
 
 	# Helper class representing a straight chain of nodes
 	class MultiNode:
@@ -98,26 +98,26 @@ def reduceDB(visitClass, heads, sdb, verbose):
 	bigHeads = [MultiNode(e) for e in heads]
 	mdb = {e.topName:e for e in bigHeads}
 
-	visit = visitClass(heads)
+	visit = visitClass(heads, sdb, logger -2)
 	while visit:
 		e = visit.pop()
 		if e in mdb: continue # This node may be a head from the initialization list
-		if verbose > 0: print('testing {}'.format(e))
+		logger.log('testing {}', e)
 
 		# If this node belongs to a chain, absorb it
 		if len(e.children) == 1 and len(mdb[e.children[0]].parents) == 1:
 			oldKey, ref = mdb[e.children[0]].absorb(e)
 			mdb[e.name] = ref
-			if verbose > 0: print('{} was absorbed by {}'.format(e.name, mdb[e.children[0]]))
+			logger.log('{} was absorbed by {}', e.name, mdb[e.children[0]])
 			if oldKey: del mdb[oldKey]
 
 		# Otherwise, create new dedicated node
 		elif e.name not in mdb:
 			s = MultiNode(e)
 			mdb[e.name] = s
-			if verbose > 0: print('{} was promoted'.format(e.name))
+			logger.log('{} was promoted', e.name)
 
-		elif verbose > 0: print('{} was preserved'.format(e.name))
+		else: logger.log('{} was preserved', e.name)
 
 		# Pushing all parent to the visit, they will be filtered automatically
 		visit.push([sdb[p] for p in e.parents])
@@ -127,7 +127,7 @@ def reduceDB(visitClass, heads, sdb, verbose):
 # A bi-directional graph of simple nodes is loaded from the input lines, then
 # it is reduced to a simpler graph where all straight chains of nodes are
 # collected into multi-nodes
-def loadAndReduceDB(visitClass, lines, verbose):
-	heads, db = loadDB(lines, verbose)
-	return reduceDB(visitClass, heads, db, verbose)
+def loadAndReduceDB(visitClass, lines, logger):
+	heads, db = loadDB(lines, logger)
+	return reduceDB(visitClass, heads, db, logger)
 
