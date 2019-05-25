@@ -1,4 +1,7 @@
 
+# Base class for all grids. Derived classes are expected to implement:
+# * def dealWith(self, node, verbose): node is visited, something must be done
+# * def done(self, flip): visit is order, layout is expected row by row (according to vertical flip)
 class BaseGrid:
 
 	class Column:
