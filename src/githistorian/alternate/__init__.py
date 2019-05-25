@@ -5,16 +5,18 @@ from .grid import getGrid
 from .orientation import getOrientation
 
 class Logger:
-	def __init__(self, value):
+	def __init__(self, value, prefix=' ', step=' '):
 		self.value = value
+		self.prefix = prefix
+		self.step = step
 
 	def log(self, *args):
 		if self.value > 0:
 			from sys import stderr
-			print(args[0].format(*args[1:]), file=stderr)
+			print(self.prefix + args[0].format(*args[1:]), file=stderr)
 
 	def __sub__(self, value):
-		return Logger(self.value - value)
+		return Logger(self.value - value, self.prefix + self.step, self.step)
 
 # Reading all lines from STDIN
 def fromStdin():

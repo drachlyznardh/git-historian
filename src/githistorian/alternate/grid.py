@@ -118,7 +118,6 @@ class StraightGrid(BaseGrid):
 	# Visit the graph and populate the grid
 	def unroll(self, visitClass, heads, db, orientation, vflip, logger):
 
-		logger.log('StraightGrid unrolling')
 		visit = visitClass(heads)
 
 		while visit:
