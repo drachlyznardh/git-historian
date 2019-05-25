@@ -14,7 +14,7 @@ class AnyCell(BaseCell):
 	def isSource(self, node): return True
 
 # Base class for all grids. Derived classes are expected to implement:
-# * def dealWith(self, node, verbose): node is visited, something must be done
+# * def dealWith(self, node, logger): node is visited, something must be done
 # * def done(self, flip): visit is order, layout is expected row by row (according to vertical flip)
 class BaseGrid:
 
@@ -52,7 +52,7 @@ class BaseGrid:
 		self.rows = rows
 
 	# Compose a row by computing all available columns
-	def compose(self, node, orientation, verbose):
+	def compose(self, node, orientation, logger):
 
 		def _color(i): return '\x1b[{}m'.format(31 + i % 6) # Helper function to set the color
 		sIndex = 0 # Column of source node
@@ -72,13 +72,13 @@ class BaseGrid:
 			else: yield (_color(sIndex), orientation.LARROW, orientation.LARROW) if i else (_color(sIndex), orientation.PIPE, orientation.EMPTY)
 
 	# Visit the graph and populate the grid
-	def unroll(self, visitClass, heads, db, orientation, vflip, verbose):
+	def unroll(self, visitClass, heads, db, orientation, vflip, logger):
 
 		visit = visitClass(heads)
 
 		while visit:
 			e = visit.pop()
-			self.dealWith(e, orientation, verbose)
+			self.dealWith(e, orientation, logger)
 			visit.push([db[p] for p in e.parents])
 
 		return self.done(vflip)
@@ -87,8 +87,8 @@ class BaseGrid:
 class NoGrid(BaseGrid):
 	def __init__(self): super().__init__([AnyCell()], [])
 
-	def dealWith(self, node, orientation, verbose):
-		self.rows.append(self.Row(node.topName, [e for e in self.compose(node, orientation, verbose)]))
+	def dealWith(self, node, orientation, logger):
+		self.rows.append(self.Row(node.topName, [e for e in self.compose(node, orientation, logger)]))
 
 	def done(self, flip): return reversed(self.rows) if flip else self.rows
 
@@ -96,9 +96,9 @@ class NoGrid(BaseGrid):
 class DumbGrid(BaseGrid):
 
 	# Append new column for each node, immediately define its row
-	def dealWith(self, node, verbose):
+	def dealWith(self, node, logger):
 		self.columns.append(self.Column(node))
-		self.rows.append(self.Row(node.topName, [e for e in self.compose(node, verbose)]))
+		self.rows.append(self.Row(node.topName, [e for e in self.compose(node, logger)]))
 
 	# No post-processing, just extend columns to the limit for alignment
 	def done(self, flip):
@@ -110,22 +110,22 @@ class DumbGrid(BaseGrid):
 class StraightGrid(BaseGrid):
 	def __init__(self): super().__init__([AnyCell()], [])
 
-	def dealWith(self, node, orientation, verbose):
-		self.rows.append(self.Row(node.topName, [e for e in self.compose(node, orientation, verbose)]))
+	def dealWith(self, node, orientation, logger):
+		self.rows.append(self.Row(node.topName, [e for e in self.compose(node, orientation, logger)]))
 
 	def done(self, flip): return reversed(self.rows) if flip else self.rows
 
 	# Visit the graph and populate the grid
-	def unroll(self, visitClass, heads, db, orientation, vflip, verbose):
+	def unroll(self, visitClass, heads, db, orientation, vflip, logger):
 
-		if verbose > 0: print('StraightGrid unrolling')
+		logger.log('StraightGrid unrolling')
 		visit = visitClass(heads)
 
 		while visit:
 			e = visit.pop()
-			if verbose > 0: print('StraightGrid unrolling {}'.format(e))
-			self.dealWith(e, orientation, verbose)
-			if verbose > 0: print('Appending {} to visit'.format(e.parents))
+			logger.log('StraightGrid unrolling {}', e)
+			self.dealWith(e, orientation, logger)
+			logger.log('Appending {} to visit', e.parents)
 			visit.push([db[p] for p in e.parents])
 
 		return self.done(vflip)

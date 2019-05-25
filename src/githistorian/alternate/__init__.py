@@ -4,6 +4,18 @@ from .db import loadAndReduceDB
 from .grid import getGrid
 from .orientation import getOrientation
 
+class Logger:
+	def __init__(self, value):
+		self.value = value
+
+	def log(self, *args):
+		if self.value > 0:
+			from sys import stderr
+			print(args[0].format(*args[1:]), file=stderr)
+
+	def __sub__(self, value):
+		return Logger(self.value - value)
+
 # Reading all lines from STDIN
 def fromStdin():
 	import sys
@@ -19,11 +31,12 @@ def deploy(options):
 		dbVisitClass, gridVisitClass = [getVisit(e) for e in options.visit.split(',')]
 	else: dbVisitClass = gridVisitClass = getVisit(options.visit)
 
-	heads, db = loadAndReduceDB(dbVisitClass, fromStdin(), options.verbose -4)
+	logger = Logger(options.verbose)
+	heads, db = loadAndReduceDB(dbVisitClass, fromStdin(), logger -4)
 	orientation = getOrientation(options)
 
 	try:
-		for row in getGrid(options.grid)().unroll(gridVisitClass, heads, db, orientation, options.vflip, options.verbose):
+		for row in getGrid(options.grid)().unroll(gridVisitClass, heads, db, orientation, options.vflip, Logger(options.verbose)):
 			print(row.dump(db, options.width, orientation))
 	except BrokenPipeError: pass
 
