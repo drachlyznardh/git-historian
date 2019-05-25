@@ -4,19 +4,6 @@ from .db import loadAndReduceDB
 from .grid import getGrid
 from .orientation import getOrientation
 
-# Visit the graph and populate the grid
-def unroll(gridClass, visitClass, heads, db, orientation, vflip, verbose):
-
-	visit = visitClass(heads)
-	grid = gridClass()
-
-	while visit:
-		e = visit.pop()
-		grid.dealWith(e, orientation, verbose)
-		visit.push([db[p] for p in e.parents])
-
-	return grid.done(vflip)
-
 # Reading all lines from STDIN
 def fromStdin():
 	import sys
@@ -33,11 +20,10 @@ def deploy(options):
 	else: dbVisitClass = gridVisitClass = getVisit(options.visit)
 
 	heads, db = loadAndReduceDB(dbVisitClass, fromStdin(), options.verbose -4)
-	gridClass = getGrid(options.grid)
 	orientation = getOrientation(options)
 
 	try:
-		for row in unroll(gridClass, gridVisitClass, heads, db, orientation, options.vflip, options.verbose):
+		for row in getGrid(options.grid)().unroll(gridVisitClass, heads, db, orientation, options.vflip, options.verbose):
 			print(row.dump(db, options.width, orientation))
 	except BrokenPipeError: pass
 

@@ -71,6 +71,18 @@ class BaseGrid:
 			# We have no relation, but arrows may pass through this cell
 			else: yield (_color(sIndex), orientation.LARROW, orientation.LARROW) if i else (_color(sIndex), orientation.PIPE, orientation.EMPTY)
 
+	# Visit the graph and populate the grid
+	def unroll(self, visitClass, heads, db, orientation, vflip, verbose):
+
+		visit = visitClass(heads)
+
+		while visit:
+			e = visit.pop()
+			self.dealWith(e, orientation, verbose)
+			visit.push([db[p] for p in e.parents])
+
+		return self.done(vflip)
+
 # This grid is a straight line
 class NoGrid(BaseGrid):
 	def __init__(self): super().__init__([AnyCell()], [])
@@ -103,6 +115,22 @@ class StraightGrid(BaseGrid):
 
 	def done(self, flip): return reversed(self.rows) if flip else self.rows
 
+	# Visit the graph and populate the grid
+	def unroll(self, visitClass, heads, db, orientation, vflip, verbose):
+
+		if verbose > 0: print('StraightGrid unrolling')
+		visit = visitClass(heads)
+
+		while visit:
+			e = visit.pop()
+			if verbose > 0: print('StraightGrid unrolling {}'.format(e))
+			self.dealWith(e, orientation, verbose)
+			if verbose > 0: print('Appending {} to visit'.format(e.parents))
+			visit.push([db[p] for p in e.parents])
+
+		return self.done(vflip)
+
+# This grid is a straight line
 # Return grid class by name or break
 def getGrid(name):
 	return {
