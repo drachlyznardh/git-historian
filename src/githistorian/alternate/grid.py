@@ -1,20 +1,22 @@
 
+# Base class for all cells
+class BaseCell:
+	# def __init__(self, source, waitList):
+	#	self.source = source
+	#	self.waitList = waitList
+
+	def isSource(self, node): raise NotImplemented()
+	def isWaitingFor(self, node): raise NotImplemented()
+	def markSeen(self, node): raise NotImplemented()
+
+# A cell to always accept any node
+class AnyCell(BaseCell):
+	def isSource(self, node): return True
+
 # Base class for all grids. Derived classes are expected to implement:
 # * def dealWith(self, node, verbose): node is visited, something must be done
 # * def done(self, flip): visit is order, layout is expected row by row (according to vertical flip)
 class BaseGrid:
-
-	class Column:
-		def __init__(self, node):
-			self.name = node.bottomName
-			self.parents = set(node.parents)
-
-		# Matching only the proper node
-		def isSource(self, node): return self.name == node.topName
-
-		# Mark parent as seen, removing it from the waiting list
-		def parentSeen(self, node):
-			self.parents.remove(node.topName)
 
 	class Row:
 		def __init__(self, nodeName, columns):
@@ -63,7 +65,7 @@ class BaseGrid:
 			# Am I straight below the source?
 			elif node.topName in c.parents:
 				sIndex = i # This is the source column
-				c.parentSeen(node) # Above us, the parent has seen one child
+				c.markSeen(node) # Above us, the parent has seen one child
 				yield (_color(sIndex), orientation.RMERGE if c.parents else orientation.LCORNER, orientation.LARROW)
 
 			# We have no relation, but arrows may pass through this cell
@@ -71,16 +73,7 @@ class BaseGrid:
 
 # This grid is a straight line
 class NoGrid(BaseGrid):
-
-	class AnyColumn:
-		def __init__(self):
-			self.name = []
-
-		# Accepting anyone
-		def isSource(self, node): return True
-
-	def __init__(self):
-		super().__init__([self.AnyColumn()], [])
+	def __init__(self): super().__init__([AnyCell()], [])
 
 	def dealWith(self, node, orientation, verbose):
 		self.rows.append(self.Row(node.topName, [e for e in self.compose(node, orientation, verbose)]))
@@ -101,10 +94,20 @@ class DumbGrid(BaseGrid):
 		for r in self.rows: r.extend(s)
 		return reversed(self.rows) if flip else self.rows
 
-# Return grid class by name
+# This grid is a straight line, with vertical ordering
+class StraightGrid(BaseGrid):
+	def __init__(self): super().__init__([AnyCell()], [])
+
+	def dealWith(self, node, orientation, verbose):
+		self.rows.append(self.Row(node.topName, [e for e in self.compose(node, orientation, verbose)]))
+
+	def done(self, flip): return reversed(self.rows) if flip else self.rows
+
+# Return grid class by name or break
 def getGrid(name):
 	return {
 			'no': NoGrid,
+			'straight': StraightGrid,
 			'dumb': DumbGrid,
-		}.get(name.lower(), NoGrid)
+		}.get(name.lower())
 
