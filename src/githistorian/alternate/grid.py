@@ -79,7 +79,7 @@ class BaseGrid:
 	# Visit the graph and populate the grid
 	def unroll(self, visitClass, heads, db, orientation, vflip, logger):
 
-		visit = visitClass(heads)
+		visit = visitClass(heads, db, logger -2)
 
 		while visit:
 			e = visit.pop()
@@ -123,8 +123,7 @@ class StraightGrid(BaseGrid):
 	# Visit the graph and populate the grid
 	def unroll(self, visitClass, heads, db, orientation, vflip, logger):
 
-		visit = visitClass(heads)
-
+		visit = visitClass(heads, db, logger -2)
 		while visit:
 			e = visit.pop()
 			logger.log('StraightGrid unrolling {}', e)

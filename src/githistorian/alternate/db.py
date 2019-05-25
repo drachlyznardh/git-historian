@@ -98,7 +98,7 @@ def reduceDB(visitClass, heads, sdb, logger):
 	bigHeads = [MultiNode(e) for e in heads]
 	mdb = {e.topName:e for e in bigHeads}
 
-	visit = visitClass(heads)
+	visit = visitClass(heads, sdb, logger -2)
 	while visit:
 		e = visit.pop()
 		if e in mdb: continue # This node may be a head from the initialization list
