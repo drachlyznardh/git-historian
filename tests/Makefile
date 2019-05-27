@@ -16,4 +16,8 @@ test-order:
 	cat m1-test-03.txt | $(NAME) $(ORDER_ARGS) | diff - order-03.ref
 	cat m1-test-04.txt | $(NAME) $(ORDER_ARGS) | diff - order-04.ref
 	cat m1-test-05.txt | $(NAME) $(ORDER_ARGS) | diff - order-05.ref
+	cat m1-test-05.txt | $(NAME) $(ORDER_ARGS)     | diff - simmetry-00.ref
+	cat m1-test-05.txt | $(NAME) $(ORDER_ARGS) -H  | diff - simmetry-00.ref
+	cat m1-test-05.txt | $(NAME) $(ORDER_ARGS) -V  | diff - simmetry-01.ref
+	cat m1-test-05.txt | $(NAME) $(ORDER_ARGS) -VH | diff - simmetry-01.ref
 
