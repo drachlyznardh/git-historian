@@ -73,13 +73,11 @@ class BaseGrid:
 				yield (_color(sIndex), orientation.SOURCE, orientation.EMPTY)
 
 			# Am I straight below the source?
-			elif c.isWaitingFor(node): #.topName in c.parents:
-			# elif node.topName in c.parents:
+			elif c.isWaitingFor(node):
 				sIndex = i # This is the source column
 				c.markSeen(node) # Above us, the parent has seen one child
 				logger.log('{} is below cell #{}', node, i)
 				yield (_color(sIndex), orientation.RMERGE if c.isMerge() else orientation.LCORNER, orientation.LARROW)
-				# yield (_color(sIndex), orientation.RMERGE if c.parents else orientation.LCORNER, orientation.LARROW)
 
 			# We have no relation, but arrows may pass through this cell
 			else:
