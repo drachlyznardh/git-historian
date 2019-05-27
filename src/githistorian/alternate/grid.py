@@ -41,7 +41,7 @@ class BaseGrid:
 			logger.log('After {}', self.cell)
 
 		# TODO please describe what is happening down there, it's scary!
-		def dump(self, db, width, orientation):
+		def dump(self, db, width, orientation, logger):
 
 			# Expand odd cell to width
 			def _expand(s, w): return [e * w for e in s]
@@ -56,7 +56,7 @@ class BaseGrid:
 					e[0] + '\x1b[m{}\x1b[m' for e in zip(*[(c + e1 + o1, c + e2 + o2) for c, (e1, e2), (o1, o2) in [
 
 						# Columns (one color and two stacks of symbols) are extracted one by one. Odd stacks are expanded to width
-						(c, e, _expand(o, width if lastColumn - i else 1)) for i, (c, e, o) in enumerate(self.cell)]])])
+						(c, e, _expand(o, width if lastColumn - i else 1)) for i, (c, e, o) in enumerate(self.cell)]])], logger)
 
 	def __init__(self, cell, rows):
 		self.cell = cell

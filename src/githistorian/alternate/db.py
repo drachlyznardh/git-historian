@@ -79,19 +79,21 @@ def reduceDB(visitClass, heads, sdb, logger):
 		# Each node has a symbol for its first line and another for the
 		# following lines. The first and last node in the chain may also be a
 		# head or a root with dedicated symbols
-		def dump(self, orientation, layout):
-			def _dump(self, layout, symbols, content):
+		def dump(self, orientation, layout, logger):
+			def _dump(self, layout, symbols, content, logger):
+				logger.log('Layout first {}', layout[0])
 				first = layout[0].format('\x1b[m' + symbols[0], content[0])
 				if len(content) == 1: return first
+				logger.log('Layout following {}', layout[1])
 				return first + '\n' + '\n'.join([layout[1].format(symbols[1], line) for line in content[1:]])
 
 			if len(self.content) == 1:
-				return _dump(self, layout, orientation.HEAD if not self.children else orientation.ROOT if not self.parents else orientation.NODE, self.content[0])
+				return _dump(self, layout, orientation.HEAD if not self.children else orientation.ROOT if not self.parents else orientation.NODE, self.content[0], logger)
 
 			return '\n'.join(
-					[_dump(self, layout, orientation.HEAD if not self.children else orientation.NODE, self.content[0])] +
-					[_dump(self, layout, orientation.NODE, e) for e in self.content[1:-1]] +
-					[_dump(self, layout, orientation.ROOT if not self.parents else orientation.NODE, self.content[-1])]
+					[_dump(self, layout, orientation.HEAD if not self.children else orientation.NODE, self.content[0], logger)] +
+					[_dump(self, layout, orientation.NODE, e, logger) for e in self.content[1:-1]] +
+					[_dump(self, layout, orientation.ROOT if not self.parents else orientation.NODE, self.content[-1], logger)]
 				)
 
 	# All heads are converted to MultiNodes are recorded in the new graph
