@@ -1,9 +1,6 @@
 
 # Base class for all cells
 class BaseCell:
-	# def __init__(self, source, waitList):
-	#	self.source = source
-	#	self.waitList = waitList
 
 	def isSource(self, node): raise NotImplemented()
 	def isWaitingFor(self, node): raise NotImplemented()
@@ -12,6 +9,17 @@ class BaseCell:
 # A cell to always accept any node
 class AnyCell(BaseCell):
 	def isSource(self, node): return True
+
+class SimpleCell(BaseCell):
+	def __init__(self, node):
+		self._source = node.topName
+		self._isMerge = len(node.parents) > 1
+		self._waitList = set(node.parents)
+
+	def isSource(self, node): return self._source == node.topName
+	def isWaitingFor(self, node): return node.topName in self._waitList
+	def markSeen(self, node): self._waitList.remove(node.topName)
+	def isMerge(self): return self._isMerge
 
 # Base class for all grids. Derived classes are expected to implement:
 # * def dealWith(self, node, logger): node is visited, something must be done
@@ -24,10 +32,10 @@ class BaseGrid:
 			self.cell = cell
 
 		# Append empty cell to match the target size
-		def extend(self, targetSize):
+		def extend(self, orientation, gridWidth):
 			l = len(self.cell)
-			if l == targetSize: return # We already match the layout size
-			self.cell.extend([('', orientation.EMPTY, orientation.EMPTY) for e in range(targetSize - l)])
+			if l == gridWidth: return # We already match the layout size
+			self.cell.extend([('', orientation.EMPTY, orientation.EMPTY) for e in range(gridWidth - l)])
 
 		# TODO please describe what is happening down there, it's scary!
 		def dump(self, db, width, orientation):
@@ -65,11 +73,13 @@ class BaseGrid:
 				yield (_color(sIndex), orientation.SOURCE, orientation.EMPTY)
 
 			# Am I straight below the source?
-			elif node.topName in c.parents:
+			elif c.isWaitingFor(node): #.topName in c.parents:
+			# elif node.topName in c.parents:
 				sIndex = i # This is the source column
 				c.markSeen(node) # Above us, the parent has seen one child
 				logger.log('{} is below cell #{}', node, i)
-				yield (_color(sIndex), orientation.RMERGE if c.parents else orientation.LCORNER, orientation.LARROW)
+				yield (_color(sIndex), orientation.RMERGE if c.isMerge() else orientation.LCORNER, orientation.LARROW)
+				# yield (_color(sIndex), orientation.RMERGE if c.parents else orientation.LCORNER, orientation.LARROW)
 
 			# We have no relation, but arrows may pass through this cell
 			else:
@@ -83,10 +93,12 @@ class BaseGrid:
 
 		while visit:
 			e = visit.pop()
-			self.dealWith(e, orientation, logger)
+			logger.log('StraightGrid unrolling {}', e)
+			self.dealWith(e, orientation, logger -1)
+			logger.log('Appending {} to visit', e.parents)
 			visit.push([db[p] for p in e.parents])
 
-		return self.done(vflip)
+		return self.done(orientation, vflip)
 
 # This grid is a straight line
 class NoGrid(BaseGrid):
@@ -95,20 +107,21 @@ class NoGrid(BaseGrid):
 	def dealWith(self, node, orientation, logger):
 		self.rows.append(self.Row(node.topName, [e for e in self.compose(node, orientation, logger)]))
 
-	def done(self, flip): return reversed(self.rows) if flip else self.rows
+	def done(self, orientation, flip): return reversed(self.rows) if flip else self.rows
 
 # This grid is simple and dumb, it assigns a new column to each chain
 class DumbGrid(BaseGrid):
+	def __init__(self): super().__init__([], [])
 
 	# Append new column for each node, immediately define its row
-	def dealWith(self, node, logger):
-		self.cell.append(self.Column(node))
-		self.rows.append(self.Row(node.topName, [e for e in self.compose(node, logger)]))
+	def dealWith(self, node, orientation, logger):
+		self.cell.append(SimpleCell(node))
+		self.rows.append(self.Row(node.topName, [e for e in self.compose(node, orientation, logger)]))
 
 	# No post-processing, just extend cell to the limit for alignment
-	def done(self, flip):
+	def done(self, orientation, flip):
 		s = len(self.cell)
-		for r in self.rows: r.extend(s)
+		for r in self.rows: r.extend(orientation, s)
 		return reversed(self.rows) if flip else self.rows
 
 # This grid is a straight line, with vertical ordering
@@ -118,20 +131,7 @@ class StraightGrid(BaseGrid):
 	def dealWith(self, node, orientation, logger):
 		self.rows.append(self.Row(node.topName, [e for e in self.compose(node, orientation, logger)]))
 
-	def done(self, flip): return reversed(self.rows) if flip else self.rows
-
-	# Visit the graph and populate the grid
-	def unroll(self, visitClass, heads, db, orientation, vflip, logger):
-
-		visit = visitClass(heads, db, logger -2)
-		while visit:
-			e = visit.pop()
-			logger.log('StraightGrid unrolling {}', e)
-			self.dealWith(e, orientation, logger -1)
-			logger.log('Appending {} to visit', e.parents)
-			visit.push([db[p] for p in e.parents])
-
-		return self.done(vflip)
+	def done(self, orientation, flip): return reversed(self.rows) if flip else self.rows
 
 # This grid is a straight line
 # Return grid class by name or break
