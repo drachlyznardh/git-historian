@@ -16,7 +16,7 @@ class Logger:
 			print(self.prefix + args[0].format(*args[1:]), file=stderr)
 
 	def __sub__(self, value):
-		return Logger(self.value - value, self.prefix + self.step, self.step)
+		return Logger(self.value - value, self.prefix + self.step * value, self.step)
 
 # Reading all lines from STDIN
 def fromStdin():

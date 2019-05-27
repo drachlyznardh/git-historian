@@ -32,10 +32,13 @@ class BaseGrid:
 			self.cell = cell
 
 		# Append empty cell to match the target size
-		def extend(self, orientation, gridWidth):
+		def extend(self, orientation, gridWidth, logger):
 			l = len(self.cell)
+			logger.log('Extending from {} to {}', l, gridWidth)
 			if l == gridWidth: return # We already match the layout size
+			logger.log('Before {}', self.cell)
 			self.cell.extend([('', orientation.EMPTY, orientation.EMPTY) for e in range(gridWidth - l)])
+			logger.log('After {}', self.cell)
 
 		# TODO please describe what is happening down there, it's scary!
 		def dump(self, db, width, orientation):
@@ -96,7 +99,7 @@ class BaseGrid:
 			logger.log('Appending {} to visit', e.parents)
 			visit.push([db[p] for p in e.parents])
 
-		return self.done(orientation, vflip)
+		return self.done(orientation, vflip, logger)
 
 # This grid is a straight line
 class NoGrid(BaseGrid):
@@ -105,22 +108,7 @@ class NoGrid(BaseGrid):
 	def dealWith(self, node, orientation, logger):
 		self.rows.append(self.Row(node.topName, [e for e in self.compose(node, orientation, logger)]))
 
-	def done(self, orientation, flip): return reversed(self.rows) if flip else self.rows
-
-# This grid is simple and dumb, it assigns a new column to each chain
-class DumbGrid(BaseGrid):
-	def __init__(self): super().__init__([], [])
-
-	# Append new column for each node, immediately define its row
-	def dealWith(self, node, orientation, logger):
-		self.cell.append(SimpleCell(node))
-		self.rows.append(self.Row(node.topName, [e for e in self.compose(node, orientation, logger)]))
-
-	# No post-processing, just extend cell to the limit for alignment
-	def done(self, orientation, flip):
-		s = len(self.cell)
-		for r in self.rows: r.extend(orientation, s)
-		return reversed(self.rows) if flip else self.rows
+	def done(self, orientation, flip, logger): return reversed(self.rows) if flip else self.rows
 
 # This grid is a straight line, with vertical ordering
 class StraightGrid(BaseGrid):
@@ -129,7 +117,25 @@ class StraightGrid(BaseGrid):
 	def dealWith(self, node, orientation, logger):
 		self.rows.append(self.Row(node.topName, [e for e in self.compose(node, orientation, logger)]))
 
-	def done(self, orientation, flip): return reversed(self.rows) if flip else self.rows
+	def done(self, orientation, flip, logger): return reversed(self.rows) if flip else self.rows
+
+# This grid is simple and dumb, it assigns a new column to each chain
+class DumbGrid(BaseGrid):
+	def __init__(self):
+		super().__init__([], [])
+		self.width = 0
+
+	# Append new column for each node, immediately define its row
+	def dealWith(self, node, orientation, logger):
+		self.cell.append(SimpleCell(node))
+		self.width = max(self.width, len(self.cell))
+		self.rows.append(self.Row(node.topName, [e for e in self.compose(node, orientation, logger)]))
+		logger.log('Current width is {}', self.width)
+
+	# No post-processing, just extend cell to the limit for alignment
+	def done(self, orientation, flip, logger):
+		for r in self.rows: r.extend(orientation, self.width, logger -2)
+		return reversed(self.rows) if flip else self.rows
 
 # This grid is a straight line
 # Return grid class by name or break
