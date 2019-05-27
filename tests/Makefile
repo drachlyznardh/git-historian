@@ -1,5 +1,5 @@
 
-test: test-simmetry test-order
+test: test-simmetry test-order test-x
 
 SIMMETRY_ARGS=-m1 --grid no
 test-simmetry:
@@ -20,4 +20,13 @@ test-order:
 	cat m1-test-05.txt | $(NAME) $(ORDER_ARGS) -H  | diff - simmetry-00.ref
 	cat m1-test-05.txt | $(NAME) $(ORDER_ARGS) -V  | diff - simmetry-01.ref
 	cat m1-test-05.txt | $(NAME) $(ORDER_ARGS) -VH | diff - simmetry-01.ref
+
+DUMB_ARGS=-m1 --grid dumb --visit reserve-pre,children-aware
+test-x:
+	cat m1-test-00.txt | $(NAME) $(DUMB_ARGS)
+	cat m1-test-01.txt | $(NAME) $(DUMB_ARGS)
+	cat m1-test-02.txt | $(NAME) $(DUMB_ARGS)
+	cat m1-test-03.txt | $(NAME) $(DUMB_ARGS)
+	cat m1-test-04.txt | $(NAME) $(DUMB_ARGS)
+	cat m1-test-05.txt | $(NAME) $(DUMB_ARGS)
 
