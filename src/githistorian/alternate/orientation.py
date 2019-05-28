@@ -11,7 +11,7 @@ def getOrientation(options):
 			self.PIPE    = '66' if highlight else '││││'[flip] + '│' # U+2502 2502 2502 2502 2502
 			self.LARROW  = '77' if highlight else '←→←→'[flip] + ' '
 			self.RARROW  = '88' if highlight else '→←→←'[flip] + ' '
-			self.BROTHER = '99' if highlight else '┴┴┬┬'[flip] + '││  '[flip] # U+2534 2534 252c 252c 2502
+			self.BROTHER = '99' if highlight else '┴┴┬┬'[flip] + '  ││'[flip] # U+2534 2534 252c 252c 2502
 			self.HEAD    = 'aa' if highlight else '┯┯┷┷'[flip] + '││  '[flip] # U+252f 2537 252f 2537 2502 2502
 			self.NODE    = 'bb' if highlight else '•│'                        # U+2022 2502
 			self.ROOT    = 'cc' if highlight else '┷┷┯┯'[flip] + '  ││'[flip] # U+2537 252f 2537 252f 2502 2502
