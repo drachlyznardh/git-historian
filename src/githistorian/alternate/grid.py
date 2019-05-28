@@ -53,7 +53,7 @@ class BaseGrid:
 			return db[self.nodeName].dump(orientation, [
 
 					# List of (colors and stacks of symbols) is zipped to lists of (colors and symbols), node description marker is appended
-					e[0] + '\x1b[m{}\x1b[m' for e in zip(*[(c + e1 + o1, c + e2 + o2) for c, (e1, e2), (o1, o2) in [
+					''.join(e) + '\x1b[m{}\x1b[m' for e in zip(*[(c + e1 + o1, c + e2 + o2) for c, (e1, e2), (o1, o2) in [
 
 						# Columns (one color and two stacks of symbols) are extracted one by one. Odd stacks are expanded to width
 						(c, e, _expand(o, width if lastColumn - i else 1)) for i, (c, e, o) in enumerate(self.cell)]])], logger)
