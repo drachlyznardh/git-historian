@@ -26,7 +26,8 @@ test-x:
 	cat m1-test-00.txt | $(NAME) $(DUMB_ARGS) | diff - stairs-00.ref
 	cat m1-test-01.txt | $(NAME) $(DUMB_ARGS) | diff - stairs-01.ref
 	cat m1-test-02.txt | $(NAME) $(DUMB_ARGS) | diff - stairs-02.ref
-	#cat m1-test-03.txt | $(NAME) $(DUMB_ARGS)
+	cat m1-test-03.txt | $(NAME) $(DUMB_ARGS)
+	cat m1-test-03.txt | $(NAME) $(DUMB_ARGS) | diff - stairs-03.ref
 	cat m1-test-04.txt | $(NAME) $(DUMB_ARGS) | diff - stairs-04.ref
 	cat m1-test-05.txt | $(NAME) $(DUMB_ARGS) | diff - stairs-05.ref
 

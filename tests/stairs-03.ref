@@ -1,0 +1,6 @@
+[31m[m┯           [m[36m1 Synch with hotfix[m
+[31m├←[32m[m•         [m[35m2 Hotfix from release[m
+[31m└←[32m│[31m←[33m[m•       [m[36m3 Merge of feature[m
+[31m  [32m│ [33m├←[34m[m•     [m[34m4 Feature[m
+[31m  [32m│ [33m└←[34m┴←[35m[m•   [m[36m5 Developing[m
+[31m  [32m└←[32m←←[32m←←[35m┴←[36m[m┷ [m[36m6 Release[m
