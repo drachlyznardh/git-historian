@@ -67,25 +67,32 @@ class BaseGrid:
 
 		def _color(i): return '\x1b[{}m'.format(31 + i % 6) # Helper function to set the color
 		sIndex = 0 # Column of source node
+		stillMissing = True
 
 		for i, c in enumerate(self.cell):
 
 			# If this is my column
 			if c.isSource(node):
 				logger.log('{} is source for cell #{}', node, i)
+				stillMissing = False
 				yield (_color(sIndex), orientation.SOURCE, orientation.EMPTY)
 
 			# Am I straight below the source?
 			elif c.isWaitingFor(node):
 				sIndex = i # This is the source column
 				c.markSeen(node) # Above us, the parent has seen one child
-				logger.log('{} is below cell #{}', node, i)
+				logger.log('{} is in list for cell #{}', node, i)
 				yield (_color(sIndex), orientation.RMERGE if c.isMerge() else orientation.LCORNER, orientation.LARROW)
 
 			# We have no relation, but arrows may pass through this cell
 			else:
 				logger.log('{} is unrelated to cell #{}', node, i)
 				yield (_color(sIndex), orientation.LARROW, orientation.LARROW) if i else (_color(sIndex), orientation.PIPE, orientation.EMPTY)
+
+		# No column was available, make a new one
+		if stillMissing:
+			logger.log('No cell was available for #{}, making one', node)
+			yield (_color(sIndex), orientation.SOURCE, orientation.EMPTY)
 
 	# Visit the graph and populate the grid
 	def unroll(self, visitClass, heads, db, orientation, vflip, logger):
