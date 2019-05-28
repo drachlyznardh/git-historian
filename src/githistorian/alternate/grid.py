@@ -75,6 +75,7 @@ class BaseGrid:
 
 			# If this is my column
 			if c.isSource(node):
+				sIndex = i # This is the source column
 				logger.log('{} is source for cell #{}', node, i)
 				stillMissing = False
 				yield (_color(sIndex), orientation.SOURCE, orientation.EMPTY)
