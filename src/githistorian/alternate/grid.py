@@ -18,6 +18,7 @@ class SimpleCell(BaseCell):
 
 	def isSource(self, node): return self._source == node.topName
 	def isWaitingFor(self, node): return node.topName in self._waitList
+	def isDoneWaiting(self): return len(self._waitList) == 0
 	def markSeen(self, node): self._waitList.remove(node.topName)
 	def isMerge(self): return self._isMerge
 
@@ -68,6 +69,7 @@ class BaseGrid:
 		def _color(i): return '\x1b[{}m'.format(31 + i % 6) # Helper function to set the color
 		sIndex = 0 # Column of source node
 		stillMissing = True
+		brotherSeen = False
 
 		for i, c in enumerate(self.cell):
 
@@ -82,7 +84,8 @@ class BaseGrid:
 				sIndex = i # This is the source column
 				c.markSeen(node) # Above us, the parent has seen one child
 				logger.log('{} is in list for cell #{}', node, i)
-				yield (_color(sIndex), orientation.RMERGE if c.isMerge() else orientation.LCORNER, orientation.LARROW)
+				yield (_color(sIndex), orientation.RMERGE if c.isMerge() and not c.isDoneWaiting() else orientation.BROTHER if brotherSeen else orientation.LCORNER, orientation.LARROW)
+				brotherSeen = True
 
 			# We have no relation, but arrows may pass through this cell
 			else:
