@@ -87,13 +87,23 @@ class BaseGrid:
 				sIndex = i # This is the source column
 				c.markSeen(node) # Above us, the parent has seen one child
 				logger.log('{} is in list for cell #{}', node, i)
-				yield (_color(sIndex), orientation.RMERGE if c.isMerge() and not c.isDoneWaiting() else orientation.BROTHER if brotherSeen else orientation.LCORNER, orientation.LARROW)
+				if c.isMerge() and not c.isDoneWaiting():
+					yield (_color(sIndex), orientation.RMERGE, orientation.LARROW)
+				elif brotherSeen:
+					yield (_color(sIndex), orientation.BROTHER, orientation.LARROW)
+				else:
+					yield (_color(sIndex), orientation.LCORNER, orientation.LARROW)
 				brotherSeen = True
 
 			# We have no relation, but arrows may pass through this cell
 			else:
 				logger.log('{} is unrelated to cell #{}', node, i)
-				yield (_color(sIndex), orientation.LARROW, orientation.LARROW) if i and brotherSeen else (_color(sIndex), orientation.EMPTY if c.isDoneWaiting() else orientation.PIPE, orientation.EMPTY)
+				if i and brotherSeen:
+					yield (_color(sIndex), orientation.LARROW, orientation.LARROW)
+				elif c.isDoneWaiting():
+					yield (_color(sIndex), orientation.EMPTY, orientation.EMPTY)
+				else:
+					yield (_color(sIndex), orientation.PIPE, orientation.EMPTY)
 
 		# No column was available, make a new one
 		if stillMissing:
