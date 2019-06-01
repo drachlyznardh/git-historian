@@ -93,7 +93,7 @@ class BaseGrid:
 			# We have no relation, but arrows may pass through this cell
 			else:
 				logger.log('{} is unrelated to cell #{}', node, i)
-				yield (_color(sIndex), orientation.LARROW, orientation.LARROW) if i else (_color(sIndex), orientation.EMPTY if c.isDoneWaiting() else orientation.PIPE, orientation.EMPTY)
+				yield (_color(sIndex), orientation.LARROW, orientation.LARROW) if i and brotherSeen else (_color(sIndex), orientation.EMPTY if c.isDoneWaiting() else orientation.PIPE, orientation.EMPTY)
 
 		# No column was available, make a new one
 		if stillMissing:
