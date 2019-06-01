@@ -4,11 +4,13 @@ class BaseCell:
 
 	def isSource(self, node): raise NotImplemented()
 	def isWaitingFor(self, node): raise NotImplemented()
+	def isDoneWaiting(self): raise NotImplemented()
 	def markSeen(self, node): raise NotImplemented()
 
 # A cell to always accept any node
 class AnyCell(BaseCell):
 	def isSource(self, node): return True
+	def isDoneWaiting(self): return False
 
 class SimpleCell(BaseCell):
 	def __init__(self, node):
@@ -91,7 +93,7 @@ class BaseGrid:
 			# We have no relation, but arrows may pass through this cell
 			else:
 				logger.log('{} is unrelated to cell #{}', node, i)
-				yield (_color(sIndex), orientation.LARROW, orientation.LARROW) if i else (_color(sIndex), orientation.PIPE, orientation.EMPTY)
+				yield (_color(sIndex), orientation.LARROW, orientation.LARROW) if i else (_color(sIndex), orientation.EMPTY if c.isDoneWaiting() else orientation.PIPE, orientation.EMPTY)
 
 		# No column was available, make a new one
 		if stillMissing:
