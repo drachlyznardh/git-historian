@@ -1,18 +1,18 @@
-[31m[m┳ [mStart[m
-[31m┃ [m[m
-[31m┃ [mThis is the first (#1) commit of a test project, with a long description. It's[m
-[31m┃ [mnumber is #1 'cause it's the first in the list[m
-[31m┃ [m[m
-[31m[m• [mDevel[m
-[31m┃ [m[m
-[31m┃ [mThis is the second (#2) commit in the list. Its description is long and contains[m
-[31m┃ [msome #s for test purposes.[m
-[31m┃ [m[m
-[31m[m┻ [mMerge[m
-[31m  [m[m
-[31m  [mThis is the third (#3) commit in the list.[m
-[31m  [m[m
-[31m  [mIts description is full of empty lines.[m
-[31m  [m[m
-[31m  [mI wonder what will happen. # # #[m
-[31m  [m[m
+[31m[m┳[31m [mStart[m
+[31m┃[31m [m[m
+[31m┃[31m [mThis is the first (#1) commit of a test project, with a long description. It's[m
+[31m┃[31m [mnumber is #1 'cause it's the first in the list[m
+[31m┃[31m [m[m
+[31m[m•[31m [mDevel[m
+[31m┃[31m [m[m
+[31m┃[31m [mThis is the second (#2) commit in the list. Its description is long and contains[m
+[31m┃[31m [msome #s for test purposes.[m
+[31m┃[31m [m[m
+[31m[m┻[31m [mMerge[m
+[31m [31m [m[m
+[31m [31m [mThis is the third (#3) commit in the list.[m
+[31m [31m [m[m
+[31m [31m [mIts description is full of empty lines.[m
+[31m [31m [m[m
+[31m [31m [mI wonder what will happen. # # #[m
+[31m [31m [m[m

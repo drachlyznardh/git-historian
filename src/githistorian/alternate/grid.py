@@ -56,7 +56,11 @@ class BaseGrid:
 			return db[self.nodeName].dump(orientation, [
 
 					# List of (colors and stacks of symbols) is zipped to lists of (colors and symbols), node description marker is appended
-					''.join(e) + '\x1b[m{}\x1b[m' for e in zip(*[(c + e1 + o1, c + e2 + o2) for c, (e1, e2), (o1, o2) in [
+					''.join(e) + '\x1b[m{}\x1b[m' for e in zip(*[(
+					ce + e1 + co + o1, ce + e2 + co + o2) for (
+					ce, co),
+					(e1, e2),
+					(o1, o2) in [
 
 						# Columns (one color and two stacks of symbols) are extracted one by one. Odd stacks are expanded to width
 						(c, e, _expand(o, width if lastColumn - i else 1)) for i, (c, e, o) in enumerate(self.cell)]])], logger)
@@ -69,6 +73,9 @@ class BaseGrid:
 	def compose(self, node, orientation, logger):
 
 		def _color(i): return '\x1b[{}m'.format(31 + i % 6) # Helper function to set the color
+		def _oneColor(i): return _color(i), _color(i)
+		def _twoColor(i, j): return _color(i), _color(j)
+
 		sIndex = 0 # Column of source node
 		stillMissing = True
 		brotherSeen = False
@@ -80,19 +87,19 @@ class BaseGrid:
 				sIndex = i # This is the source column
 				logger.log('{} is source for cell #{}', node, i)
 				stillMissing = False
-				yield (_color(sIndex), orientation.SOURCE, orientation.EMPTY)
+				yield (_oneColor(sIndex), orientation.SOURCE, orientation.EMPTY)
 
 			# Am I straight below the source?
 			elif c.isWaitingFor(node):
-				sIndex = i # This is the source column
+				sIndex = i # Source is above
 				c.markSeen(node) # Above us, the parent has seen one child
 				logger.log('{} is in list for cell #{}', node, i)
 				if c.isMerge() and not c.isDoneWaiting():
-					yield (_color(sIndex), orientation.RMERGE, orientation.LARROW)
+					yield (_oneColor(sIndex), orientation.RMERGE, orientation.LARROW)
 				elif brotherSeen:
-					yield (_color(sIndex), orientation.BROTHER, orientation.LARROW)
+					yield (_oneColor(sIndex), orientation.BROTHER, orientation.LARROW)
 				else:
-					yield (_color(sIndex), orientation.LCORNER, orientation.LARROW)
+					yield (_oneColor(sIndex), orientation.LCORNER, orientation.LARROW)
 				brotherSeen = True
 
 			# We have no relation, but arrows may pass through this cell
@@ -101,18 +108,18 @@ class BaseGrid:
 				logger.log('Cell #{} has {}seen a brother and is {}done waiting', i, '' if brotherSeen else 'not ', '' if c.isDoneWaiting() else 'not ')
 				if brotherSeen:
 					if c.isDoneWaiting():
-						yield (_color(sIndex), orientation.LARROW, orientation.LARROW)
+						yield (_oneColor(sIndex), orientation.LARROW, orientation.LARROW)
 					else:
-						yield (_color(sIndex), orientation.PIPE, orientation.LARROW)
+						yield (_twoColor(sIndex, i), orientation.PIPE, orientation.LARROW)
 				elif c.isDoneWaiting():
-					yield (_color(sIndex), orientation.EMPTY, orientation.EMPTY)
+					yield (_oneColor(sIndex), orientation.EMPTY, orientation.EMPTY)
 				else:
-					yield (_color(sIndex), orientation.PIPE, orientation.EMPTY)
+					yield (_oneColor(sIndex), orientation.PIPE, orientation.EMPTY)
 
 		# No column was available, make a new one
 		if stillMissing:
 			logger.log('No cell was available for #{}, making one', node)
-			yield (_color(sIndex), orientation.SOURCE, orientation.EMPTY)
+			yield (_oneColor(sIndex), orientation.SOURCE, orientation.EMPTY)
 
 	# Visit the graph and populate the grid
 	def unroll(self, visitClass, heads, db, orientation, vflip, logger):
