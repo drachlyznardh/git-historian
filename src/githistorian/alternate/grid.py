@@ -24,6 +24,21 @@ class SimpleCell(BaseCell):
 	def markSeen(self, node): self._waitList.remove(node.topName)
 	def isMerge(self): return self._isMerge
 
+class Box:
+	def __init__(self, color, evenCell, oddCell):
+		self.evenColor = color[0]
+		self.evenCell = evenCell
+		self.oddColor = color[1]
+		self.oddCell = oddCell
+
+	def unpack(self, width):
+		def _expand(s, w): return [e * w for e in s]
+
+		first = '\x1b[{}m{}\x1b[{}m{}'.format(self.evenColor, self.evenCell[0], self.oddColor, self.oddCell[0] * width)
+		other = '\x1b[{}m{}\x1b[{}m{}'.format(self.evenColor, self.evenCell[1], self.oddColor, self.oddCell[1] * width)
+
+		return first, other
+
 # Base class for all grids. Derived classes are expected to implement:
 # * def dealWith(self, node, logger): node is visited, something must be done
 # * def done(self, flip): visit is order, layout is expected row by row (according to vertical flip)
@@ -52,6 +67,10 @@ class BaseGrid:
 			# Compute index of last column, which must not be expanded
 			lastColumn = len(self.cell) -1
 
+			return db[self.nodeName].dump(orientation, [
+				'{}{}'.format(''.join(e), '\x1b[m{}\x1b[m') for e in zip(*[ box.unpack(width if lastColumn - index else 1) for index, box in enumerate(self.cell) ])
+			], logger)
+
 			# Each chain can dump its content according to the layout emerging from the cell
 			return db[self.nodeName].dump(orientation, [
 
@@ -72,7 +91,7 @@ class BaseGrid:
 	# Compose a row by computing all available cell
 	def compose(self, node, orientation, logger):
 
-		def _color(i): return '\x1b[{}m'.format(31 + i % 6) # Helper function to set the color
+		def _color(i): return 31 + i % 6 # Helper function to set the color
 		def _oneColor(i): return _color(i), _color(i)
 		def _twoColor(i, j): return _color(i), _color(j)
 
@@ -87,7 +106,7 @@ class BaseGrid:
 				sIndex = i # This is the source column
 				logger.log('{} is source for cell #{}', node, i)
 				stillMissing = False
-				yield (_oneColor(sIndex), orientation.SOURCE, orientation.EMPTY)
+				yield Box(_oneColor(sIndex), orientation.SOURCE, orientation.EMPTY)
 
 			# Am I straight below the source?
 			elif c.isWaitingFor(node):
@@ -95,11 +114,11 @@ class BaseGrid:
 				c.markSeen(node) # Above us, the parent has seen one child
 				logger.log('{} is in list for cell #{}', node, i)
 				if c.isMerge() and not c.isDoneWaiting():
-					yield (_oneColor(sIndex), orientation.RMERGE, orientation.LARROW)
+					yield Box(_oneColor(sIndex), orientation.RMERGE, orientation.LARROW)
 				elif brotherSeen:
-					yield (_oneColor(sIndex), orientation.BROTHER, orientation.LARROW)
+					yield Box(_oneColor(sIndex), orientation.BROTHER, orientation.LARROW)
 				else:
-					yield (_oneColor(sIndex), orientation.LCORNER, orientation.LARROW)
+					yield Box(_oneColor(sIndex), orientation.LCORNER, orientation.LARROW)
 				brotherSeen = True
 
 			# We have no relation, but arrows may pass through this cell
@@ -108,13 +127,13 @@ class BaseGrid:
 				logger.log('Cell #{} has {}seen a brother and is {}done waiting', i, '' if brotherSeen else 'not ', '' if c.isDoneWaiting() else 'not ')
 				if brotherSeen:
 					if c.isDoneWaiting():
-						yield (_oneColor(sIndex), orientation.LARROW, orientation.LARROW)
+						yield Box(_oneColor(sIndex), orientation.LARROW, orientation.LARROW)
 					else:
-						yield (_twoColor(sIndex, i), orientation.PIPE, orientation.LARROW)
+						yield Box(_twoColor(sIndex, i), orientation.PIPE, orientation.LARROW)
 				elif c.isDoneWaiting():
-					yield (_oneColor(sIndex), orientation.EMPTY, orientation.EMPTY)
+					yield Box(_oneColor(sIndex), orientation.EMPTY, orientation.EMPTY)
 				else:
-					yield (_oneColor(sIndex), orientation.PIPE, orientation.EMPTY)
+					yield Box(_oneColor(sIndex), orientation.PIPE, orientation.EMPTY)
 
 		# No column was available, make a new one
 		if stillMissing:
