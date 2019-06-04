@@ -55,7 +55,7 @@ class BaseGrid:
 			logger.log('Extending from {} to {}', l, gridWidth)
 			if l == gridWidth: return # We already match the layout size
 			logger.log('Before {}', self.cell)
-			self.cell.extend([('', orientation.EMPTY, orientation.EMPTY) for e in range(gridWidth - l)])
+			self.cell.extend([Box((0, 0), orientation.EMPTY, orientation.EMPTY) for e in range(gridWidth - l)])
 			logger.log('After {}', self.cell)
 
 		# TODO please describe what is happening down there, it's scary!
