@@ -133,7 +133,7 @@ class BaseGrid:
 				elif c.isDoneWaiting():
 					yield Box(_oneColor(sIndex), orientation.EMPTY, orientation.EMPTY)
 				else:
-					yield Box(_oneColor(sIndex), orientation.PIPE, orientation.EMPTY)
+					yield Box(_twoColor(i, sIndex), orientation.PIPE, orientation.EMPTY)
 
 		# No column was available, make a new one
 		if stillMissing:
