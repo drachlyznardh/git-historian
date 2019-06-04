@@ -93,7 +93,7 @@ class BaseGrid:
 
 		def _color(i): return 31 + i % 6 # Helper function to set the color
 		def _oneColor(i): return _color(i), _color(i)
-		def _twoColor(i, j): return _color(i), _color(j)
+		def _twoColors(i, j): return _color(i), _color(j)
 
 		sIndex = 0 # Column of source node
 		stillMissing = True
@@ -129,11 +129,11 @@ class BaseGrid:
 					if c.isDoneWaiting():
 						yield Box(_oneColor(sIndex), orientation.LARROW, orientation.LARROW)
 					else:
-						yield Box(_twoColor(i, sIndex), orientation.PIPE, orientation.LARROW)
+						yield Box(_twoColors(i, sIndex), orientation.PIPE, orientation.LARROW)
 				elif c.isDoneWaiting():
 					yield Box(_oneColor(sIndex), orientation.EMPTY, orientation.EMPTY)
 				else:
-					yield Box(_twoColor(i, sIndex), orientation.PIPE, orientation.EMPTY)
+					yield Box(_twoColors(i, sIndex), orientation.PIPE, orientation.EMPTY)
 
 		# No column was available, make a new one
 		if stillMissing:
