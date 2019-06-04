@@ -129,7 +129,7 @@ class BaseGrid:
 					if c.isDoneWaiting():
 						yield Box(_oneColor(sIndex), orientation.LARROW, orientation.LARROW)
 					else:
-						yield Box(_twoColor(sIndex, i), orientation.PIPE, orientation.LARROW)
+						yield Box(_twoColor(i, sIndex), orientation.PIPE, orientation.LARROW)
 				elif c.isDoneWaiting():
 					yield Box(_oneColor(sIndex), orientation.EMPTY, orientation.EMPTY)
 				else:
