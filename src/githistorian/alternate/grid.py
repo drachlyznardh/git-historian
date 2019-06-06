@@ -193,14 +193,15 @@ class StairsGrid(BaseGrid):
 # This grid is ugly, but close to natural
 class UglyGrid(BaseGrid):
 	def __init__(self):
-		super().__init__([], [])
+		super().__init__([AnyCell()], [])
 		self.width = 0
 
 	# Append new column for each node, immediately define its row
 	def dealWith(self, node, orientation, logger):
+		row = self.Row(node.topName, [e for e in self.compose(node, orientation, logger)])
+		self.rows.append(row)
 		self.cell.append(SimpleCell(node))
 		self.width = max(self.width, len(self.cell))
-		self.rows.append(self.Row(node.topName, [e for e in self.compose(node, orientation, logger)]))
 		logger.log('Current width is {}', self.width)
 
 	# No post-processing, just extend cell to the limit for alignment

@@ -30,7 +30,7 @@ test-stairs:
 	cat m1-test-04.txt | $(NAME) $(STAIRS_ARGS) | diff - stairs-04.ref
 	cat m1-test-05.txt | $(NAME) $(STAIRS_ARGS) | diff - stairs-05.ref
 
-UGLY_ARGS=-m1 --grid ugly -w3
+UGLY_ARGS=-m1 --grid ugly --visit reverse-pre,children-aware -w1
 test-ugly:
 	cat m1-test-00.txt | $(NAME) $(UGLY_ARGS)
 	cat m1-test-01.txt | $(NAME) $(UGLY_ARGS)
