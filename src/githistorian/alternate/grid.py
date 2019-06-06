@@ -173,7 +173,7 @@ class StraightGrid(BaseGrid):
 	def done(self, orientation, flip, logger): return reversed(self.rows) if flip else self.rows
 
 # This grid is simple and dumb, it assigns a new column to each chain
-class DumbGrid(BaseGrid):
+class StairsGrid(BaseGrid):
 	def __init__(self):
 		super().__init__([], [])
 		self.width = 0
@@ -196,6 +196,6 @@ def getGrid(name):
 	return {
 			'no': NoGrid,
 			'straight': StraightGrid,
-			'dumb': DumbGrid,
+			'stairs': StairsGrid,
 		}.get(name.lower())
 
