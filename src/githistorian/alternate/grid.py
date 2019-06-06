@@ -190,6 +190,24 @@ class StairsGrid(BaseGrid):
 		for r in self.rows: r.extend(orientation, self.width, logger -2)
 		return reversed(self.rows) if flip else self.rows
 
+# This grid is ugly, but close to natural
+class UglyGrid(BaseGrid):
+	def __init__(self):
+		super().__init__([], [])
+		self.width = 0
+
+	# Append new column for each node, immediately define its row
+	def dealWith(self, node, orientation, logger):
+		self.cell.append(SimpleCell(node))
+		self.width = max(self.width, len(self.cell))
+		self.rows.append(self.Row(node.topName, [e for e in self.compose(node, orientation, logger)]))
+		logger.log('Current width is {}', self.width)
+
+	# No post-processing, just extend cell to the limit for alignment
+	def done(self, orientation, flip, logger):
+		for r in self.rows: r.extend(orientation, self.width, logger -2)
+		return reversed(self.rows) if flip else self.rows
+
 # This grid is a straight line
 # Return grid class by name or break
 def getGrid(name):
@@ -197,5 +215,6 @@ def getGrid(name):
 			'no': NoGrid,
 			'straight': StraightGrid,
 			'stairs': StairsGrid,
+			'ugly': UglyGrid,
 		}.get(name.lower())
 
