@@ -7,9 +7,9 @@ def getOrientation(options):
 			self.LCORNER = '222' if highlight else '┗┛┏┓'[flip] + ' 2' # U+2517 251b 250f 2513
 			self.RCORNER = '333' if highlight else '┛┗┓┏'[flip] + ' 3' # U+251b 2517 2513 250f
 			self.LMERGE  = '444' if highlight else '┫┣┫┣'[flip] + '┃4' # U+252b 2523 252b 2523 2503
-			self.RMERGE  = '555' if highlight else '┣┫┣┫'[flip] + '┃5' # U+2523 252b 2523 252b 2503
+			self.RMERGE  = '555' if highlight else '┣┫┣┫'[flip] + '┃┃' # U+2523 252b 2523 252b 2503 2503
 			self.PIPE    = '666' if highlight else '┃┃┃┃'[flip] + '┃6' # U+2503 2503 2503 2503 2503
-			self.LARROW  = '777' if highlight else '«»«»'[flip] + ' 7'
+			self.LARROW  = '777' if highlight else '«»«»'[flip] + '  '
 			self.RARROW  = '888' if highlight else '»«»«'[flip] + ' 8'
 			self.BROTHER = '999' if highlight else '┻┻┳┳'[flip] + '  ┃┃'[flip] + '9' # U+253b 253b 2533 2533 2503 2503
 			self.HEAD    = 'aaa' if highlight else '┳┳┻┻'[flip] + '┃┃  '[flip] + 'a' # U+2533 2533 253b 253b 2503 2503
