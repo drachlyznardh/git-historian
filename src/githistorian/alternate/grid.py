@@ -4,6 +4,7 @@ class BaseCell:
 
 	def isSource(self, node): raise NotImplemented()
 	def isWaitingFor(self, node): raise NotImplemented()
+	def isOnlyWaitingFor(self, node): raise NotImplemented()
 	def isDoneWaiting(self): raise NotImplemented()
 	def markSeen(self, node): raise NotImplemented()
 
@@ -20,6 +21,7 @@ class SimpleCell(BaseCell):
 
 	def isSource(self, node): return self._source == node.topName
 	def isWaitingFor(self, node): return node.topName in self._waitList
+	def isOnlyWaitingFor(self, node): return node.topName in self._waitList and len(self._waitList) == 1
 	def isDoneWaiting(self): return len(self._waitList) == 0
 	def markSeen(self, node): self._waitList.remove(node.topName)
 	def isMerge(self): return self._isMerge
@@ -88,6 +90,13 @@ class BaseGrid:
 		self.cell = cell
 		self.rows = rows
 
+	# Verify whether given node is a branching point. True when given node is
+	# the only node in all waiting lists in which it appears
+	def isBranchingPoint(self, node):
+		for c in self.cell:
+			if not c.isOnlyWaitingFor(node): return False
+		return True
+
 	# Compose a row by computing all available cell
 	def compose(self, node, orientation, logger):
 
@@ -111,8 +120,18 @@ class BaseGrid:
 			# Am I straight below the source?
 			elif c.isWaitingFor(node):
 				sIndex = i # Source is above
-				c.markSeen(node) # Above us, the parent has seen one child
 				logger.log('{} is in list for cell #{}', node, i)
+
+				# Am I going to originate branches and free columns up?
+				if self.isBranchingPoint(node):
+					logger.log('{} is a branching point', node)
+					stillMissing = False
+					c.markSeen(node) # Above us, the parent has seen one child
+					yield Box(_oneColor(sIndex), orientation.SOURCE, orientation.EMPTY)
+					continue
+
+				c.markSeen(node) # Above us, the parent has seen one child
+
 				if c.isMerge() and not c.isDoneWaiting():
 					yield Box(_oneColor(sIndex), orientation.RMERGE, orientation.LARROW)
 				elif brotherSeen:
@@ -201,7 +220,6 @@ class UglyGrid(BaseGrid):
 	def dealWith(self, node, orientation, logger):
 		row = self.Row(node.topName, [e for e in self.compose(node, orientation, logger)])
 		self.rows.append(row)
-		self.cell.append(SimpleCell(node))
 		self.width = max(self.width, len(self.cell))
 		logger.log('Current width is {}', self.width)
 
