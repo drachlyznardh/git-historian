@@ -81,10 +81,10 @@ def reduceDB(visitClass, heads, sdb, logger):
 		# head or a root with dedicated symbols
 		def dump(self, orientation, layout, logger):
 			def _dump(self, layout, symbols, content, logger):
-				logger.log('Layout first {}', layout[0])
+				# logger.log('Layout first {}', layout[0])
 				first = layout[0].format('\x1b[m' + symbols[0], content[0])
 				if len(content) == 1: return first
-				logger.log('Layout following {}', layout[1])
+				# logger.log('Layout following {}', layout[1])
 				return first + '\n' + '\n'.join([layout[1].format(symbols[1], line) for line in content[1:]])
 
 			if len(self.content) == 1:
