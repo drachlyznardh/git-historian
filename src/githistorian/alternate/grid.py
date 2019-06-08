@@ -143,11 +143,15 @@ class BaseGrid:
 
 				if c.isMerge() and not c.isDoneWaiting():
 					yield Box(_oneColor(sIndex), orientation.RMERGE, orientation.LARROW)
-				elif brotherSeen:
+				elif childSeen:
 					yield Box(_oneColor(sIndex), orientation.BROTHER, orientation.LARROW)
-				else:
+				elif stillMissing: # Still waiting for source
 					yield Box(_oneColor(sIndex), orientation.LCORNER, orientation.LARROW)
-				brotherSeen = True
+				else:
+					yield Box(_oneColor(sIndex), orientation.RCORNER, orientation.EMPTY)
+
+				childSeen = True
+				missingChildren -= 1
 
 			# We have no relation, but arrows may pass through this cell
 			else:
