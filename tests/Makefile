@@ -32,8 +32,9 @@ test-stairs:
 
 UGLY_ARGS=-m1 --grid ugly --visit reverse-pre,children-aware -w1
 test-ugly:
-	cat m1-test-00.txt | $(NAME) $(UGLY_ARGS)
+	cat m1-test-00.txt | $(NAME) $(UGLY_ARGS) | diff - ugly-00.ref
 	cat m1-test-01.txt | $(NAME) $(UGLY_ARGS)
+	cat m1-test-01.txt | $(NAME) $(UGLY_ARGS) | diff - ugly-01.ref
 	cat m1-test-02.txt | $(NAME) $(UGLY_ARGS)
 	cat m1-test-03.txt | $(NAME) $(UGLY_ARGS)
 	cat m1-test-04.txt | $(NAME) $(UGLY_ARGS)
