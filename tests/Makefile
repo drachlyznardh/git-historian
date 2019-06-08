@@ -35,6 +35,7 @@ test-ugly:
 	cat m1-test-00.txt | $(NAME) $(UGLY_ARGS) | diff - ugly-00.ref
 	cat m1-test-01.txt | $(NAME) $(UGLY_ARGS) | diff - ugly-01.ref
 	cat m1-test-02.txt | $(NAME) $(UGLY_ARGS)
+	cat m1-test-02.txt | $(NAME) $(UGLY_ARGS) | diff - ugly-02.ref
 	#cat m1-test-03.txt | $(NAME) $(UGLY_ARGS)
 	#cat m1-test-04.txt | $(NAME) $(UGLY_ARGS)
 	#cat m1-test-05.txt | $(NAME) $(UGLY_ARGS)
