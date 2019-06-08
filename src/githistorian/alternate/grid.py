@@ -147,7 +147,7 @@ class BaseGrid:
 
 		while visit:
 			e = visit.pop()
-			logger.log('StraightGrid unrolling {}', e)
+			logger.log('{} unrolling {}', self.__class__.__name__, e)
 			self.dealWith(e, orientation, logger -1)
 			logger.log('Appending {} to visit', e.parents)
 			visit.push([db[p] for p in e.parents])
