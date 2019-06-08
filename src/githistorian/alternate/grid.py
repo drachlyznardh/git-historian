@@ -98,6 +98,10 @@ class BaseGrid:
 			if not c.isOnlyWaitingFor(node): return False
 		return True
 
+	def indexOfFirstChild(self, index, node):
+		for i, c in enumerate(self.cell[index:]):
+			if c.isWaitingFor(node): return index + i
+
 	# Compose a row by computing all available cell
 	def compose(self, node, orientation, logger):
 
@@ -107,7 +111,8 @@ class BaseGrid:
 
 		sIndex = 0 # Column of source node
 		stillMissing = True
-		brotherSeen = False
+		childSeen = False
+		missingChildren = len(node.children)
 
 		for i, c in enumerate(self.cell):
 
@@ -125,10 +130,13 @@ class BaseGrid:
 
 				# Am I going to originate branches and free columns up?
 				if self.isBranchingPoint(node):
-					logger.log('{} is a branching point', node)
+					logger.log('{} is a branching point and is {}missing children', node, '' if missingChildren else 'not ')
 					stillMissing = False
 					c.markSeen(node) # Above us, the parent has seen one child
-					yield Box(_oneColor(sIndex), orientation.SOURCE, orientation.EMPTY)
+					if missingChildren:
+						yield Box(_twoColors(sIndex, self.indexOfFirstChild(i, node)), orientation.SOURCE, orientation.RARROW)
+					else:
+						yield Box(_oneColor(sIndex), orientation.SOURCE, orientation.EMPTY)
 					continue
 
 				c.markSeen(node) # Above us, the parent has seen one child
