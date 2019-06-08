@@ -138,7 +138,8 @@ class BaseGrid:
 		# No column was available, make a new one
 		if stillMissing:
 			logger.log('No cell was available for #{}, making one', node)
-			yield (_oneColor(sIndex), orientation.SOURCE, orientation.EMPTY)
+			self.cell.append(SimpleCell(node))
+			yield Box(_oneColor(sIndex), orientation.SOURCE, orientation.EMPTY)
 
 	# Visit the graph and populate the grid
 	def unroll(self, visitClass, heads, db, orientation, vflip, logger):
@@ -193,7 +194,7 @@ class StairsGrid(BaseGrid):
 # This grid is ugly, but close to natural
 class UglyGrid(BaseGrid):
 	def __init__(self):
-		super().__init__([AnyCell()], [])
+		super().__init__([], [])
 		self.width = 0
 
 	# Append new column for each node, immediately define its row
