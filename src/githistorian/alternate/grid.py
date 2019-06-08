@@ -38,8 +38,9 @@ class Box:
 
 		first = '\x1b[{}m{}\x1b[{}m{}'.format(self.evenColor, self.evenCell[0], self.oddColor, self.oddCell[0] * width)
 		other = '\x1b[{}m{}\x1b[{}m{}'.format(self.evenColor, self.evenCell[1], self.oddColor, self.oddCell[1] * width)
+		alter = '\x1b[{}m{}\x1b[{}m{}'.format(self.evenColor, self.evenCell[2], self.oddColor, self.oddCell[2] * width)
 
-		return first, other
+		return first, other, alter
 
 # Base class for all grids. Derived classes are expected to implement:
 # * def dealWith(self, node, logger): node is visited, something must be done

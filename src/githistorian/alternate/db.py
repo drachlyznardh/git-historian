@@ -92,8 +92,8 @@ def reduceDB(visitClass, heads, sdb, logger):
 
 			return '\n'.join(
 					[_dump(layout[0], layout[1], orientation.HEAD if not self.children else orientation.NODE, self.content[0], logger)] +
-					[_dump(layout[0], layout[1], orientation.NODE, e, logger) for e in self.content[1:-1]] +
-					[_dump(layout[0], layout[1], orientation.ROOT if not self.parents else orientation.NODE, self.content[-1], logger)]
+					[_dump(layout[2], layout[1], orientation.NODE, e, logger) for e in self.content[1:-1]] +
+					[_dump(layout[2], layout[1], orientation.ROOT if not self.parents else orientation.NODE, self.content[-1], logger)]
 				)
 
 	# All heads are converted to MultiNodes are recorded in the new graph
