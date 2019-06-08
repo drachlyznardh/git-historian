@@ -156,8 +156,8 @@ class BaseGrid:
 			# We have no relation, but arrows may pass through this cell
 			else:
 				logger.log('{} is unrelated to cell #{}', node, i)
-				logger.log('Cell #{} has {}seen a brother and is {}done waiting', i, '' if brotherSeen else 'not ', '' if c.isDoneWaiting() else 'not ')
-				if brotherSeen:
+				logger.log('Cell #{} has {}seen a child, is waiting for {} children and is {}done waiting for parents', i, '' if childSeen else 'not ', missingChildren, '' if c.isDoneWaiting() else 'not ')
+				if childSeen:
 					if c.isDoneWaiting():
 						yield Box(_oneColor(sIndex), orientation.LARROW, orientation.LARROW)
 					else:
