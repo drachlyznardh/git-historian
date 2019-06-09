@@ -19,13 +19,12 @@ class SimpleCell:
 
 class Box:
 	def __init__(self, color, evenCell, oddCell):
-		self.evenColor = color[0]
+		self.color = color
 		self.evenCell = evenCell
-		self.oddColor = color[1]
 		self.oddCell = oddCell
 
 	def unpack(self, width):
-		return ['\x1b[{}m{}\x1b[{}m{}'.format(self.evenColor, evenCell, self.oddColor, oddCell * width) for evenCell, oddCell in zip(self.evenCell, self.oddCell)]
+		return ['\x1b[{}m{}\x1b[{}m{}'.format(self.color[0], evenCell, self.color[1], oddCell * width) for evenCell, oddCell in zip(self.evenCell, self.oddCell)]
 
 # Base class for all grids. Derived classes are expected to implement:
 # * def dealWith(self, node, logger): node is visited, something must be done
