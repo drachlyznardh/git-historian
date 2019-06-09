@@ -63,61 +63,66 @@ class BaseGrid:
 		self.cell = cell
 		self.rows = rows
 
+	def whenIsSource(node, index, childSeen):
+		return index, False, childSeen
+
 	# Compose a row by computing all available cell
 	def compose(self, node, orientation, logger):
+
+		self.logger = logger
 
 		def _color(i): return 31 + i % 6 # Helper function to set the color
 		def _oneColor(i): return _color(i), _color(i)
 		def _twoColors(i, j): return _color(i), _color(j)
 
-		sIndex = 0 # Column of source node
-		stillMissing = True
-		childSeen = False
+		self.sIndex = 0 # Column of source node
+		self.stillMissing = True
+		self.childSeen = False
 
 		for i, c in enumerate(self.cell):
 
 			# If this is my column
 			if c.isSource(node):
-				sIndex = i # This is the source column
-				logger.log('{} is source for cell #{}', node, i)
-				stillMissing = False
-				yield Box(_oneColor(sIndex), orientation.SOURCE, orientation.EMPTY)
+				self.sIndex = i # This is the source column
+				self.logger.log('{} is source for cell #{}', node, i)
+				self.stillMissing = False
+				yield Box(_oneColor(self.sIndex), orientation.SOURCE, orientation.EMPTY)
 				continue
 
 			# Am I straight below the source?
 			if c.isWaitingFor(node):
-				sIndex = i # Source is above
-				logger.log('{} is in list for cell #{}', node, i)
+				self.sIndex = i # Source is above
+				self.logger.log('{} is in list for cell #{}', node, i)
 				c.markSeen(node) # Above us, the parent has seen one child
 
 				if c.isMerge() and not c.isDoneWaiting():
-					yield Box(_oneColor(sIndex), orientation.RMERGE, orientation.LARROW)
-				elif childSeen:
-					yield Box(_oneColor(sIndex), orientation.BROTHER, orientation.LARROW)
+					yield Box(_oneColor(self.sIndex), orientation.RMERGE, orientation.LARROW)
+				elif self.childSeen:
+					yield Box(_oneColor(self.sIndex), orientation.BROTHER, orientation.LARROW)
 				else:
-					yield Box(_oneColor(sIndex), orientation.LCORNER, orientation.LARROW)
+					yield Box(_oneColor(self.sIndex), orientation.LCORNER, orientation.LARROW)
 
-				childSeen = True
+				self.childSeen = True
 				continue
 
 			# We have no relation, but arrows may pass through this cell
 			isDoneWaiting = c.isDoneWaiting()
-			logger.log('{} is unrelated to cell #{}', node, i)
-			logger.log('Cell #{} has {}seen a child, is {}done waiting for parents', i, '' if childSeen else 'not ', '' if isDoneWaiting else 'not ')
+			self.logger.log('{} is unrelated to cell #{}', node, i)
+			self.logger.log('Cell #{} has {}seen a child, is {}done waiting for parents', i, '' if self.childSeen else 'not ', '' if isDoneWaiting else 'not ')
 
 			if isDoneWaiting:
-				if childSeen:
-					yield Box(_oneColor(sIndex), orientation.LARROW, orientation.LARROW)
+				if self.childSeen:
+					yield Box(_oneColor(self.sIndex), orientation.LARROW, orientation.LARROW)
 				else:
-					yield Box(_oneColor(sIndex), orientation.EMPTY, orientation.EMPTY)
-			elif childSeen:
-				yield Box(_twoColors(i, sIndex), orientation.PIPE, orientation.LARROW)
+					yield Box(_oneColor(self.sIndex), orientation.EMPTY, orientation.EMPTY)
+			elif self.childSeen:
+				yield Box(_twoColors(i, self.sIndex), orientation.PIPE, orientation.LARROW)
 			else:
-				yield Box(_twoColors(i, sIndex), orientation.PIPE, orientation.EMPTY)
+				yield Box(_twoColors(i, self.sIndex), orientation.PIPE, orientation.EMPTY)
 
 		# No column was available, make a new one
-		if stillMissing:
-			logger.log('No cell was available for #{}, making one', node)
+		if self.stillMissing:
+			self.logger.log('No cell was available for #{}, making one', node)
 			self.cell.append(SimpleCell(node))
 			yield Box(_oneColor(sIndex), orientation.SOURCE, orientation.EMPTY)
 
