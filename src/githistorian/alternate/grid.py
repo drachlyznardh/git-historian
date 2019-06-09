@@ -1,19 +1,10 @@
 
-# Base class for all cells
-class BaseCell:
-
-	def isSource(self, node): raise NotImplemented()
-	def isWaitingFor(self, node): raise NotImplemented()
-	def isOnlyWaitingFor(self, node): raise NotImplemented()
-	def isDoneWaiting(self): raise NotImplemented()
-	def markSeen(self, node): raise NotImplemented()
-
 # A cell to always accept any node
-class AnyCell(BaseCell):
+class AnyCell:
 	def isSource(self, node): return True
 	def isDoneWaiting(self): return False
 
-class SimpleCell(BaseCell):
+class SimpleCell:
 	def __init__(self, node):
 		self._source = node.topName
 		self._isMerge = len(node.parents) > 1
