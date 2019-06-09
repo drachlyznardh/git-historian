@@ -61,11 +61,8 @@ class BaseGrid:
 			self.cell.extend([Box((0, 0), orientation.EMPTY, orientation.EMPTY) for e in range(gridWidth - l)])
 			logger.log('After {}', self.cell)
 
-		# TODO please describe what is happening down there, it's scary!
+		# Collect lines of boxes and unpack them into usable layouts, which are passed to each node
 		def dump(self, db, width, orientation, logger):
-
-			# Expand odd cell to width
-			def _expand(s, w): return [e * w for e in s]
 
 			# Compute index of last column, which must not be expanded
 			lastColumn = len(self.cell) -1
