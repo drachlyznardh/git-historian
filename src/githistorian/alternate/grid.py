@@ -110,9 +110,10 @@ class BaseGrid:
 				logger.log('{} is source for cell #{}', node, i)
 				stillMissing = False
 				yield Box(_oneColor(sIndex), orientation.SOURCE, orientation.EMPTY)
+				continue
 
 			# Am I straight below the source?
-			elif c.isWaitingFor(node):
+			if c.isWaitingFor(node):
 				sIndex = i # Source is above
 				logger.log('{} is in list for cell #{}', node, i)
 				c.markSeen(node) # Above us, the parent has seen one child
@@ -125,21 +126,21 @@ class BaseGrid:
 					yield Box(_oneColor(sIndex), orientation.LCORNER, orientation.LARROW)
 
 				childSeen = True
+				continue
 
 			# We have no relation, but arrows may pass through this cell
-			else:
-				logger.log('{} is unrelated to cell #{}', node, i)
-				logger.log('Cell #{} has {}seen a child, is {}done waiting for parents', i, '' if childSeen else 'not ', '' if c.isDoneWaiting() else 'not ')
+			logger.log('{} is unrelated to cell #{}', node, i)
+			logger.log('Cell #{} has {}seen a child, is {}done waiting for parents', i, '' if childSeen else 'not ', '' if c.isDoneWaiting() else 'not ')
 
-				if c.isDoneWaiting():
-					if childSeen:
-						yield Box(_oneColor(sIndex), orientation.LARROW, orientation.LARROW)
-					else:
-						yield Box(_oneColor(sIndex), orientation.EMPTY, orientation.EMPTY)
-				elif childSeen:
-					yield Box(_twoColors(i, sIndex), orientation.PIPE, orientation.LARROW)
+			if c.isDoneWaiting():
+				if childSeen:
+					yield Box(_oneColor(sIndex), orientation.LARROW, orientation.LARROW)
 				else:
-					yield Box(_twoColors(i, sIndex), orientation.PIPE, orientation.EMPTY)
+					yield Box(_oneColor(sIndex), orientation.EMPTY, orientation.EMPTY)
+			elif childSeen:
+				yield Box(_twoColors(i, sIndex), orientation.PIPE, orientation.LARROW)
+			else:
+				yield Box(_twoColors(i, sIndex), orientation.PIPE, orientation.EMPTY)
 
 		# No column was available, make a new one
 		if stillMissing:
