@@ -91,6 +91,118 @@ class BaseGrid:
 		self.cell = cell
 		self.rows = rows
 
+	# Compose a row by computing all available cell
+	def compose(self, node, orientation, logger):
+
+		def _color(i): return 31 + i % 6 # Helper function to set the color
+		def _oneColor(i): return _color(i), _color(i)
+		def _twoColors(i, j): return _color(i), _color(j)
+
+		sIndex = 0 # Column of source node
+		stillMissing = True
+		childSeen = False
+
+		for i, c in enumerate(self.cell):
+
+			# If this is my column
+			if c.isSource(node):
+				sIndex = i # This is the source column
+				logger.log('{} is source for cell #{}', node, i)
+				stillMissing = False
+				yield Box(_oneColor(sIndex), orientation.SOURCE, orientation.EMPTY)
+
+			# Am I straight below the source?
+			elif c.isWaitingFor(node):
+				sIndex = i # Source is above
+				logger.log('{} is in list for cell #{}', node, i)
+				c.markSeen(node) # Above us, the parent has seen one child
+
+				if c.isMerge() and not c.isDoneWaiting():
+					yield Box(_oneColor(sIndex), orientation.RMERGE, orientation.LARROW)
+				elif childSeen:
+					yield Box(_oneColor(sIndex), orientation.BROTHER, orientation.LARROW)
+				else:
+					yield Box(_oneColor(sIndex), orientation.LCORNER, orientation.LARROW)
+
+				childSeen = True
+
+			# We have no relation, but arrows may pass through this cell
+			else:
+				logger.log('{} is unrelated to cell #{}', node, i)
+				logger.log('Cell #{} has {}seen a child, is {}done waiting for parents', i, '' if childSeen else 'not ', '' if c.isDoneWaiting() else 'not ')
+
+				if c.isDoneWaiting():
+					if childSeen:
+						yield Box(_oneColor(sIndex), orientation.LARROW, orientation.LARROW)
+					else:
+						yield Box(_oneColor(sIndex), orientation.EMPTY, orientation.EMPTY)
+				elif childSeen:
+					yield Box(_twoColors(i, sIndex), orientation.PIPE, orientation.LARROW)
+				else:
+					yield Box(_twoColors(i, sIndex), orientation.PIPE, orientation.EMPTY)
+
+		# No column was available, make a new one
+		if stillMissing:
+			logger.log('No cell was available for #{}, making one', node)
+			self.cell.append(SimpleCell(node))
+			yield Box(_oneColor(sIndex), orientation.SOURCE, orientation.EMPTY)
+
+	# Visit the graph and populate the grid
+	def unroll(self, visitClass, heads, db, orientation, vflip, logger):
+
+		visit = visitClass(heads, db, logger -2)
+
+		while visit:
+			e = visit.pop()
+			logger.log('{} unrolling {}', self.__class__.__name__, e)
+			self.dealWith(e, orientation, logger -1)
+			logger.log('Appending {} to visit', e.parents)
+			visit.push([db[p] for p in e.parents])
+
+		return self.done(orientation, vflip, logger)
+
+# This grid is a straight line
+class NoGrid(BaseGrid):
+	def __init__(self): super().__init__([AnyCell()], [])
+
+	def dealWith(self, node, orientation, logger):
+		self.rows.append(self.Row(node.topName, [e for e in self.compose(node, orientation, logger)]))
+
+	def done(self, orientation, flip, logger): return reversed(self.rows) if flip else self.rows
+
+# This grid is a straight line, with vertical ordering
+class StraightGrid(BaseGrid):
+	def __init__(self): super().__init__([AnyCell()], [])
+
+	def dealWith(self, node, orientation, logger):
+		self.rows.append(self.Row(node.topName, [e for e in self.compose(node, orientation, logger)]))
+
+	def done(self, orientation, flip, logger): return reversed(self.rows) if flip else self.rows
+
+# This grid is simple and dumb, it assigns a new column to each chain
+class StairsGrid(BaseGrid):
+	def __init__(self):
+		super().__init__([], [])
+		self.width = 0
+
+	# Append new column for each node, immediately define its row
+	def dealWith(self, node, orientation, logger):
+		self.cell.append(SimpleCell(node))
+		self.width = max(self.width, len(self.cell))
+		self.rows.append(self.Row(node.topName, [e for e in self.compose(node, orientation, logger)]))
+		logger.log('Current width is {}', self.width)
+
+	# No post-processing, just extend cell to the limit for alignment
+	def done(self, orientation, flip, logger):
+		for r in self.rows: r.extend(orientation, self.width, logger -2)
+		return reversed(self.rows) if flip else self.rows
+
+# This grid is ugly, but close to natural
+class UglyGrid(BaseGrid):
+	def __init__(self):
+		super().__init__([], [])
+		self.width = 0
+
 	# Verify whether given node is a branching point. True when given node is
 	# the only node in all waiting lists in which it appears
 	def isBranchingPoint(self, node):
@@ -172,62 +284,6 @@ class BaseGrid:
 			logger.log('No cell was available for #{}, making one', node)
 			self.cell.append(SimpleCell(node))
 			yield Box(_oneColor(sIndex), orientation.SOURCE, orientation.EMPTY)
-
-	# Visit the graph and populate the grid
-	def unroll(self, visitClass, heads, db, orientation, vflip, logger):
-
-		visit = visitClass(heads, db, logger -2)
-
-		while visit:
-			e = visit.pop()
-			logger.log('{} unrolling {}', self.__class__.__name__, e)
-			self.dealWith(e, orientation, logger -1)
-			logger.log('Appending {} to visit', e.parents)
-			visit.push([db[p] for p in e.parents])
-
-		return self.done(orientation, vflip, logger)
-
-# This grid is a straight line
-class NoGrid(BaseGrid):
-	def __init__(self): super().__init__([AnyCell()], [])
-
-	def dealWith(self, node, orientation, logger):
-		self.rows.append(self.Row(node.topName, [e for e in self.compose(node, orientation, logger)]))
-
-	def done(self, orientation, flip, logger): return reversed(self.rows) if flip else self.rows
-
-# This grid is a straight line, with vertical ordering
-class StraightGrid(BaseGrid):
-	def __init__(self): super().__init__([AnyCell()], [])
-
-	def dealWith(self, node, orientation, logger):
-		self.rows.append(self.Row(node.topName, [e for e in self.compose(node, orientation, logger)]))
-
-	def done(self, orientation, flip, logger): return reversed(self.rows) if flip else self.rows
-
-# This grid is simple and dumb, it assigns a new column to each chain
-class StairsGrid(BaseGrid):
-	def __init__(self):
-		super().__init__([], [])
-		self.width = 0
-
-	# Append new column for each node, immediately define its row
-	def dealWith(self, node, orientation, logger):
-		self.cell.append(SimpleCell(node))
-		self.width = max(self.width, len(self.cell))
-		self.rows.append(self.Row(node.topName, [e for e in self.compose(node, orientation, logger)]))
-		logger.log('Current width is {}', self.width)
-
-	# No post-processing, just extend cell to the limit for alignment
-	def done(self, orientation, flip, logger):
-		for r in self.rows: r.extend(orientation, self.width, logger -2)
-		return reversed(self.rows) if flip else self.rows
-
-# This grid is ugly, but close to natural
-class UglyGrid(BaseGrid):
-	def __init__(self):
-		super().__init__([], [])
-		self.width = 0
 
 	# Append new column for each node, immediately define its row
 	def dealWith(self, node, orientation, logger):
