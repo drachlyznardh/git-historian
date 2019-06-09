@@ -70,22 +70,13 @@ class BaseGrid:
 			# Compute index of last column, which must not be expanded
 			lastColumn = len(self.cell) -1
 
+			# Each chain can dump its content according to the layout emerging
+			# from the cell List of (colors and stacks of symbols) is zipped to
+			# lists of (colors and symbols), node description marker is
+			# appended
 			return db[self.nodeName].dump(orientation, [
-				'{}{}'.format(''.join(e), '\x1b[m{}\x1b[m') for e in zip(*[ box.unpack(width if lastColumn - index else 1) for index, box in enumerate(self.cell) ])
-			], logger)
-
-			# Each chain can dump its content according to the layout emerging from the cell
-			return db[self.nodeName].dump(orientation, [
-
-					# List of (colors and stacks of symbols) is zipped to lists of (colors and symbols), node description marker is appended
-					''.join(e) + '\x1b[m{}\x1b[m' for e in zip(*[(
-					ce + e1 + co + o1, ce + e2 + co + o2) for (
-					ce, co),
-					(e1, e2),
-					(o1, o2) in [
-
-						# Columns (one color and two stacks of symbols) are extracted one by one. Odd stacks are expanded to width
-						(c, e, _expand(o, width if lastColumn - i else 1)) for i, (c, e, o) in enumerate(self.cell)]])], logger)
+					'{}{}'.format(''.join(e), '\x1b[m{}\x1b[m') for e in zip(*[ box.unpack(width if lastColumn - index else 1) for index, box in enumerate(self.cell) ])
+				], logger)
 
 	def __init__(self, cell, rows):
 		self.cell = cell
