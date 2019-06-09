@@ -1,5 +1,5 @@
-#1 5 2#[31mRelease
-#2 4 3#[34mDevel
-#3 4#[34mDevel
-#4 5#[34mDevel
-#5 #[33mBase
+#1 5 2#[m(1) [31mRelease
+#2 4 3#[m(2) [34mDevel
+#3 4#[m(3) [34mDevel
+#4 5#[m(4) [34mDevel
+#5 #[m(5) [33mBase
