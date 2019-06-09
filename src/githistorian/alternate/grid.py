@@ -129,10 +129,11 @@ class BaseGrid:
 				continue
 
 			# We have no relation, but arrows may pass through this cell
+			isDoneWaiting = c.isDoneWaiting()
 			logger.log('{} is unrelated to cell #{}', node, i)
-			logger.log('Cell #{} has {}seen a child, is {}done waiting for parents', i, '' if childSeen else 'not ', '' if c.isDoneWaiting() else 'not ')
+			logger.log('Cell #{} has {}seen a child, is {}done waiting for parents', i, '' if childSeen else 'not ', '' if isDoneWaiting else 'not ')
 
-			if c.isDoneWaiting():
+			if isDoneWaiting:
 				if childSeen:
 					yield Box(_oneColor(sIndex), orientation.LARROW, orientation.LARROW)
 				else:
@@ -235,9 +236,10 @@ class UglyGrid(BaseGrid):
 				logger.log('{} is source for cell #{}', node, i)
 				stillMissing = False
 				yield Box(_oneColor(sIndex), orientation.SOURCE, orientation.EMPTY)
+				continue
 
 			# Am I straight below the source?
-			elif c.isWaitingFor(node):
+			if c.isWaitingFor(node):
 				sIndex = i # Source is above
 				logger.log('{} is in list for cell #{}', node, i)
 
@@ -265,22 +267,23 @@ class UglyGrid(BaseGrid):
 
 				childSeen = True
 				missingChildren -= 1
+				continue
 
 			# We have no relation, but arrows may pass through this cell
-			else:
-				logger.log('{} is unrelated to cell #{}', node, i)
-				logger.log('Cell #{} has {}seen a child, is waiting for {} children and is {}done waiting for parents', i, '' if childSeen else 'not ', missingChildren, '' if c.isDoneWaiting() else 'not ')
-				if childSeen:
-					if c.isDoneWaiting():
-						yield Box(_oneColor(sIndex), orientation.LARROW, orientation.LARROW)
-					else:
-						yield Box(_twoColors(i, sIndex), orientation.PIPE, orientation.LARROW)
-				elif c.isDoneWaiting():
-					yield Box(_oneColor(sIndex), orientation.EMPTY, orientation.EMPTY)
-				else:
-					yield Box(_twoColors(i, sIndex), orientation.PIPE, orientation.EMPTY)
+			isDoneWaiting = c.isDoneWaiting()
+			logger.log('{} is unrelated to cell #{}', node, i)
+			logger.log('Cell #{} has {}seen a child, is waiting for {} children and is {}done waiting for parents', i, '' if childSeen else 'not ', missingChildren, '' if isDoneWaiting else 'not ')
 
-		# No column was available, make a new one
+			if isDoneWaiting:
+				if childSeen:
+					yield Box(_oneColor(sIndex), orientation.LARROW, orientation.LARROW)
+				else:
+					yield Box(_oneColor(sIndex), orientation.EMPTY, orientation.EMPTY)
+			elif childSeen:
+				yield Box(_twoColors(i, sIndex), orientation.PIPE, orientation.LARROW)
+			else:
+				yield Box(_twoColors(i, sIndex), orientation.PIPE, orientation.EMPTY)
+
 		if stillMissing:
 			logger.log('No cell was available for #{}, making one', node)
 			self.cell.append(SimpleCell(node))
